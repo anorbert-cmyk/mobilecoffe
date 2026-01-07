@@ -19,6 +19,7 @@ import type { EdgeInsets, Metrics, Rect } from "react-native-safe-area-context";
 import { trpc, createTRPCClient } from "@/lib/trpc";
 import { initManusRuntime, subscribeSafeAreaInsets } from "@/lib/_core/manus-runtime";
 import { UserProfileProvider } from "@/lib/user-profile";
+import { useColors } from "@/hooks/use-colors";
 
 const DEFAULT_WEB_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 };
 const DEFAULT_WEB_FRAME: Rect = { x: 0, y: 0, width: 0, height: 0 };
@@ -26,6 +27,131 @@ const DEFAULT_WEB_FRAME: Rect = { x: 0, y: 0, width: 0, height: 0 };
 export const unstable_settings = {
   anchor: "(tabs)",
 };
+
+function AppStack() {
+  const colors = useColors();
+  
+  // Apple HIG compliant header style
+  const defaultHeaderOptions = {
+    headerShown: true,
+    headerBackTitle: "Back",
+    headerBackTitleVisible: true,
+    headerTintColor: colors.primary,
+    headerStyle: { 
+      backgroundColor: colors.background,
+    },
+    headerTitleStyle: {
+      fontWeight: '600' as const,
+      fontSize: 17,
+      color: colors.foreground,
+    },
+    headerShadowVisible: false,
+    // Enable swipe-to-go-back gesture (iOS standard)
+    gestureEnabled: true,
+    // Animation style
+    animation: 'slide_from_right' as const,
+  };
+
+  return (
+    <>
+      <Stack 
+        screenOptions={{ 
+          ...defaultHeaderOptions,
+          headerShown: false, // Default to hidden, screens opt-in
+        }}
+      >
+        {/* Tab navigator - no header */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        
+        {/* Onboarding - no back gesture */}
+        <Stack.Screen 
+          name="onboarding/index" 
+          options={{ 
+            headerShown: false,
+            gestureEnabled: false,
+          }} 
+        />
+        
+        {/* OAuth callback - no header */}
+        <Stack.Screen name="oauth/callback" options={{ headerShown: false }} />
+        
+        {/* Coffee detail - with header */}
+        <Stack.Screen 
+          name="coffee/[id]" 
+          options={{
+            ...defaultHeaderOptions,
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: "",
+            headerStyle: { backgroundColor: 'transparent' },
+          }} 
+        />
+        
+        {/* Machine detail - with header */}
+        <Stack.Screen 
+          name="machine/[id]" 
+          options={{
+            ...defaultHeaderOptions,
+            headerShown: true,
+          }} 
+        />
+        
+        {/* Grinder detail - with header */}
+        <Stack.Screen 
+          name="grinder/[id]" 
+          options={{
+            ...defaultHeaderOptions,
+            headerShown: true,
+          }} 
+        />
+        
+        {/* Learn article/category detail - with header */}
+        <Stack.Screen 
+          name="learn/[id]" 
+          options={{
+            ...defaultHeaderOptions,
+            headerShown: true,
+          }} 
+        />
+        
+        {/* Equipment wizard - with header and back */}
+        <Stack.Screen 
+          name="equipment-wizard" 
+          options={{
+            ...defaultHeaderOptions,
+            headerShown: true,
+            headerTitle: "Equipment Finder",
+            presentation: 'card',
+          }} 
+        />
+        
+        {/* Recommendations - with header and back */}
+        <Stack.Screen 
+          name="recommendations" 
+          options={{
+            ...defaultHeaderOptions,
+            headerShown: true,
+            headerTitle: "Your Recommendations",
+          }} 
+        />
+        
+        {/* Profile settings - with header */}
+        <Stack.Screen 
+          name="profile" 
+          options={{
+            ...defaultHeaderOptions,
+            headerShown: true,
+            headerTitle: "Profile Settings",
+          }} 
+        />
+        
+        {/* App index (onboarding check) - no header */}
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack>
+      <StatusBar style="auto" />
+    </>
+  );
+}
 
 export default function RootLayout() {
   const initialInsets = initialWindowMetrics?.insets ?? DEFAULT_WEB_INSETS;
@@ -84,14 +210,7 @@ export default function RootLayout() {
       <UserProfileProvider>
         <trpc.Provider client={trpcClient} queryClient={queryClient}>
           <QueryClientProvider client={queryClient}>
-            {/* Default to hiding native headers so raw route segments don't appear (e.g. "(tabs)", "products/[id]"). */}
-            {/* If a screen needs the native header, explicitly enable it and set a human title via Stack.Screen options. */}
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="onboarding/index" options={{ gestureEnabled: false }} />
-              <Stack.Screen name="oauth/callback" />
-            </Stack>
-            <StatusBar style="auto" />
+            <AppStack />
           </QueryClientProvider>
         </trpc.Provider>
       </UserProfileProvider>

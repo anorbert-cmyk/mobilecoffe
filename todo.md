@@ -96,3 +96,12 @@
 - [x] Implement horizontal scrolling categories
 - [x] Add large card design with rich visuals
 - [x] Polish animations and transitions
+
+
+## v6 Apple HIG Compliance Audit
+- [x] Audit all screens for back button navigation
+- [x] Update tab bar to iOS 26 style (Liquid Glass)
+- [x] Ensure consistent navigation patterns
+- [x] Add back buttons to all detail/sub screens
+- [x] Verify swipe-to-go-back gesture support
+- [x] Check tab bar icon sizes and spacing per HIG
