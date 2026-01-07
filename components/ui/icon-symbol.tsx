@@ -62,6 +62,19 @@ const MAPPING = {
   "phone.fill": "phone",
   "globe": "language",
   "clock.fill": "schedule",
+  
+  // Theme/Appearance
+  "sun.max.fill": "light-mode",
+  "moon.fill": "dark-mode",
+  "circle.lefthalf.filled": "contrast",
+  "paintbrush.fill": "brush",
+  
+  // Profile
+  "person.fill": "person",
+  "gearshape.2.fill": "settings",
+  "dollarsign.circle.fill": "attach-money",
+  "sparkles": "auto-awesome",
+  "arrow.counterclockwise": "refresh",
 } as IconMapping;
 
 /**

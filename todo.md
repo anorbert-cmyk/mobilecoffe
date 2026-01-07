@@ -105,3 +105,11 @@
 - [x] Add back buttons to all detail/sub screens
 - [x] Verify swipe-to-go-back gesture support
 - [x] Check tab bar icon sizes and spacing per HIG
+
+
+## v7 Dark Mode Toggle
+- [x] Extend ThemeProvider with manual theme switching
+- [x] Create theme selector UI in Profile screen (Light/Dark/Auto)
+- [x] Persist theme preference to AsyncStorage
+- [x] Add smooth transition animation between themes
+- [x] Test dark mode across all screens

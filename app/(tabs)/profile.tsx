@@ -13,15 +13,35 @@ import {
   getBudgetLabel,
   getPurposeLabel 
 } from '@/lib/user-profile';
+import { useThemeContext, ThemePreference } from '@/lib/theme-provider';
+
+type ThemeOption = {
+  value: ThemePreference;
+  label: string;
+  icon: string;
+  description: string;
+};
+
+const THEME_OPTIONS: ThemeOption[] = [
+  { value: 'light', label: 'Light', icon: 'sun.max.fill', description: 'Always light' },
+  { value: 'dark', label: 'Dark', icon: 'moon.fill', description: 'Always dark' },
+  { value: 'auto', label: 'Auto', icon: 'circle.lefthalf.filled', description: 'Follow system' },
+];
 
 export default function ProfileScreen() {
   const colors = useColors();
   const { profile, resetProfile } = useUserProfile();
+  const { themePreference, setThemePreference } = useThemeContext();
 
   const triggerHaptic = () => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
+  };
+
+  const handleThemeChange = (newTheme: ThemePreference) => {
+    triggerHaptic();
+    setThemePreference(newTheme);
   };
 
   const handleEquipmentWizard = () => {
@@ -106,6 +126,77 @@ export default function ProfileScreen() {
                 </Text>
               </View>
             )}
+          </View>
+        </Animated.View>
+
+        {/* Appearance Section - Dark Mode Toggle */}
+        <Animated.View 
+          entering={FadeInDown.delay(150).duration(400)}
+          style={styles.section}
+        >
+          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+            Appearance
+          </Text>
+          
+          <View style={[styles.themeCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.themeHeader}>
+              <View style={[styles.themeIconWrapper, { backgroundColor: colors.primary + '20' }]}>
+                <IconSymbol name="paintbrush.fill" size={20} color={colors.primary} />
+              </View>
+              <View style={styles.themeHeaderText}>
+                <Text style={[styles.themeTitle, { color: colors.foreground }]}>
+                  Theme
+                </Text>
+                <Text style={[styles.themeDescription, { color: colors.muted }]}>
+                  Choose your preferred appearance
+                </Text>
+              </View>
+            </View>
+            
+            <View style={styles.themeOptions}>
+              {THEME_OPTIONS.map((option) => {
+                const isSelected = themePreference === option.value;
+                return (
+                  <Pressable
+                    key={option.value}
+                    onPress={() => handleThemeChange(option.value)}
+                    style={({ pressed }) => [
+                      styles.themeOption,
+                      {
+                        backgroundColor: isSelected 
+                          ? colors.primary 
+                          : colors.background,
+                        borderColor: isSelected 
+                          ? colors.primary 
+                          : colors.border,
+                        transform: [{ scale: pressed ? 0.96 : 1 }],
+                      },
+                    ]}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: isSelected }}
+                    accessibilityLabel={`${option.label} theme: ${option.description}`}
+                  >
+                    <IconSymbol 
+                      name={option.icon as any} 
+                      size={24} 
+                      color={isSelected ? '#FFFFFF' : colors.muted} 
+                    />
+                    <Text style={[
+                      styles.themeOptionLabel,
+                      { color: isSelected ? '#FFFFFF' : colors.foreground }
+                    ]}>
+                      {option.label}
+                    </Text>
+                    <Text style={[
+                      styles.themeOptionDescription,
+                      { color: isSelected ? 'rgba(255,255,255,0.8)' : colors.muted }
+                    ]}>
+                      {option.description}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
         </Animated.View>
 
@@ -329,6 +420,60 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     letterSpacing: -0.2,
   },
+  // Theme selector styles
+  themeCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 20,
+  },
+  themeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 20,
+  },
+  themeIconWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  themeHeaderText: {
+    flex: 1,
+  },
+  themeTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  themeDescription: {
+    fontSize: 13,
+    marginTop: 2,
+  },
+  themeOptions: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  themeOption: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    gap: 6,
+  },
+  themeOptionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  themeOptionDescription: {
+    fontSize: 11,
+    textAlign: 'center',
+  },
+  // Primary action card
   primaryActionCard: {
     borderRadius: 20,
     padding: 20,
@@ -449,8 +594,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: 'center',
-    paddingTop: 24,
-    paddingBottom: 40,
+    paddingVertical: 24,
     gap: 4,
   },
   footerText: {
