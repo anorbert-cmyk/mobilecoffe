@@ -1,17 +1,21 @@
 import { useState, useCallback } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Platform } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { 
   FadeIn, 
   FadeOut, 
   SlideInRight, 
   SlideOutLeft,
+  SlideInLeft,
   useAnimatedStyle,
   withSpring,
   useSharedValue,
+  withTiming,
+  Easing,
 } from 'react-native-reanimated';
 
 import { ScreenContainer } from '@/components/screen-container';
@@ -25,7 +29,7 @@ import {
   CoffeePurpose 
 } from '@/lib/user-profile';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Onboarding step types
 type OnboardingStep = 
@@ -60,6 +64,7 @@ export default function OnboardingScreen() {
   const [wantsToBuy, setWantsToBuy] = useState<boolean | null>(null);
   const [budget, setBudget] = useState<BudgetRange | null>(null);
   const [purposes, setPurposes] = useState<CoffeePurpose[]>([]);
+  const [direction, setDirection] = useState<'forward' | 'back'>('forward');
 
   const triggerHaptic = useCallback(() => {
     if (Platform.OS !== 'web') {
@@ -81,18 +86,46 @@ export default function OnboardingScreen() {
 
   const goToNextStep = useCallback((nextStepId: OnboardingStep) => {
     triggerHaptic();
+    setDirection('forward');
     setCurrentStep(nextStepId);
   }, [triggerHaptic]);
+
+  const goBack = useCallback(() => {
+    triggerHaptic();
+    setDirection('back');
+    
+    const stepOrder: OnboardingStep[] = ['welcome', 'experience', 'equipment-interest', 'budget', 'purpose', 'complete'];
+    const currentIndex = stepOrder.indexOf(currentStep);
+    
+    if (currentStep === 'purpose') {
+      if (experienceLevel === 'beginner' && wantsToBuy) {
+        setCurrentStep('budget');
+      } else if (experienceLevel === 'beginner') {
+        setCurrentStep('equipment-interest');
+      } else {
+        setCurrentStep('experience');
+      }
+    } else if (currentStep === 'budget') {
+      setCurrentStep('equipment-interest');
+    } else if (currentStep === 'equipment-interest') {
+      setCurrentStep('experience');
+    } else if (currentStep === 'experience') {
+      setCurrentStep('welcome');
+    } else if (currentStep === 'complete') {
+      setCurrentStep('purpose');
+    }
+  }, [currentStep, experienceLevel, wantsToBuy, triggerHaptic]);
 
   const handleExperienceSelect = async (level: ExperienceLevel) => {
     triggerHaptic();
     setExperienceLevel(level);
     await updateProfile({ experienceLevel: level });
     
+    setDirection('forward');
     if (level === 'beginner') {
-      goToNextStep('equipment-interest');
+      setCurrentStep('equipment-interest');
     } else {
-      goToNextStep('purpose');
+      setCurrentStep('purpose');
     }
   };
 
@@ -101,10 +134,11 @@ export default function OnboardingScreen() {
     setWantsToBuy(wants);
     await updateProfile({ wantsToBuyEquipment: wants });
     
+    setDirection('forward');
     if (wants) {
-      goToNextStep('budget');
+      setCurrentStep('budget');
     } else {
-      goToNextStep('purpose');
+      setCurrentStep('purpose');
     }
   };
 
@@ -112,7 +146,8 @@ export default function OnboardingScreen() {
     triggerHaptic();
     setBudget(selectedBudget);
     await updateProfile({ budgetRange: selectedBudget });
-    goToNextStep('purpose');
+    setDirection('forward');
+    setCurrentStep('purpose');
   };
 
   const handlePurposeToggle = (purpose: CoffeePurpose) => {
@@ -128,7 +163,8 @@ export default function OnboardingScreen() {
   const handlePurposeContinue = async () => {
     triggerHaptic();
     await updateProfile({ coffeePurpose: purposes });
-    goToNextStep('complete');
+    setDirection('forward');
+    setCurrentStep('complete');
   };
 
   const handleComplete = async () => {
@@ -140,33 +176,59 @@ export default function OnboardingScreen() {
   const visibleSteps = getVisibleSteps();
   const currentIndex = getCurrentStepIndex();
   const progress = (currentIndex + 1) / visibleSteps.length;
+  const canGoBack = currentStep !== 'welcome';
+
+  const enteringAnimation = direction === 'forward' ? SlideInRight.duration(350) : SlideInLeft.duration(350);
+  const exitingAnimation = direction === 'forward' ? SlideOutLeft.duration(250) : SlideOutLeft.duration(250);
 
   return (
-    <ScreenContainer edges={['top', 'bottom', 'left', 'right']}>
-      {/* Progress Bar */}
-      {currentStep !== 'welcome' && currentStep !== 'complete' && (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Premium Header with Back Button */}
+      {currentStep !== 'welcome' && (
         <Animated.View 
-          entering={FadeIn}
-          style={styles.progressContainer}
+          entering={FadeIn.duration(300)}
+          style={styles.header}
         >
-          <View style={[styles.progressTrack, { backgroundColor: colors.surface }]}>
-            <Animated.View 
-              style={[
-                styles.progressFill, 
+          {canGoBack && currentStep !== 'complete' && (
+            <Pressable
+              onPress={goBack}
+              style={({ pressed }) => [
+                styles.backButton,
                 { 
-                  backgroundColor: colors.primary,
-                  width: `${progress * 100}%`,
-                }
-              ]} 
-            />
-          </View>
-          <Text style={[styles.progressText, { color: colors.muted }]}>
-            Step {currentIndex + 1} of {visibleSteps.length}
-          </Text>
+                  backgroundColor: colors.surface,
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
+              <IconSymbol name="chevron.left" size={20} color={colors.foreground} />
+            </Pressable>
+          )}
+          
+          {/* Progress Indicator */}
+          {currentStep !== 'complete' && (
+            <View style={styles.progressWrapper}>
+              <View style={[styles.progressTrack, { backgroundColor: colors.surface }]}>
+                <Animated.View 
+                  style={[
+                    styles.progressFill, 
+                    { 
+                      backgroundColor: colors.primary,
+                      width: `${progress * 100}%`,
+                    }
+                  ]} 
+                />
+              </View>
+              <Text style={[styles.progressText, { color: colors.muted }]}>
+                {currentIndex + 1} / {visibleSteps.length}
+              </Text>
+            </View>
+          )}
         </Animated.View>
       )}
 
-      {/* Welcome Step */}
+      {/* Welcome Step - Premium Design */}
       {currentStep === 'welcome' && (
         <WelcomeStep 
           colors={colors} 
@@ -176,55 +238,85 @@ export default function OnboardingScreen() {
 
       {/* Experience Level Step */}
       {currentStep === 'experience' && (
-        <ExperienceStep 
-          colors={colors} 
-          onSelect={handleExperienceSelect}
-        />
+        <Animated.View 
+          key="experience"
+          entering={enteringAnimation}
+          style={styles.stepContainer}
+        >
+          <ExperienceStep 
+            colors={colors} 
+            onSelect={handleExperienceSelect}
+          />
+        </Animated.View>
       )}
 
       {/* Equipment Interest Step */}
       {currentStep === 'equipment-interest' && (
-        <EquipmentInterestStep 
-          colors={colors} 
-          onSelect={handleEquipmentInterest}
-        />
+        <Animated.View 
+          key="equipment"
+          entering={enteringAnimation}
+          style={styles.stepContainer}
+        >
+          <EquipmentInterestStep 
+            colors={colors} 
+            onSelect={handleEquipmentInterest}
+          />
+        </Animated.View>
       )}
 
       {/* Budget Step */}
       {currentStep === 'budget' && (
-        <BudgetStep 
-          colors={colors} 
-          selected={budget}
-          onSelect={handleBudgetSelect}
-        />
+        <Animated.View 
+          key="budget"
+          entering={enteringAnimation}
+          style={styles.stepContainer}
+        >
+          <BudgetStep 
+            colors={colors} 
+            selected={budget}
+            onSelect={handleBudgetSelect}
+          />
+        </Animated.View>
       )}
 
       {/* Purpose Step */}
       {currentStep === 'purpose' && (
-        <PurposeStep 
-          colors={colors} 
-          selected={purposes}
-          onToggle={handlePurposeToggle}
-          onContinue={handlePurposeContinue}
-        />
+        <Animated.View 
+          key="purpose"
+          entering={enteringAnimation}
+          style={styles.stepContainer}
+        >
+          <PurposeStep 
+            colors={colors} 
+            selected={purposes}
+            onToggle={handlePurposeToggle}
+            onContinue={handlePurposeContinue}
+          />
+        </Animated.View>
       )}
 
       {/* Complete Step */}
       {currentStep === 'complete' && (
-        <CompleteStep 
-          colors={colors}
-          experienceLevel={experienceLevel}
-          wantsToBuy={wantsToBuy}
-          budget={budget}
-          purposes={purposes}
-          onComplete={handleComplete}
-        />
+        <Animated.View 
+          key="complete"
+          entering={FadeIn.duration(500)}
+          style={styles.stepContainer}
+        >
+          <CompleteStep 
+            colors={colors}
+            experienceLevel={experienceLevel}
+            wantsToBuy={wantsToBuy}
+            budget={budget}
+            purposes={purposes}
+            onComplete={handleComplete}
+          />
+        </Animated.View>
       )}
-    </ScreenContainer>
+    </View>
   );
 }
 
-// Welcome Step Component
+// Premium Welcome Step Component
 function WelcomeStep({ 
   colors, 
   onContinue 
@@ -234,29 +326,79 @@ function WelcomeStep({
 }) {
   return (
     <Animated.View 
-      entering={FadeIn.duration(600)}
-      style={styles.stepContainer}
+      entering={FadeIn.duration(800)}
+      style={styles.welcomeContainer}
     >
-      <View style={styles.imageContainer}>
+      {/* Hero Image - Full Width */}
+      <View style={styles.heroImageWrapper}>
         <Image
-          source={require('@/assets/images/onboarding/welcome.png')}
-          style={styles.heroImage}
-          contentFit="contain"
+          source={require('@/assets/images/onboarding/welcome_premium.png')}
+          style={styles.heroImageFull}
+          contentFit="cover"
+        />
+        {/* Gradient Overlay */}
+        <LinearGradient
+          colors={['transparent', 'rgba(255,255,255,0.3)', colors.background]}
+          locations={[0, 0.5, 1]}
+          style={styles.heroGradient}
         />
       </View>
       
-      <View style={styles.contentContainer}>
-        <Text 
-          style={[styles.title, { color: colors.foreground }]}
+      {/* Content */}
+      <View style={styles.welcomeContent}>
+        {/* App Logo Badge */}
+        <Animated.View 
+          entering={FadeIn.delay(300).duration(500)}
+          style={[styles.logoBadge, { backgroundColor: colors.primary }]}
+        >
+          <IconSymbol name="cup.and.saucer.fill" size={24} color="#FFFFFF" />
+        </Animated.View>
+
+        <Animated.Text 
+          entering={FadeIn.delay(400).duration(500)}
+          style={[styles.welcomeTitle, { color: colors.foreground }]}
           accessibilityRole="header"
         >
-          Welcome to{'\n'}Coffee Craft
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.muted }]}>
-          Your personal guide to brewing the perfect cup of specialty coffee at home.
-        </Text>
+          Coffee Craft
+        </Animated.Text>
         
-        <View style={styles.buttonContainer}>
+        <Animated.Text 
+          entering={FadeIn.delay(500).duration(500)}
+          style={[styles.welcomeTagline, { color: colors.primary }]}
+        >
+          Master the Art of Specialty Coffee
+        </Animated.Text>
+        
+        <Animated.Text 
+          entering={FadeIn.delay(600).duration(500)}
+          style={[styles.welcomeDescription, { color: colors.muted }]}
+        >
+          Your personal barista guide to brewing café-quality coffee at home. Learn techniques, discover recipes, and find the perfect equipment.
+        </Animated.Text>
+
+        {/* Feature Pills */}
+        <Animated.View 
+          entering={FadeIn.delay(700).duration(500)}
+          style={styles.featurePills}
+        >
+          <View style={[styles.featurePill, { backgroundColor: colors.surface }]}>
+            <IconSymbol name="book.fill" size={14} color={colors.primary} />
+            <Text style={[styles.featurePillText, { color: colors.foreground }]}>12+ Recipes</Text>
+          </View>
+          <View style={[styles.featurePill, { backgroundColor: colors.surface }]}>
+            <IconSymbol name="gearshape.fill" size={14} color={colors.primary} />
+            <Text style={[styles.featurePillText, { color: colors.foreground }]}>Equipment Guide</Text>
+          </View>
+          <View style={[styles.featurePill, { backgroundColor: colors.surface }]}>
+            <IconSymbol name="mappin.circle.fill" size={14} color={colors.primary} />
+            <Text style={[styles.featurePillText, { color: colors.foreground }]}>Find Cafés</Text>
+          </View>
+        </Animated.View>
+        
+        <Animated.View 
+          entering={FadeIn.delay(800).duration(500)}
+          style={styles.welcomeButtonContainer}
+        >
           <PremiumButton
             variant="primary"
             size="lg"
@@ -264,9 +406,13 @@ function WelcomeStep({
             fullWidth
             accessibilityLabel="Get started with Coffee Craft"
           >
-            Get Started
+            Start Your Journey
           </PremiumButton>
-        </View>
+          
+          <Text style={[styles.welcomeFooter, { color: colors.muted }]}>
+            Takes only 30 seconds to personalize
+          </Text>
+        </Animated.View>
       </View>
     </Animated.View>
   );
@@ -280,80 +426,84 @@ function ExperienceStep({
   colors: ReturnType<typeof useColors>;
   onSelect: (level: ExperienceLevel) => void;
 }) {
-  const options: { level: ExperienceLevel; title: string; description: string; image: any }[] = [
+  const options: { level: ExperienceLevel; title: string; description: string; icon: string; color: string }[] = [
     {
       level: 'beginner',
       title: 'Just Starting Out',
-      description: "I'm new to specialty coffee",
-      image: require('@/assets/images/onboarding/beginner.png'),
+      description: "I'm new to specialty coffee and want to learn the basics",
+      icon: 'leaf.fill',
+      color: '#4CAF50',
     },
     {
       level: 'intermediate',
       title: 'Home Brewer',
-      description: 'I make coffee at home sometimes',
-      image: require('@/assets/images/onboarding/intermediate.png'),
+      description: 'I make coffee at home and want to improve my skills',
+      icon: 'flame.fill',
+      color: '#FF9800',
     },
     {
       level: 'advanced',
       title: 'Coffee Enthusiast',
-      description: "I'm passionate about coffee",
-      image: require('@/assets/images/onboarding/advanced.png'),
+      description: "I'm passionate about coffee and seek advanced techniques",
+      icon: 'star.fill',
+      color: '#9C27B0',
     },
   ];
 
   return (
-    <Animated.View 
-      entering={SlideInRight.duration(400)}
-      exiting={SlideOutLeft.duration(300)}
-      style={styles.stepContainer}
+    <ScrollView 
+      style={styles.scrollContainer}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
     >
-      <View style={styles.headerContainer}>
+      <View style={styles.stepHeader}>
         <Text 
           style={[styles.stepTitle, { color: colors.foreground }]}
           accessibilityRole="header"
         >
-          Where are you on your{'\n'}coffee journey?
+          Where are you on your coffee journey?
         </Text>
         <Text style={[styles.stepSubtitle, { color: colors.muted }]}>
-          We'll personalize your experience
+          We'll personalize your experience based on your level
         </Text>
       </View>
 
-      <View style={styles.optionsContainer}>
-        {options.map((option) => (
-          <Pressable
+      <View style={styles.optionsGrid}>
+        {options.map((option, index) => (
+          <Animated.View
             key={option.level}
-            onPress={() => onSelect(option.level)}
-            style={({ pressed }) => [
-              styles.optionCard,
-              { 
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                opacity: pressed ? 0.8 : 1,
-                transform: [{ scale: pressed ? 0.98 : 1 }],
-              },
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel={`${option.title}: ${option.description}`}
+            entering={FadeIn.delay(index * 100).duration(400)}
           >
-            <Image
-              source={option.image}
-              style={styles.optionImage}
-              contentFit="cover"
-            />
-            <View style={styles.optionContent}>
-              <Text style={[styles.optionTitle, { color: colors.foreground }]}>
-                {option.title}
-              </Text>
-              <Text style={[styles.optionDescription, { color: colors.muted }]}>
-                {option.description}
-              </Text>
-            </View>
-            <IconSymbol name="chevron.right" size={20} color={colors.muted} />
-          </Pressable>
+            <Pressable
+              onPress={() => onSelect(option.level)}
+              style={({ pressed }) => [
+                styles.experienceCard,
+                { 
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                  transform: [{ scale: pressed ? 0.98 : 1 }],
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={`${option.title}: ${option.description}`}
+            >
+              <View style={[styles.experienceIconWrapper, { backgroundColor: option.color + '20' }]}>
+                <IconSymbol name={option.icon as any} size={28} color={option.color} />
+              </View>
+              <View style={styles.experienceTextContainer}>
+                <Text style={[styles.experienceTitle, { color: colors.foreground }]}>
+                  {option.title}
+                </Text>
+                <Text style={[styles.experienceDescription, { color: colors.muted }]}>
+                  {option.description}
+                </Text>
+              </View>
+              <IconSymbol name="chevron.right" size={20} color={colors.muted} />
+            </Pressable>
+          </Animated.View>
         ))}
       </View>
-    </Animated.View>
+    </ScrollView>
   );
 }
 
@@ -366,71 +516,76 @@ function EquipmentInterestStep({
   onSelect: (wants: boolean) => void;
 }) {
   return (
-    <Animated.View 
-      entering={SlideInRight.duration(400)}
-      exiting={SlideOutLeft.duration(300)}
-      style={styles.stepContainer}
+    <ScrollView 
+      style={styles.scrollContainer}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
     >
-      <View style={styles.imageContainer}>
-        <Image
-          source={require('@/assets/images/onboarding/equipment.png')}
-          style={styles.mediumImage}
-          contentFit="contain"
-        />
-      </View>
-
-      <View style={styles.contentContainer}>
+      <View style={styles.stepHeader}>
+        <View style={[styles.stepIconWrapper, { backgroundColor: colors.primary + '20' }]}>
+          <IconSymbol name="gearshape.2.fill" size={32} color={colors.primary} />
+        </View>
         <Text 
           style={[styles.stepTitle, { color: colors.foreground }]}
           accessibilityRole="header"
         >
-          Looking to buy{'\n'}coffee equipment?
+          Looking to buy coffee equipment?
         </Text>
         <Text style={[styles.stepSubtitle, { color: colors.muted }]}>
-          We can help you find the perfect setup for your needs and budget.
+          We can help you find the perfect espresso machine and grinder for your needs
         </Text>
-
-        <View style={styles.binaryOptions}>
-          <Pressable
-            onPress={() => onSelect(true)}
-            style={({ pressed }) => [
-              styles.binaryOption,
-              { 
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                opacity: pressed ? 0.8 : 1,
-              },
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel="Yes, I want to buy equipment"
-          >
-            <IconSymbol name="checkmark.circle.fill" size={32} color={colors.success} />
-            <Text style={[styles.binaryOptionText, { color: colors.foreground }]}>
-              Yes, help me choose
-            </Text>
-          </Pressable>
-
-          <Pressable
-            onPress={() => onSelect(false)}
-            style={({ pressed }) => [
-              styles.binaryOption,
-              { 
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                opacity: pressed ? 0.8 : 1,
-              },
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel="No, I already have equipment"
-          >
-            <IconSymbol name="xmark.circle.fill" size={32} color={colors.muted} />
-            <Text style={[styles.binaryOptionText, { color: colors.foreground }]}>
-              No, I have equipment
-            </Text>
-          </Pressable>
-        </View>
       </View>
-    </Animated.View>
+
+      <View style={styles.binaryOptions}>
+        <Pressable
+          onPress={() => onSelect(true)}
+          style={({ pressed }) => [
+            styles.binaryCard,
+            { 
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              transform: [{ scale: pressed ? 0.98 : 1 }],
+            },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Yes, I want equipment recommendations"
+        >
+          <View style={[styles.binaryIconWrapper, { backgroundColor: '#4CAF5020' }]}>
+            <IconSymbol name="checkmark.circle.fill" size={32} color="#4CAF50" />
+          </View>
+          <Text style={[styles.binaryTitle, { color: colors.foreground }]}>
+            Yes, help me choose
+          </Text>
+          <Text style={[styles.binaryDescription, { color: colors.muted }]}>
+            Get personalized equipment recommendations based on your budget and goals
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => onSelect(false)}
+          style={({ pressed }) => [
+            styles.binaryCard,
+            { 
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              transform: [{ scale: pressed ? 0.98 : 1 }],
+            },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="No, skip equipment recommendations"
+        >
+          <View style={[styles.binaryIconWrapper, { backgroundColor: colors.muted + '20' }]}>
+            <IconSymbol name="arrow.right.circle.fill" size={32} color={colors.muted} />
+          </View>
+          <Text style={[styles.binaryTitle, { color: colors.foreground }]}>
+            Not right now
+          </Text>
+          <Text style={[styles.binaryDescription, { color: colors.muted }]}>
+            Skip this step - you can always access equipment guide later from your profile
+          </Text>
+        </Pressable>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -448,44 +603,39 @@ function BudgetStep({
     {
       budget: 'starter',
       title: 'Getting Started',
-      range: '$100 - $300',
-      description: 'Basic setup for beginners',
+      range: '$200 - $500',
+      description: 'Entry-level equipment for beginners',
     },
     {
       budget: 'home-barista',
       title: 'Home Barista',
-      range: '$300 - $700',
+      range: '$500 - $1,000',
       description: 'Quality equipment for daily use',
     },
     {
       budget: 'serious',
       title: 'Serious Setup',
-      range: '$700 - $1,500',
-      description: 'Professional-grade at home',
+      range: '$1,000 - $2,000',
+      description: 'Professional-grade home equipment',
     },
     {
       budget: 'prosumer',
       title: 'Prosumer',
-      range: '$1,500+',
-      description: 'Café-quality equipment',
+      range: '$2,000+',
+      description: 'Commercial-quality machines',
     },
   ];
 
   return (
-    <Animated.View 
-      entering={SlideInRight.duration(400)}
-      exiting={SlideOutLeft.duration(300)}
-      style={styles.stepContainer}
+    <ScrollView 
+      style={styles.scrollContainer}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
     >
-      <View style={styles.smallImageContainer}>
-        <Image
-          source={require('@/assets/images/onboarding/budget.png')}
-          style={styles.smallImage}
-          contentFit="contain"
-        />
-      </View>
-
-      <View style={styles.headerContainer}>
+      <View style={styles.stepHeader}>
+        <View style={[styles.stepIconWrapper, { backgroundColor: '#4CAF5020' }]}>
+          <IconSymbol name="dollarsign.circle.fill" size={32} color="#4CAF50" />
+        </View>
         <Text 
           style={[styles.stepTitle, { color: colors.foreground }]}
           accessibilityRole="header"
@@ -493,48 +643,49 @@ function BudgetStep({
           What's your budget?
         </Text>
         <Text style={[styles.stepSubtitle, { color: colors.muted }]}>
-          We'll recommend equipment that fits
+          This helps us recommend the right equipment for you
         </Text>
       </View>
 
       <View style={styles.budgetOptions}>
-        {options.map((option) => (
-          <Pressable
+        {options.map((option, index) => (
+          <Animated.View
             key={option.budget}
-            onPress={() => onSelect(option.budget)}
-            style={({ pressed }) => [
-              styles.budgetOption,
-              { 
-                backgroundColor: selected === option.budget 
-                  ? `${colors.primary}15` 
-                  : colors.surface,
-                borderColor: selected === option.budget 
-                  ? colors.primary 
-                  : colors.border,
-                opacity: pressed ? 0.8 : 1,
-              },
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel={`${option.title}: ${option.range}`}
+            entering={FadeIn.delay(index * 80).duration(300)}
           >
-            <View style={styles.budgetContent}>
-              <Text style={[styles.budgetTitle, { color: colors.foreground }]}>
-                {option.title}
-              </Text>
-              <Text style={[styles.budgetRange, { color: colors.primary }]}>
-                {option.range}
-              </Text>
-              <Text style={[styles.budgetDescription, { color: colors.muted }]}>
-                {option.description}
-              </Text>
-            </View>
-            {selected === option.budget && (
-              <IconSymbol name="checkmark.circle.fill" size={24} color={colors.primary} />
-            )}
-          </Pressable>
+            <Pressable
+              onPress={() => onSelect(option.budget)}
+              style={({ pressed }) => [
+                styles.budgetCard,
+                { 
+                  backgroundColor: selected === option.budget ? colors.primary + '15' : colors.surface,
+                  borderColor: selected === option.budget ? colors.primary : colors.border,
+                  borderWidth: selected === option.budget ? 2 : 1,
+                  transform: [{ scale: pressed ? 0.98 : 1 }],
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={`${option.title}: ${option.range}`}
+            >
+              <View style={styles.budgetContent}>
+                <Text style={[styles.budgetTitle, { color: colors.foreground }]}>
+                  {option.title}
+                </Text>
+                <Text style={[styles.budgetRange, { color: colors.primary }]}>
+                  {option.range}
+                </Text>
+                <Text style={[styles.budgetDescription, { color: colors.muted }]}>
+                  {option.description}
+                </Text>
+              </View>
+              {selected === option.budget && (
+                <IconSymbol name="checkmark.circle.fill" size={24} color={colors.primary} />
+              )}
+            </Pressable>
+          </Animated.View>
         ))}
       </View>
-    </Animated.View>
+    </ScrollView>
   );
 }
 
@@ -543,103 +694,87 @@ function PurposeStep({
   colors, 
   selected,
   onToggle,
-  onContinue,
+  onContinue
 }: { 
   colors: ReturnType<typeof useColors>;
   selected: CoffeePurpose[];
   onToggle: (purpose: CoffeePurpose) => void;
   onContinue: () => void;
 }) {
-  const options: { purpose: CoffeePurpose; title: string; description: string; image: any }[] = [
-    {
-      purpose: 'quick-espresso',
-      title: 'Quick Espresso',
-      description: 'Fast morning shots',
-      image: require('@/assets/images/onboarding/purpose_espresso.png'),
-    },
-    {
-      purpose: 'milk-drinks',
-      title: 'Milk Drinks',
-      description: 'Lattes, cappuccinos',
-      image: require('@/assets/images/onboarding/purpose_milk.png'),
-    },
-    {
-      purpose: 'pour-over',
-      title: 'Pour-Over',
-      description: 'Filter & manual brewing',
-      image: require('@/assets/images/onboarding/purpose_pourover.png'),
-    },
-    {
-      purpose: 'full-setup',
-      title: 'Full Café',
-      description: 'Everything at home',
-      image: require('@/assets/images/onboarding/equipment.png'),
-    },
+  const options: { purpose: CoffeePurpose; title: string; icon: string }[] = [
+    { purpose: 'quick-espresso', title: 'Quick Espresso Shots', icon: 'bolt.fill' },
+    { purpose: 'milk-drinks', title: 'Milk-Based Drinks', icon: 'drop.fill' },
+    { purpose: 'pour-over', title: 'Pour Over & Filter', icon: 'arrow.down.circle.fill' },
+    { purpose: 'cold-brew', title: 'Cold Brew', icon: 'snowflake' },
+    { purpose: 'experimenting', title: 'Experimenting', icon: 'flask.fill' },
   ];
 
   return (
-    <Animated.View 
-      entering={SlideInRight.duration(400)}
-      exiting={SlideOutLeft.duration(300)}
-      style={styles.stepContainer}
-    >
-      <View style={styles.headerContainer}>
-        <Text 
-          style={[styles.stepTitle, { color: colors.foreground }]}
-          accessibilityRole="header"
-        >
-          What do you want{'\n'}to make?
-        </Text>
-        <Text style={[styles.stepSubtitle, { color: colors.muted }]}>
-          Select all that interest you
-        </Text>
-      </View>
+    <View style={styles.purposeContainer}>
+      <ScrollView 
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.stepHeader}>
+          <View style={[styles.stepIconWrapper, { backgroundColor: '#FF980020' }]}>
+            <IconSymbol name="cup.and.saucer.fill" size={32} color="#FF9800" />
+          </View>
+          <Text 
+            style={[styles.stepTitle, { color: colors.foreground }]}
+            accessibilityRole="header"
+          >
+            What do you want to make?
+          </Text>
+          <Text style={[styles.stepSubtitle, { color: colors.muted }]}>
+            Select all that apply
+          </Text>
+        </View>
 
-      <View style={styles.purposeGrid}>
-        {options.map((option) => {
-          const isSelected = selected.includes(option.purpose);
-          return (
-            <Pressable
-              key={option.purpose}
-              onPress={() => onToggle(option.purpose)}
-              style={({ pressed }) => [
-                styles.purposeCard,
-                { 
-                  backgroundColor: isSelected 
-                    ? `${colors.primary}15` 
-                    : colors.surface,
-                  borderColor: isSelected 
-                    ? colors.primary 
-                    : colors.border,
-                  opacity: pressed ? 0.8 : 1,
-                },
-              ]}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: isSelected }}
-              accessibilityLabel={`${option.title}: ${option.description}`}
-            >
-              <Image
-                source={option.image}
-                style={styles.purposeImage}
-                contentFit="cover"
-              />
-              <Text style={[styles.purposeTitle, { color: colors.foreground }]}>
-                {option.title}
-              </Text>
-              <Text style={[styles.purposeDescription, { color: colors.muted }]}>
-                {option.description}
-              </Text>
-              {isSelected && (
-                <View style={[styles.checkBadge, { backgroundColor: colors.primary }]}>
-                  <IconSymbol name="checkmark" size={12} color="#FFFFFF" />
-                </View>
-              )}
-            </Pressable>
-          );
-        })}
-      </View>
+        <View style={styles.purposeOptions}>
+          {options.map((option, index) => {
+            const isSelected = selected.includes(option.purpose);
+            return (
+              <Animated.View
+                key={option.purpose}
+                entering={FadeIn.delay(index * 60).duration(300)}
+              >
+                <Pressable
+                  onPress={() => onToggle(option.purpose)}
+                  style={({ pressed }) => [
+                    styles.purposeChip,
+                    { 
+                      backgroundColor: isSelected ? colors.primary : colors.surface,
+                      borderColor: isSelected ? colors.primary : colors.border,
+                      transform: [{ scale: pressed ? 0.96 : 1 }],
+                    },
+                  ]}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: isSelected }}
+                  accessibilityLabel={option.title}
+                >
+                  <IconSymbol 
+                    name={option.icon as any} 
+                    size={20} 
+                    color={isSelected ? '#FFFFFF' : colors.foreground} 
+                  />
+                  <Text style={[
+                    styles.purposeChipText, 
+                    { color: isSelected ? '#FFFFFF' : colors.foreground }
+                  ]}>
+                    {option.title}
+                  </Text>
+                  {isSelected && (
+                    <IconSymbol name="checkmark" size={16} color="#FFFFFF" />
+                  )}
+                </Pressable>
+              </Animated.View>
+            );
+          })}
+        </View>
+      </ScrollView>
 
-      <View style={styles.continueContainer}>
+      <View style={[styles.bottomButtonContainer, { backgroundColor: colors.background }]}>
         <PremiumButton
           variant="primary"
           size="lg"
@@ -651,7 +786,7 @@ function PurposeStep({
           Continue
         </PremiumButton>
       </View>
-    </Animated.View>
+    </View>
   );
 }
 
@@ -662,7 +797,7 @@ function CompleteStep({
   wantsToBuy,
   budget,
   purposes,
-  onComplete,
+  onComplete
 }: { 
   colors: ReturnType<typeof useColors>;
   experienceLevel: ExperienceLevel | null;
@@ -672,82 +807,106 @@ function CompleteStep({
   onComplete: () => void;
 }) {
   return (
-    <Animated.View 
-      entering={FadeIn.duration(600)}
-      style={styles.stepContainer}
+    <ScrollView 
+      style={styles.scrollContainer}
+      contentContainerStyle={[styles.scrollContent, styles.completeContent]}
+      showsVerticalScrollIndicator={false}
     >
-      <View style={styles.imageContainer}>
-        <Image
-          source={require('@/assets/images/onboarding/complete.png')}
-          style={styles.heroImage}
-          contentFit="contain"
-        />
-      </View>
+      <Animated.View 
+        entering={FadeIn.delay(200).duration(500)}
+        style={[styles.completeIconWrapper, { backgroundColor: '#4CAF5020' }]}
+      >
+        <IconSymbol name="checkmark.circle.fill" size={64} color="#4CAF50" />
+      </Animated.View>
+
+      <Animated.Text 
+        entering={FadeIn.delay(400).duration(500)}
+        style={[styles.completeTitle, { color: colors.foreground }]}
+        accessibilityRole="header"
+      >
+        You're All Set!
+      </Animated.Text>
       
-      <View style={styles.contentContainer}>
-        <Text 
-          style={[styles.title, { color: colors.foreground }]}
-          accessibilityRole="header"
-        >
-          You're all set!
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.muted }]}>
-          {experienceLevel === 'beginner' && wantsToBuy
-            ? "We've prepared personalized equipment recommendations and recipes just for you."
-            : "Your personalized coffee journey awaits. Let's start brewing!"}
-        </Text>
+      <Animated.Text 
+        entering={FadeIn.delay(500).duration(500)}
+        style={[styles.completeSubtitle, { color: colors.muted }]}
+      >
+        Your personalized coffee experience is ready
+      </Animated.Text>
+
+      {/* Summary Card */}
+      <Animated.View 
+        entering={FadeIn.delay(600).duration(500)}
+        style={[styles.summaryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+      >
+        <Text style={[styles.summaryTitle, { color: colors.foreground }]}>Your Profile</Text>
         
-        {/* Summary */}
-        <View style={[styles.summaryCard, { backgroundColor: colors.surface }]}>
+        <View style={styles.summaryRow}>
+          <Text style={[styles.summaryLabel, { color: colors.muted }]}>Experience</Text>
+          <Text style={[styles.summaryValue, { color: colors.foreground }]}>
+            {experienceLevel === 'beginner' ? 'Beginner' : experienceLevel === 'intermediate' ? 'Home Brewer' : 'Enthusiast'}
+          </Text>
+        </View>
+
+        {wantsToBuy && budget && (
           <View style={styles.summaryRow}>
-            <Text style={[styles.summaryLabel, { color: colors.muted }]}>Experience</Text>
+            <Text style={[styles.summaryLabel, { color: colors.muted }]}>Budget</Text>
             <Text style={[styles.summaryValue, { color: colors.foreground }]}>
-              {experienceLevel === 'beginner' ? 'Beginner' : 
-               experienceLevel === 'intermediate' ? 'Home Brewer' : 'Enthusiast'}
+              {budget === 'starter' ? '$200-500' : budget === 'home-barista' ? '$500-1K' : budget === 'serious' ? '$1K-2K' : '$2K+'}
             </Text>
           </View>
-          {budget && (
-            <View style={styles.summaryRow}>
-              <Text style={[styles.summaryLabel, { color: colors.muted }]}>Budget</Text>
-              <Text style={[styles.summaryValue, { color: colors.foreground }]}>
-                {budget === 'starter' ? '$100-300' :
-                 budget === 'home-barista' ? '$300-700' :
-                 budget === 'serious' ? '$700-1,500' : '$1,500+'}
-              </Text>
-            </View>
-          )}
+        )}
+
+        {purposes.length > 0 && (
           <View style={styles.summaryRow}>
             <Text style={[styles.summaryLabel, { color: colors.muted }]}>Interests</Text>
             <Text style={[styles.summaryValue, { color: colors.foreground }]}>
               {purposes.length} selected
             </Text>
           </View>
-        </View>
+        )}
+      </Animated.View>
 
-        <View style={styles.buttonContainer}>
-          <PremiumButton
-            variant="primary"
-            size="lg"
-            onPress={onComplete}
-            fullWidth
-            accessibilityLabel="Start using Coffee Craft"
-          >
-            Start Brewing
-          </PremiumButton>
-        </View>
-      </View>
-    </Animated.View>
+      <Animated.View 
+        entering={FadeIn.delay(800).duration(500)}
+        style={styles.completeButtonContainer}
+      >
+        <PremiumButton
+          variant="primary"
+          size="lg"
+          onPress={onComplete}
+          fullWidth
+          accessibilityLabel="Start exploring Coffee Craft"
+        >
+          Start Exploring
+        </PremiumButton>
+      </Animated.View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  stepContainer: {
+  container: {
     flex: 1,
   },
-  progressContainer: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 8,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 16,
+    gap: 16,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  progressWrapper: {
+    flex: 1,
+    gap: 8,
   },
   progressTrack: {
     height: 4,
@@ -760,78 +919,139 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 12,
-    marginTop: 8,
-    textAlign: 'center',
+    fontWeight: '500',
   },
-  imageContainer: {
-    flex: 0.45,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
+  stepContainer: {
+    flex: 1,
   },
-  smallImageContainer: {
-    height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
+  scrollContainer: {
+    flex: 1,
   },
-  heroImage: {
+  scrollContent: {
+    paddingHorizontal: 24,
+    paddingBottom: 100,
+  },
+  
+  // Welcome Step Styles
+  welcomeContainer: {
+    flex: 1,
+  },
+  heroImageWrapper: {
+    height: SCREEN_HEIGHT * 0.45,
+    width: '100%',
+    position: 'relative',
+  },
+  heroImageFull: {
     width: '100%',
     height: '100%',
   },
-  mediumImage: {
-    width: '80%',
-    height: '100%',
+  heroGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 150,
   },
-  smallImage: {
-    width: '60%',
-    height: '100%',
-  },
-  contentContainer: {
-    flex: 0.55,
+  welcomeContent: {
+    flex: 1,
     paddingHorizontal: 24,
-    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: -40,
   },
-  headerContainer: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16,
+  logoBadge: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  title: {
-    fontSize: 32,
+  welcomeTitle: {
+    fontSize: 36,
     fontWeight: '700',
     textAlign: 'center',
     letterSpacing: -0.5,
-    marginBottom: 12,
   },
-  subtitle: {
-    fontSize: 17,
+  welcomeTagline: {
+    fontSize: 16,
+    fontWeight: '600',
     textAlign: 'center',
+    marginTop: 8,
+    letterSpacing: 0.5,
+  },
+  welcomeDescription: {
+    fontSize: 16,
     lineHeight: 24,
-    paddingHorizontal: 16,
+    textAlign: 'center',
+    marginTop: 16,
+    paddingHorizontal: 8,
+  },
+  featurePills: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 24,
+  },
+  featurePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  featurePillText: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  welcomeButtonContainer: {
+    width: '100%',
+    marginTop: 32,
+    gap: 12,
+  },
+  welcomeFooter: {
+    fontSize: 13,
+    textAlign: 'center',
+  },
+
+  // Step Header Styles
+  stepHeader: {
+    alignItems: 'center',
+    paddingTop: 24,
+    paddingBottom: 32,
+  },
+  stepIconWrapper: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
   },
   stepTitle: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '700',
     textAlign: 'center',
-    letterSpacing: -0.5,
-    marginBottom: 8,
+    letterSpacing: -0.3,
   },
   stepSubtitle: {
     fontSize: 16,
     textAlign: 'center',
+    marginTop: 8,
     lineHeight: 22,
   },
-  buttonContainer: {
-    marginTop: 32,
-    paddingHorizontal: 16,
-  },
-  optionsContainer: {
-    flex: 1,
-    paddingHorizontal: 24,
+
+  // Experience Step Styles
+  optionsGrid: {
     gap: 12,
   },
-  optionCard: {
+  experienceCard: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
@@ -839,130 +1059,164 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 16,
   },
-  optionImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
+  experienceIconWrapper: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  optionContent: {
+  experienceTextContainer: {
     flex: 1,
   },
-  optionTitle: {
+  experienceTitle: {
     fontSize: 17,
     fontWeight: '600',
-    marginBottom: 4,
   },
-  optionDescription: {
+  experienceDescription: {
     fontSize: 14,
+    marginTop: 4,
+    lineHeight: 20,
   },
+
+  // Binary Options Styles
   binaryOptions: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 32,
+    gap: 16,
   },
-  binaryOption: {
-    flex: 1,
-    alignItems: 'center',
+  binaryCard: {
     padding: 24,
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
-    gap: 12,
+    alignItems: 'center',
   },
-  binaryOptionText: {
-    fontSize: 15,
+  binaryIconWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  binaryTitle: {
+    fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
   },
-  budgetOptions: {
-    flex: 1,
-    paddingHorizontal: 24,
-    gap: 10,
+  binaryDescription: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 8,
+    lineHeight: 20,
   },
-  budgetOption: {
+
+  // Budget Step Styles
+  budgetOptions: {
+    gap: 12,
+  },
+  budgetCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 14,
-    borderWidth: 1.5,
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
   },
   budgetContent: {
     flex: 1,
   },
   budgetTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
-    marginBottom: 2,
   },
   budgetRange: {
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: 15,
+    fontWeight: '600',
+    marginTop: 4,
   },
   budgetDescription: {
     fontSize: 13,
+    marginTop: 4,
   },
-  purposeGrid: {
+
+  // Purpose Step Styles
+  purposeContainer: {
+    flex: 1,
+  },
+  purposeOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 24,
     gap: 12,
-    marginTop: 16,
   },
-  purposeCard: {
-    width: (SCREEN_WIDTH - 60) / 2,
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1.5,
+  purposeChip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 24,
+    borderWidth: 1,
   },
-  purposeImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  purposeTitle: {
+  purposeChipText: {
     fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 4,
-    textAlign: 'center',
+    fontWeight: '500',
   },
-  purposeDescription: {
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  checkBadge: {
+  bottomButtonContainer: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 24,
+    paddingBottom: 40,
+  },
+
+  // Complete Step Styles
+  completeContent: {
+    alignItems: 'center',
+    paddingTop: 60,
+  },
+  completeIconWrapper: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 24,
   },
-  continueContainer: {
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-    marginTop: 'auto',
+  completeTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  completeSubtitle: {
+    fontSize: 17,
+    textAlign: 'center',
+    marginTop: 8,
   },
   summaryCard: {
-    marginTop: 24,
-    padding: 16,
+    width: '100%',
+    padding: 20,
     borderRadius: 16,
-    gap: 12,
+    borderWidth: 1,
+    marginTop: 32,
+  },
+  summaryTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 16,
   },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    paddingVertical: 8,
   },
   summaryLabel: {
-    fontSize: 14,
+    fontSize: 15,
   },
   summaryValue: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  completeButtonContainer: {
+    width: '100%',
+    marginTop: 32,
   },
 });

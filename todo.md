@@ -72,6 +72,16 @@
 - [x] Create profile screen for viewing/editing preferences
 - [x] Create recommendations screen with equipment suggestions
 
+## v4 UX Improvements
+- [x] Redesign welcome screen with premium, eye-catching design
+- [x] Add back navigation to all onboarding steps
+- [x] Create Profile tab with settings and preferences
+- [x] Add "Buy/Upgrade Equipment" menu in Profile
+- [x] Create modern equipment wizard accessible from Profile
+- [x] Ensure all screens have back button navigation
+- [x] Make equipment flow restartable anytime from Profile
+- [x] Generate new premium welcome illustration
+
 ## Future Enhancements
 - [ ] Google Places API integration for real cafe data
 - [ ] User favorites/bookmarks

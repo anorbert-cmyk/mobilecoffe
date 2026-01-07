@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Types
 export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced';
 export type BudgetRange = 'starter' | 'home-barista' | 'serious' | 'prosumer';
-export type CoffeePurpose = 'quick-espresso' | 'milk-drinks' | 'pour-over' | 'full-setup';
+export type CoffeePurpose = 'quick-espresso' | 'milk-drinks' | 'pour-over' | 'cold-brew' | 'experimenting' | 'full-setup';
 
 export interface UserProfile {
   hasCompletedOnboarding: boolean;
@@ -134,6 +134,8 @@ export function getPurposeLabel(purpose: CoffeePurpose): string {
     'quick-espresso': 'Quick Morning Espresso',
     'milk-drinks': 'Milk-Based Drinks',
     'pour-over': 'Pour-Over & Filter',
+    'cold-brew': 'Cold Brew',
+    'experimenting': 'Experimenting',
     'full-setup': 'Full Home Café',
   };
   return labels[purpose];

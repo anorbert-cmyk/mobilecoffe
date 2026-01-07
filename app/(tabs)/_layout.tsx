@@ -1,11 +1,6 @@
 import { Tabs } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, View, Platform } from "react-native";
-import Animated, { 
-  useAnimatedStyle, 
-  withSpring,
-  useSharedValue,
-} from "react-native-reanimated";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -25,7 +20,7 @@ export default function TabLayout() {
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: '600',
           marginTop: 2,
         },
@@ -51,7 +46,7 @@ export default function TabLayout() {
           title: "Make",
           tabBarIcon: ({ color, focused }) => (
             <View style={focused && styles.activeIconContainer}>
-              <IconSymbol size={26} name="cup.and.saucer.fill" color={color} />
+              <IconSymbol size={24} name="cup.and.saucer.fill" color={color} />
             </View>
           ),
           tabBarAccessibilityLabel: "Make coffee recipes",
@@ -63,7 +58,7 @@ export default function TabLayout() {
           title: "Find",
           tabBarIcon: ({ color, focused }) => (
             <View style={focused && styles.activeIconContainer}>
-              <IconSymbol size={26} name="location.fill" color={color} />
+              <IconSymbol size={24} name="location.fill" color={color} />
             </View>
           ),
           tabBarAccessibilityLabel: "Find nearby cafes",
@@ -75,7 +70,7 @@ export default function TabLayout() {
           title: "Setup",
           tabBarIcon: ({ color, focused }) => (
             <View style={focused && styles.activeIconContainer}>
-              <IconSymbol size={26} name="gearshape.fill" color={color} />
+              <IconSymbol size={24} name="gearshape.fill" color={color} />
             </View>
           ),
           tabBarAccessibilityLabel: "Machine and grinder settings",
@@ -87,10 +82,22 @@ export default function TabLayout() {
           title: "Learn",
           tabBarIcon: ({ color, focused }) => (
             <View style={focused && styles.activeIconContainer}>
-              <IconSymbol size={26} name="book.fill" color={color} />
+              <IconSymbol size={24} name="book.fill" color={color} />
             </View>
           ),
           tabBarAccessibilityLabel: "Learn about coffee",
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused && styles.activeIconContainer}>
+              <IconSymbol size={24} name="person.fill" color={color} />
+            </View>
+          ),
+          tabBarAccessibilityLabel: "Your profile and settings",
         }}
       />
     </Tabs>
