@@ -2,6 +2,7 @@ export interface Article {
   id: string;
   title: string;
   content: string;
+  readTime: number; // in minutes
 }
 
 export interface LearningCategory {
@@ -49,7 +50,8 @@ Specialty coffee represents only about 3% of global production. By choosing spec
 - Sustainable farming practices
 - Fair compensation for farmers
 - Exceptional taste experiences
-- Traceability from farm to cup`
+- Traceability from farm to cup`,
+        readTime: 5
       },
       {
         id: 'water-quality',
@@ -81,7 +83,8 @@ Chlorine creates off-flavors. Use filtered water or let tap water sit uncovered 
 - **Too hot**: Bitter, over-extracted
 - **Too cold**: Sour, under-extracted
 
-**Pro tip**: After boiling, wait 30-45 seconds before pouring for optimal temperature.`
+**Pro tip**: After boiling, wait 30-45 seconds before pouring for optimal temperature.`,
+        readTime: 5
       },
       {
         id: 'grind-size-guide',
@@ -119,7 +122,8 @@ The grind size dramatically affects extraction and flavor.
 **Blade Grinders**: Inconsistent, create dust and boulders
 **Burr Grinders**: Uniform particles, adjustable settings
 
-Invest in a burr grinder—it's the single biggest upgrade for home brewing.`
+Invest in a burr grinder—it's the single biggest upgrade for home brewing.`,
+        readTime: 5
       }
     ]
   },
@@ -174,7 +178,8 @@ Roasting transforms green coffee beans into the aromatic brown beans we know.
 
 ## The Caffeine Myth
 
-Contrary to popular belief, light roasts have slightly MORE caffeine than dark roasts. The roasting process burns off some caffeine, so the longer the roast, the less caffeine remains.`
+Contrary to popular belief, light roasts have slightly MORE caffeine than dark roasts. The roasting process burns off some caffeine, so the longer the roast, the less caffeine remains.`,
+        readTime: 5
       },
       {
         id: 'first-second-crack',
@@ -214,7 +219,8 @@ The time between first crack and end of roast is called "development time." This
 
 ## Specialty Coffee Approach
 
-Most specialty roasters stop between first crack and early second crack to preserve origin characteristics while developing sweetness.`
+Most specialty roasters stop between first crack and early second crack to preserve origin characteristics while developing sweetness.`,
+        readTime: 5
       }
     ]
   },
@@ -259,7 +265,8 @@ Coffee thrives between the Tropics of Cancer and Capricorn (23.5°N to 23.5°S) 
 
 ## Terroir
 
-Like wine, coffee expresses "terroir"—the complete natural environment where it grows. The same variety planted in different regions will taste distinctly different.`
+Like wine, coffee expresses "terroir"—the complete natural environment where it grows. The same variety planted in different regions will taste distinctly different.`,
+        readTime: 5
       },
       {
         id: 'arabica-vs-robusta',
@@ -307,7 +314,8 @@ The two main commercial coffee species have distinct characteristics.
 
 ## The Quality Gap
 
-While Robusta has a reputation for low quality, specialty-grade Robusta does exist. Some Italian espresso blends traditionally include 10-20% Robusta for extra crema and caffeine kick.`
+While Robusta has a reputation for low quality, specialty-grade Robusta does exist. Some Italian espresso blends traditionally include 10-20% Robusta for extra crema and caffeine kick.`,
+        readTime: 5
       }
     ]
   },
@@ -369,7 +377,8 @@ Start with one method and master it:
 1. Start with grinder + simple brewer
 2. Add scale for consistency
 3. Upgrade kettle for pour over
-4. Consider espresso machine later`
+4. Consider espresso machine later`,
+        readTime: 5
       },
       {
         id: 'espresso-machines',
@@ -423,7 +432,8 @@ Espresso at home requires significant investment but rewards with café-quality 
 
 ## Don't Forget the Grinder!
 
-An espresso-capable grinder is essential. Budget at least as much for the grinder as the machine.`
+An espresso-capable grinder is essential. Budget at least as much for the grinder as the machine.`,
+        readTime: 5
       }
     ]
   },
@@ -478,7 +488,8 @@ Keep these nearby:
 **Daily**: Wipe surfaces, rinse equipment
 **Weekly**: Deep clean brewer, empty knock box
 **Monthly**: Clean grinder, descale if needed
-**Quarterly**: Replace gaskets, check seals`
+**Quarterly**: Replace gaskets, check seals`,
+        readTime: 5
       },
       {
         id: 'buying-beans',
@@ -538,7 +549,8 @@ Get the most from your coffee with proper selection and storage.
 - **Days 1-3**: Degassing, may taste uneven
 - **Days 4-14**: Peak flavor window
 - **Days 15-30**: Still good, declining
-- **30+ days**: Noticeably stale`
+- **30+ days**: Noticeably stale`,
+        readTime: 5
       }
     ]
   }

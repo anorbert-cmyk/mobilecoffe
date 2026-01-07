@@ -1,64 +1,143 @@
-import { FlatList, Text, View, Pressable, StyleSheet } from "react-native";
-import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { View, Text, FlatList, StyleSheet, Pressable, Dimensions } from 'react-native';
+import { Image } from 'expo-image';
+import { router } from 'expo-router';
+import Animated, { 
+  FadeInDown,
+  useAnimatedStyle, 
+  useSharedValue, 
+  withSpring,
+} from 'react-native-reanimated';
 
-import { ScreenContainer } from "@/components/screen-container";
-import { coffeeRecipes, CoffeeRecipe } from "@/data/coffees";
-import { useColors } from "@/hooks/use-colors";
+import { ScreenContainer } from '@/components/screen-container';
+import { PremiumCard } from '@/components/ui/premium-card';
+import { useColors } from '@/hooks/use-colors';
+import { coffeeRecipes, CoffeeRecipe } from '@/data/coffees';
+
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = (width - 48 - 12) / 2; // 20px padding each side + 12px gap
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function getDifficultyColor(difficulty: string, colors: any) {
+  switch (difficulty) {
+    case 'beginner':
+      return colors.success;
+    case 'intermediate':
+      return colors.warning;
+    case 'advanced':
+      return colors.error;
+    default:
+      return colors.muted;
+  }
+}
+
+// Separate component for coffee card to properly use hooks
+function CoffeeCard({ item, index }: { item: CoffeeRecipe; index: number }) {
+  const colors = useColors();
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View
+      entering={FadeInDown.delay(index * 50).springify()}
+      style={[styles.cardWrapper, { width: CARD_WIDTH }]}
+    >
+      <AnimatedPressable
+        onPress={() => router.push(`/coffee/${item.id}` as any)}
+        onPressIn={() => { scale.value = withSpring(0.97); }}
+        onPressOut={() => { scale.value = withSpring(1); }}
+        style={[animatedStyle]}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.name}, ${item.subtitle}`}
+      >
+        <PremiumCard elevated>
+          <View style={styles.imageContainer}>
+            <Image
+              source={item.image}
+              style={styles.image}
+              contentFit="cover"
+              transition={300}
+            />
+            {/* Difficulty badge */}
+            <View style={[
+              styles.difficultyBadge,
+              { backgroundColor: getDifficultyColor(item.difficulty, colors) }
+            ]}>
+              <Text style={styles.difficultyText}>
+                {item.difficulty}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.cardContent}>
+            <Text 
+              style={[styles.cardTitle, { color: colors.foreground }]}
+              numberOfLines={1}
+            >
+              {item.name}
+            </Text>
+            <Text 
+              style={[styles.cardSubtitle, { color: colors.muted }]}
+              numberOfLines={1}
+            >
+              {item.subtitle}
+            </Text>
+            {/* Quick info */}
+            <View style={styles.quickInfo}>
+              <View style={[styles.infoPill, { backgroundColor: colors.surfaceElevated }]}>
+                <Text style={[styles.infoPillText, { color: colors.muted }]}>
+                  {item.prepTime}
+                </Text>
+              </View>
+              <View style={[styles.infoPill, { backgroundColor: colors.surfaceElevated }]}>
+                <Text style={[styles.infoPillText, { color: colors.muted }]}>
+                  {item.ratio}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </PremiumCard>
+      </AnimatedPressable>
+    </Animated.View>
+  );
+}
 
 export default function MakeCoffeeScreen() {
-  const router = useRouter();
   const colors = useColors();
 
-  const handleCoffeePress = (coffee: CoffeeRecipe) => {
-    router.push({ pathname: '/coffee/[id]', params: { id: coffee.id } });
-  };
-
-  const renderCoffeeCard = ({ item }: { item: CoffeeRecipe }) => (
-    <Pressable
-      onPress={() => handleCoffeePress(item)}
-      style={({ pressed }) => [
-        styles.card,
-        { backgroundColor: colors.surface, borderColor: colors.border },
-        pressed && styles.cardPressed
-      ]}
-    >
-      <View style={styles.imageContainer}>
-        <Image
-          source={item.image}
-          style={styles.image}
-          contentFit="cover"
-          transition={200}
-        />
-      </View>
-      <View style={styles.cardContent}>
-        <Text style={[styles.cardTitle, { color: colors.foreground }]} numberOfLines={1}>
-          {item.name}
-        </Text>
-        <Text style={[styles.cardSubtitle, { color: colors.muted }]} numberOfLines={1}>
-          {item.subtitle}
-        </Text>
-      </View>
-    </Pressable>
+  const renderCoffeeItem = ({ item, index }: { item: CoffeeRecipe; index: number }) => (
+    <CoffeeCard item={item} index={index} />
   );
 
   return (
     <ScreenContainer>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Make Coffee</Text>
-        <Text style={[styles.subtitle, { color: colors.muted }]}>
-          Choose a drink to brew
-        </Text>
-      </View>
-      
       <FlatList
         data={coffeeRecipes}
-        renderItem={renderCoffeeCard}
+        renderItem={renderCoffeeItem}
         keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Animated.Text 
+              entering={FadeInDown.delay(0).springify()}
+              style={[styles.title, { color: colors.foreground }]}
+              accessibilityRole="header"
+            >
+              Make Coffee
+            </Animated.Text>
+            <Animated.Text 
+              entering={FadeInDown.delay(100).springify()}
+              style={[styles.subtitle, { color: colors.muted }]}
+            >
+              Choose a drink to brew
+            </Animated.Text>
+          </View>
+        }
       />
     </ScreenContainer>
   );
@@ -66,55 +145,81 @@ export default function MakeCoffeeScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 4,
     paddingTop: 8,
-    paddingBottom: 16,
+    paddingBottom: 20,
   },
   title: {
-    fontSize: 32,
+    fontSize: 34,
     fontWeight: '700',
     letterSpacing: -0.5,
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
-    marginTop: 4,
+    fontSize: 17,
+    lineHeight: 22,
   },
   listContent: {
-    paddingHorizontal: 12,
-    paddingBottom: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
   row: {
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 16,
   },
-  card: {
-    width: '48%',
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-  },
-  cardPressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.97 }],
+  cardWrapper: {
+    flex: 1,
+    maxWidth: CARD_WIDTH,
   },
   imageContainer: {
-    width: '100%',
+    position: 'relative',
     aspectRatio: 1,
-    backgroundColor: '#f5f5f5',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    overflow: 'hidden',
   },
   image: {
     width: '100%',
     height: '100%',
+  },
+  difficultyBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  difficultyText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   cardContent: {
     padding: 12,
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    marginBottom: 2,
   },
   cardSubtitle: {
     fontSize: 13,
-    marginTop: 2,
+    marginBottom: 8,
+  },
+  quickInfo: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  infoPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  infoPillText: {
+    fontSize: 11,
+    fontWeight: '600',
   },
 });

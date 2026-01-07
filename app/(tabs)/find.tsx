@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import { FlatList, Text, View, Pressable, StyleSheet, Linking, Platform, ActivityIndicator } from "react-native";
 import { Image } from "expo-image";
 import * as Location from "expo-location";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { ScreenContainer } from "@/components/screen-container";
+import { PremiumCard } from "@/components/ui/premium-card";
+import { PremiumButton } from "@/components/ui/premium-button";
 import { useColors } from "@/hooks/use-colors";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { demoCafes, Cafe, sortCafesByDistance, formatDistance } from "@/data/cafes";
@@ -25,7 +28,6 @@ export default function FindCoffeeScreen() {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           setLocationError('Enable location to see distances');
-          // Use default Budapest center location
           const defaultLat = 47.4979;
           const defaultLon = 19.0402;
           const sortedCafes = sortCafesByDistance(demoCafes, defaultLat, defaultLon);
@@ -51,7 +53,6 @@ export default function FindCoffeeScreen() {
         setCafes(sortedCafes);
       } catch (error) {
         setLocationError('Could not get location');
-        // Fallback to default location
         const sortedCafes = sortCafesByDistance(demoCafes, 47.4979, 19.0402);
         setCafes(sortedCafes);
       } finally {
@@ -81,126 +82,144 @@ export default function FindCoffeeScreen() {
     return '€'.repeat(level);
   };
 
-  const renderCafeCard = ({ item }: { item: CafeWithDistance }) => (
-    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-      <Image
-        source={{ uri: item.image }}
-        style={styles.cardImage}
-        contentFit="cover"
-        transition={200}
-      />
-      
-      <View style={styles.cardContent}>
-        {/* Header Row */}
-        <View style={styles.cardHeader}>
-          <View style={styles.titleRow}>
-            <Text style={[styles.cafeName, { color: colors.foreground }]} numberOfLines={1}>
-              {item.name}
-            </Text>
-            <View style={[
-              styles.statusBadge,
-              { backgroundColor: item.isOpen ? colors.success : colors.error }
-            ]}>
-              <Text style={styles.statusText}>
-                {item.isOpen ? 'Open' : 'Closed'}
-              </Text>
-            </View>
-          </View>
-          <Text style={[styles.neighborhood, { color: colors.muted }]}>
-            {item.neighborhood} · {renderPriceLevel(item.priceLevel)}
-          </Text>
-        </View>
-        
-        {/* Rating & Distance Row */}
-        <View style={styles.infoRow}>
-          <View style={styles.ratingContainer}>
-            <IconSymbol name="star.fill" size={16} color="#F59E0B" />
-            <Text style={[styles.ratingText, { color: colors.foreground }]}>
+  const renderCafeCard = ({ item, index }: { item: CafeWithDistance; index: number }) => (
+    <Animated.View entering={FadeInDown.delay(index * 60).springify()}>
+      <PremiumCard style={styles.card} elevated>
+        {/* Image with overlays */}
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: item.image }}
+            style={styles.cardImage}
+            contentFit="cover"
+            transition={300}
+          />
+          
+          {/* Rating badge */}
+          <View style={[styles.ratingBadge, { backgroundColor: colors.surface }]}>
+            <IconSymbol name="star.fill" size={14} color="#FFB800" />
+            <Text style={[styles.ratingBadgeText, { color: colors.foreground }]}>
               {item.rating.toFixed(1)}
             </Text>
-            <Text style={[styles.reviewCount, { color: colors.muted }]}>
-              ({item.reviewCount.toLocaleString()})
+          </View>
+          
+          {/* Distance badge */}
+          <View style={[styles.distanceBadge, { backgroundColor: colors.primary }]}>
+            <Text style={styles.distanceBadgeText}>
+              {formatDistance(item.distance)}
             </Text>
           </View>
-          <Text style={[styles.distance, { color: colors.primary }]}>
-            {formatDistance(item.distance)}
-          </Text>
-        </View>
-        
-        {/* Address */}
-        <Text style={[styles.address, { color: colors.muted }]} numberOfLines={1}>
-          {item.address}
-        </Text>
-        
-        {/* Description */}
-        <Text style={[styles.description, { color: colors.foreground }]} numberOfLines={2}>
-          {item.description}
-        </Text>
-        
-        {/* Features */}
-        <View style={styles.features}>
-          {item.features.slice(0, 4).map((feature, index) => (
-            <View key={index} style={[styles.featureTag, { backgroundColor: colors.background }]}>
-              <Text style={[styles.featureText, { color: colors.muted }]}>{feature}</Text>
-            </View>
-          ))}
-          {item.features.length > 4 && (
-            <View style={[styles.featureTag, { backgroundColor: colors.background }]}>
-              <Text style={[styles.featureText, { color: colors.muted }]}>+{item.features.length - 4}</Text>
-            </View>
-          )}
-        </View>
-        
-        {/* Specialties */}
-        <View style={styles.specialties}>
-          <Text style={[styles.specialtiesLabel, { color: colors.muted }]}>Known for: </Text>
-          <Text style={[styles.specialtiesText, { color: colors.foreground }]} numberOfLines={1}>
-            {item.specialties.join(' · ')}
-          </Text>
-        </View>
-        
-        {/* Action Buttons */}
-        <View style={styles.actions}>
-          <Pressable
-            onPress={() => openMaps(item)}
-            style={({ pressed }) => [
-              styles.primaryButton,
-              { backgroundColor: colors.primary },
-              pressed && { opacity: 0.9 }
-            ]}
-          >
-            <IconSymbol name="map.fill" size={18} color="#fff" />
-            <Text style={styles.primaryButtonText}>Navigate</Text>
-          </Pressable>
           
-          {item.phone && (
-            <Pressable
-              onPress={() => openPhone(item.phone!)}
-              style={({ pressed }) => [
-                styles.secondaryButton,
-                { borderColor: colors.border },
-                pressed && { opacity: 0.7 }
-              ]}
-            >
-              <IconSymbol name="phone.fill" size={18} color={colors.foreground} />
-            </Pressable>
-          )}
-          
-          {item.website && (
-            <Pressable
-              onPress={() => openWebsite(item.website!)}
-              style={({ pressed }) => [
-                styles.secondaryButton,
-                { borderColor: colors.border },
-                pressed && { opacity: 0.7 }
-              ]}
-            >
-              <IconSymbol name="globe" size={18} color={colors.foreground} />
-            </Pressable>
-          )}
+          {/* Status badge */}
+          <View style={[
+            styles.statusBadge,
+            { backgroundColor: item.isOpen ? colors.success : colors.error }
+          ]}>
+            <Text style={styles.statusText}>
+              {item.isOpen ? 'Open' : 'Closed'}
+            </Text>
+          </View>
         </View>
-      </View>
-    </View>
+        
+        <View style={styles.cardContent}>
+          {/* Header */}
+          <View style={styles.cardHeader}>
+            <Text 
+              style={[styles.cafeName, { color: colors.foreground }]} 
+              numberOfLines={1}
+              accessibilityRole="header"
+            >
+              {item.name}
+            </Text>
+            <Text style={[styles.neighborhood, { color: colors.muted }]}>
+              {item.neighborhood} · {renderPriceLevel(item.priceLevel)}
+            </Text>
+          </View>
+          
+          {/* Address */}
+          <View style={styles.addressRow}>
+            <IconSymbol name="location.fill" size={14} color={colors.muted} />
+            <Text style={[styles.address, { color: colors.muted }]} numberOfLines={1}>
+              {item.address}
+            </Text>
+          </View>
+          
+          {/* Description */}
+          <Text style={[styles.description, { color: colors.foreground }]} numberOfLines={2}>
+            {item.description}
+          </Text>
+          
+          {/* Features */}
+          <View style={styles.features}>
+            {item.features.slice(0, 3).map((feature, idx) => (
+              <View 
+                key={idx} 
+                style={[styles.featureTag, { backgroundColor: colors.surfaceElevated }]}
+              >
+                <Text style={[styles.featureText, { color: colors.muted }]}>{feature}</Text>
+              </View>
+            ))}
+            {item.features.length > 3 && (
+              <View style={[styles.featureTag, { backgroundColor: colors.surfaceElevated }]}>
+                <Text style={[styles.featureText, { color: colors.muted }]}>
+                  +{item.features.length - 3}
+                </Text>
+              </View>
+            )}
+          </View>
+          
+          {/* Specialties */}
+          <View style={styles.specialties}>
+            <Text style={[styles.specialtiesLabel, { color: colors.muted }]}>Known for: </Text>
+            <Text style={[styles.specialtiesText, { color: colors.foreground }]} numberOfLines={1}>
+              {item.specialties.join(' · ')}
+            </Text>
+          </View>
+          
+          {/* Action Buttons */}
+          <View style={styles.actions}>
+            <PremiumButton
+              variant="primary"
+              size="md"
+              onPress={() => openMaps(item)}
+              accessibilityLabel={`Navigate to ${item.name}`}
+              className="flex-1"
+            >
+              Navigate
+            </PremiumButton>
+            
+            {item.phone && (
+              <Pressable
+                onPress={() => openPhone(item.phone!)}
+                style={({ pressed }) => [
+                  styles.iconButton,
+                  { backgroundColor: colors.surfaceElevated },
+                  pressed && { opacity: 0.7 }
+                ]}
+                accessibilityLabel={`Call ${item.name}`}
+                accessibilityRole="button"
+              >
+                <IconSymbol name="phone.fill" size={20} color={colors.foreground} />
+              </Pressable>
+            )}
+            
+            {item.website && (
+              <Pressable
+                onPress={() => openWebsite(item.website!)}
+                style={({ pressed }) => [
+                  styles.iconButton,
+                  { backgroundColor: colors.surfaceElevated },
+                  pressed && { opacity: 0.7 }
+                ]}
+                accessibilityLabel={`Visit ${item.name} website`}
+                accessibilityRole="button"
+              >
+                <IconSymbol name="globe" size={20} color={colors.foreground} />
+              </Pressable>
+            )}
+          </View>
+        </View>
+      </PremiumCard>
+    </Animated.View>
   );
 
   if (loading) {
@@ -216,13 +235,6 @@ export default function FindCoffeeScreen() {
 
   return (
     <ScreenContainer>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Find Coffee</Text>
-        <Text style={[styles.subtitle, { color: colors.muted }]}>
-          {locationError || `${cafes.length} specialty cafes nearby`}
-        </Text>
-      </View>
-      
       <FlatList
         data={cafes}
         renderItem={renderCafeCard}
@@ -230,6 +242,23 @@ export default function FindCoffeeScreen() {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Animated.Text 
+              entering={FadeInDown.delay(0).springify()}
+              style={[styles.title, { color: colors.foreground }]}
+              accessibilityRole="header"
+            >
+              Find Coffee
+            </Animated.Text>
+            <Animated.Text 
+              entering={FadeInDown.delay(100).springify()}
+              style={[styles.subtitle, { color: colors.muted }]}
+            >
+              {locationError || `${cafes.length} specialty cafes nearby`}
+            </Animated.Text>
+          </View>
+        }
       />
     </ScreenContainer>
   );
@@ -237,35 +266,79 @@ export default function FindCoffeeScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 4,
     paddingTop: 8,
-    paddingBottom: 16,
+    paddingBottom: 20,
   },
   title: {
-    fontSize: 32,
+    fontSize: 34,
     fontWeight: '700',
     letterSpacing: -0.5,
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
-    marginTop: 4,
+    fontSize: 17,
+    lineHeight: 22,
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: 16,
+    marginTop: 16,
+    fontSize: 17,
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
   card: {
-    borderRadius: 20,
     overflow: 'hidden',
-    borderWidth: 1,
+  },
+  imageContainer: {
+    position: 'relative',
+    height: 180,
   },
   cardImage: {
     width: '100%',
-    height: 200,
+    height: '100%',
+  },
+  ratingBadge: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    gap: 4,
+  },
+  ratingBadgeText: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  distanceBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  distanceBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  statusBadge: {
+    position: 'absolute',
+    bottom: 12,
+    left: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+  statusText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
   },
   cardContent: {
     padding: 16,
@@ -273,60 +346,28 @@ const styles = StyleSheet.create({
   cardHeader: {
     marginBottom: 8,
   },
-  titleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
   cafeName: {
     fontSize: 20,
     fontWeight: '700',
-    flex: 1,
-    marginRight: 8,
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
+    marginBottom: 2,
   },
   neighborhood: {
     fontSize: 14,
+    fontWeight: '500',
   },
-  infoRow: {
+  addressRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  reviewCount: {
-    fontSize: 14,
-  },
-  distance: {
-    fontSize: 15,
-    fontWeight: '600',
+    gap: 6,
+    marginBottom: 10,
   },
   address: {
     fontSize: 14,
-    marginBottom: 8,
+    flex: 1,
   },
   description: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 15,
+    lineHeight: 22,
     marginBottom: 12,
   },
   features: {
@@ -337,12 +378,12 @@ const styles = StyleSheet.create({
   },
   featureTag: {
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: 8,
   },
   featureText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   specialties: {
     flexDirection: 'row',
@@ -354,33 +395,18 @@ const styles = StyleSheet.create({
   },
   specialtiesText: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: '600',
     flex: 1,
   },
   actions: {
     flexDirection: 'row',
     gap: 10,
   },
-  primaryButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 14,
-    borderRadius: 14,
-    gap: 8,
-  },
-  primaryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
+  iconButton: {
     width: 48,
     height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
-    borderWidth: 1,
+    borderRadius: 12,
   },
 });

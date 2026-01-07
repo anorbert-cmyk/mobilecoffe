@@ -1,20 +1,22 @@
 import { useState, useEffect, useRef } from "react";
 import { ScrollView, Text, View, Pressable, StyleSheet } from "react-native";
 import { Image } from "expo-image";
-import { useLocalSearchParams, useRouter, Stack } from "expo-router";
+import { useLocalSearchParams, Stack } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
+import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 
 import { ScreenContainer } from "@/components/screen-container";
-import { getCoffeeById, CoffeeRecipe } from "@/data/coffees";
-import { useColors } from "@/hooks/use-colors";
+import { PremiumCard } from "@/components/ui/premium-card";
+import { PremiumButton } from "@/components/ui/premium-button";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { getCoffeeById } from "@/data/coffees";
+import { useColors } from "@/hooks/use-colors";
 
 type TabType = 'recipe' | 'about' | 'tips';
 
 export default function CoffeeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
   const colors = useColors();
   const [activeTab, setActiveTab] = useState<TabType>('recipe');
   const [timerRunning, setTimerRunning] = useState(false);
@@ -67,6 +69,15 @@ export default function CoffeeDetailScreen() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return colors.success;
+      case 'intermediate': return colors.warning;
+      case 'advanced': return colors.error;
+      default: return colors.muted;
+    }
+  };
+
   if (!coffee) {
     return (
       <ScreenContainer className="items-center justify-center">
@@ -75,10 +86,10 @@ export default function CoffeeDetailScreen() {
     );
   }
 
-  const tabs: { key: TabType; label: string }[] = [
-    { key: 'recipe', label: 'Recipe' },
-    { key: 'about', label: 'About' },
-    { key: 'tips', label: 'Tips' },
+  const tabs: { key: TabType; label: string; icon: string }[] = [
+    { key: 'recipe', label: 'Recipe', icon: 'list.bullet' },
+    { key: 'about', label: 'About', icon: 'info.circle.fill' },
+    { key: 'tips', label: 'Tips', icon: 'lightbulb.fill' },
   ];
 
   return (
@@ -86,214 +97,282 @@ export default function CoffeeDetailScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
-          headerTitle: coffee.name,
+          headerTitle: "",
           headerBackTitle: "Back",
-          headerStyle: { backgroundColor: colors.background },
+          headerTransparent: true,
+          headerStyle: { backgroundColor: 'transparent' },
           headerTintColor: colors.primary,
-          headerTitleStyle: { color: colors.foreground },
         }}
       />
       <ScreenContainer edges={["left", "right"]}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Hero Image */}
-          <View style={styles.heroContainer}>
-            <Image
-              source={coffee.image}
-              style={styles.heroImage}
-              contentFit="cover"
-              transition={300}
-            />
-          </View>
+          <Animated.View entering={FadeIn.duration(400)}>
+            <View style={styles.heroContainer}>
+              <Image
+                source={coffee.image}
+                style={styles.heroImage}
+                contentFit="cover"
+                transition={300}
+              />
+              {/* Gradient overlay */}
+              <View style={styles.heroGradient} />
+            </View>
+          </Animated.View>
 
           {/* Title Section */}
-          <View style={styles.titleSection}>
-            <Text style={[styles.title, { color: colors.foreground }]}>
-              {coffee.name}
-            </Text>
-            <Text style={[styles.subtitle, { color: colors.muted }]}>
-              {coffee.subtitle}
-            </Text>
+          <Animated.View 
+            entering={FadeInDown.delay(100).springify()}
+            style={styles.titleSection}
+          >
+            <View style={styles.titleRow}>
+              <View style={styles.titleContent}>
+                <Text 
+                  style={[styles.title, { color: colors.foreground }]}
+                  accessibilityRole="header"
+                >
+                  {coffee.name}
+                </Text>
+                <Text style={[styles.subtitle, { color: colors.muted }]}>
+                  {coffee.subtitle}
+                </Text>
+              </View>
+            </View>
             
-            {/* Quick Info */}
+            {/* Quick Info Pills */}
             <View style={styles.quickInfo}>
-              <View style={[styles.infoBadge, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.infoBadgeText, { color: colors.foreground }]}>
+              <View style={[
+                styles.difficultyPill, 
+                { backgroundColor: `${getDifficultyColor(coffee.difficulty)}20` }
+              ]}>
+                <View style={[
+                  styles.difficultyDot,
+                  { backgroundColor: getDifficultyColor(coffee.difficulty) }
+                ]} />
+                <Text style={[
+                  styles.difficultyText, 
+                  { color: getDifficultyColor(coffee.difficulty) }
+                ]}>
                   {coffee.difficulty}
                 </Text>
               </View>
-              <View style={[styles.infoBadge, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.infoBadgeText, { color: colors.foreground }]}>
+              <View style={[styles.infoPill, { backgroundColor: colors.surfaceElevated }]}>
+                <IconSymbol name="clock.fill" size={14} color={colors.muted} />
+                <Text style={[styles.infoPillText, { color: colors.foreground }]}>
                   {coffee.prepTime}
                 </Text>
               </View>
-              <View style={[styles.infoBadge, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.infoBadgeText, { color: colors.foreground }]}>
+              <View style={[styles.infoPill, { backgroundColor: colors.surfaceElevated }]}>
+                <IconSymbol name="gauge" size={14} color={colors.muted} />
+                <Text style={[styles.infoPillText, { color: colors.foreground }]}>
                   {coffee.ratio}
                 </Text>
               </View>
             </View>
-          </View>
+          </Animated.View>
 
           {/* Tabs */}
-          <View style={[styles.tabContainer, { borderBottomColor: colors.border }]}>
+          <Animated.View 
+            entering={FadeInDown.delay(200).springify()}
+            style={[styles.tabContainer, { backgroundColor: colors.surface }]}
+          >
             {tabs.map((tab) => (
               <Pressable
                 key={tab.key}
                 onPress={() => setActiveTab(tab.key)}
                 style={[
                   styles.tab,
-                  activeTab === tab.key && { borderBottomColor: colors.primary, borderBottomWidth: 2 }
+                  activeTab === tab.key && { backgroundColor: colors.primary }
                 ]}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: activeTab === tab.key }}
               >
-                <Text
-                  style={[
-                    styles.tabText,
-                    { color: activeTab === tab.key ? colors.primary : colors.muted }
-                  ]}
-                >
+                <IconSymbol 
+                  name={tab.icon as any} 
+                  size={16} 
+                  color={activeTab === tab.key ? '#FFFFFF' : colors.muted} 
+                />
+                <Text style={[
+                  styles.tabText,
+                  { color: activeTab === tab.key ? '#FFFFFF' : colors.muted }
+                ]}>
                   {tab.label}
                 </Text>
               </Pressable>
             ))}
-          </View>
+          </Animated.View>
 
           {/* Tab Content */}
-          <View style={styles.content}>
+          <Animated.View 
+            entering={FadeInDown.delay(300).springify()}
+            style={styles.content}
+          >
             {activeTab === 'recipe' && (
               <View>
-                {/* Recipe Details */}
-                <View style={[styles.recipeCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                  <View style={styles.recipeRow}>
-                    <Text style={[styles.recipeLabel, { color: colors.muted }]}>Input</Text>
-                    <Text style={[styles.recipeValue, { color: colors.foreground }]}>
-                      {coffee.inputGrams}g ground coffee
+                {/* Recipe Details Card */}
+                <PremiumCard style={styles.recipeCard} elevated>
+                  <Text style={[styles.cardTitle, { color: colors.foreground }]}>
+                    Parameters
+                  </Text>
+                  
+                  <View style={styles.recipeGrid}>
+                    <View style={[styles.recipeItem, { backgroundColor: colors.surfaceElevated }]}>
+                      <Text style={[styles.recipeLabel, { color: colors.muted }]}>Input</Text>
+                      <Text style={[styles.recipeValue, { color: colors.foreground }]}>
+                        {coffee.inputGrams}g
+                      </Text>
+                    </View>
+                    
+                    {coffee.outputGrams && (
+                      <View style={[styles.recipeItem, { backgroundColor: colors.surfaceElevated }]}>
+                        <Text style={[styles.recipeLabel, { color: colors.muted }]}>Output</Text>
+                        <Text style={[styles.recipeValue, { color: colors.foreground }]}>
+                          {coffee.outputGrams}g
+                        </Text>
+                      </View>
+                    )}
+                    
+                    {coffee.outputMl && (
+                      <View style={[styles.recipeItem, { backgroundColor: colors.surfaceElevated }]}>
+                        <Text style={[styles.recipeLabel, { color: colors.muted }]}>Output</Text>
+                        <Text style={[styles.recipeValue, { color: colors.foreground }]}>
+                          {coffee.outputMl}ml
+                        </Text>
+                      </View>
+                    )}
+                    
+                    {coffee.extractionTime && (
+                      <View style={[styles.recipeItem, { backgroundColor: colors.surfaceElevated }]}>
+                        <Text style={[styles.recipeLabel, { color: colors.muted }]}>Time</Text>
+                        <Text style={[styles.recipeValue, { color: colors.foreground }]}>
+                          {coffee.extractionTime}
+                        </Text>
+                      </View>
+                    )}
+                    
+                    {coffee.milkMl && (
+                      <View style={[styles.recipeItem, { backgroundColor: colors.surfaceElevated }]}>
+                        <Text style={[styles.recipeLabel, { color: colors.muted }]}>Milk</Text>
+                        <Text style={[styles.recipeValue, { color: colors.foreground }]}>
+                          {coffee.milkMl}ml
+                        </Text>
+                      </View>
+                    )}
+                    
+                    {coffee.waterMl && (
+                      <View style={[styles.recipeItem, { backgroundColor: colors.surfaceElevated }]}>
+                        <Text style={[styles.recipeLabel, { color: colors.muted }]}>Water</Text>
+                        <Text style={[styles.recipeValue, { color: colors.foreground }]}>
+                          {coffee.waterMl}ml
+                        </Text>
+                      </View>
+                    )}
+                    
+                    {coffee.temperature && (
+                      <View style={[styles.recipeItem, { backgroundColor: colors.surfaceElevated }]}>
+                        <Text style={[styles.recipeLabel, { color: colors.muted }]}>Temp</Text>
+                        <Text style={[styles.recipeValue, { color: colors.foreground }]}>
+                          {coffee.temperature}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </PremiumCard>
+
+                {/* Timer Card */}
+                <PremiumCard style={styles.timerCard} elevated>
+                  <Text style={[styles.cardTitle, { color: colors.foreground }]}>
+                    Extraction Timer
+                  </Text>
+                  <View style={[styles.timerDisplay, { backgroundColor: colors.surfaceElevated }]}>
+                    <Text style={[styles.timerText, { color: colors.foreground }]}>
+                      {formatTime(timerSeconds)}
                     </Text>
                   </View>
-                  
-                  {coffee.outputGrams && (
-                    <View style={styles.recipeRow}>
-                      <Text style={[styles.recipeLabel, { color: colors.muted }]}>Output</Text>
-                      <Text style={[styles.recipeValue, { color: colors.foreground }]}>
-                        {coffee.outputGrams}g espresso
-                      </Text>
-                    </View>
-                  )}
-                  
-                  {coffee.outputMl && (
-                    <View style={styles.recipeRow}>
-                      <Text style={[styles.recipeLabel, { color: colors.muted }]}>Output</Text>
-                      <Text style={[styles.recipeValue, { color: colors.foreground }]}>
-                        {coffee.outputMl}ml
-                      </Text>
-                    </View>
-                  )}
-                  
-                  {coffee.extractionTime && (
-                    <View style={styles.recipeRow}>
-                      <Text style={[styles.recipeLabel, { color: colors.muted }]}>Time</Text>
-                      <Text style={[styles.recipeValue, { color: colors.foreground }]}>
-                        {coffee.extractionTime}
-                      </Text>
-                    </View>
-                  )}
-                  
-                  {coffee.milkMl && (
-                    <View style={styles.recipeRow}>
-                      <Text style={[styles.recipeLabel, { color: colors.muted }]}>Milk</Text>
-                      <Text style={[styles.recipeValue, { color: colors.foreground }]}>
-                        {coffee.milkMl}ml steamed
-                      </Text>
-                    </View>
-                  )}
-                  
-                  {coffee.waterMl && (
-                    <View style={styles.recipeRow}>
-                      <Text style={[styles.recipeLabel, { color: colors.muted }]}>Water</Text>
-                      <Text style={[styles.recipeValue, { color: colors.foreground }]}>
-                        {coffee.waterMl}ml hot water
-                      </Text>
-                    </View>
-                  )}
-                  
-                  {coffee.temperature && (
-                    <View style={styles.recipeRow}>
-                      <Text style={[styles.recipeLabel, { color: colors.muted }]}>Temp</Text>
-                      <Text style={[styles.recipeValue, { color: colors.foreground }]}>
-                        {coffee.temperature}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-
-                {/* Timer */}
-                <View style={[styles.timerCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                  <Text style={[styles.timerLabel, { color: colors.muted }]}>Extraction Timer</Text>
-                  <Text style={[styles.timerDisplay, { color: colors.foreground }]}>
-                    {formatTime(timerSeconds)}
-                  </Text>
                   <View style={styles.timerButtons}>
-                    <Pressable
+                    <PremiumButton
+                      variant={timerRunning ? "outline" : "primary"}
+                      size="md"
                       onPress={handleTimerToggle}
-                      style={[styles.timerButton, { backgroundColor: colors.primary }]}
+                      accessibilityLabel={timerRunning ? "Stop timer" : "Start timer"}
                     >
-                      <Text style={styles.timerButtonText}>
-                        {timerRunning ? 'Stop' : 'Start'}
-                      </Text>
-                    </Pressable>
-                    <Pressable
+                      {timerRunning ? 'Stop' : 'Start'}
+                    </PremiumButton>
+                    <PremiumButton
+                      variant="ghost"
+                      size="md"
                       onPress={resetTimer}
-                      style={[styles.timerButtonSecondary, { borderColor: colors.border }]}
+                      accessibilityLabel="Reset timer"
                     >
-                      <Text style={[styles.timerButtonSecondaryText, { color: colors.foreground }]}>
-                        Reset
-                      </Text>
-                    </Pressable>
+                      Reset
+                    </PremiumButton>
                   </View>
-                </View>
+                </PremiumCard>
 
                 {/* Steps */}
-                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Steps</Text>
-                {coffee.steps.map((step, index) => (
-                  <View key={index} style={styles.stepRow}>
-                    <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                      <Text style={styles.stepNumberText}>{index + 1}</Text>
+                <PremiumCard style={styles.stepsCard} elevated>
+                  <Text style={[styles.cardTitle, { color: colors.foreground }]}>
+                    Steps
+                  </Text>
+                  {coffee.steps.map((step, index) => (
+                    <View key={index} style={styles.stepRow}>
+                      <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                        <Text style={styles.stepNumberText}>{index + 1}</Text>
+                      </View>
+                      <Text style={[styles.stepText, { color: colors.foreground }]}>
+                        {step}
+                      </Text>
                     </View>
-                    <Text style={[styles.stepText, { color: colors.foreground }]}>{step}</Text>
-                  </View>
-                ))}
+                  ))}
+                </PremiumCard>
               </View>
             )}
 
             {activeTab === 'about' && (
               <View>
-                <Text style={[styles.description, { color: colors.foreground }]}>
-                  {coffee.description}
-                </Text>
+                <PremiumCard style={styles.aboutCard} elevated>
+                  <Text style={[styles.description, { color: colors.foreground }]}>
+                    {coffee.description}
+                  </Text>
+                </PremiumCard>
                 
-                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-                  Flavor Profile
-                </Text>
-                <View style={styles.flavorTags}>
-                  {coffee.flavorProfile.map((flavor, index) => (
-                    <View key={index} style={[styles.flavorTag, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                      <Text style={[styles.flavorTagText, { color: colors.foreground }]}>{flavor}</Text>
-                    </View>
-                  ))}
-                </View>
+                <PremiumCard style={styles.flavorCard} elevated>
+                  <Text style={[styles.cardTitle, { color: colors.foreground }]}>
+                    Flavor Profile
+                  </Text>
+                  <View style={styles.flavorTags}>
+                    {coffee.flavorProfile.map((flavor, index) => (
+                      <View 
+                        key={index} 
+                        style={[styles.flavorTag, { backgroundColor: `${colors.primary}15` }]}
+                      >
+                        <Text style={[styles.flavorTagText, { color: colors.primary }]}>
+                          {flavor}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </PremiumCard>
               </View>
             )}
 
             {activeTab === 'tips' && (
               <View>
-                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Pro Tips</Text>
                 {coffee.tips.map((tip, index) => (
-                  <View key={index} style={[styles.tipCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                    <Text style={[styles.tipText, { color: colors.foreground }]}>{tip}</Text>
-                  </View>
+                  <PremiumCard key={index} style={styles.tipCard} elevated>
+                    <View style={styles.tipContent}>
+                      <View style={[styles.tipIcon, { backgroundColor: `${colors.warning}15` }]}>
+                        <IconSymbol name="lightbulb.fill" size={20} color={colors.warning} />
+                      </View>
+                      <Text style={[styles.tipText, { color: colors.foreground }]}>
+                        {tip}
+                      </Text>
+                    </View>
+                  </PremiumCard>
                 ))}
               </View>
             )}
-          </View>
+          </Animated.View>
         </ScrollView>
       </ScreenContainer>
     </>
@@ -302,152 +381,193 @@ export default function CoffeeDetailScreen() {
 
 const styles = StyleSheet.create({
   heroContainer: {
-    width: '100%',
-    aspectRatio: 1,
-    backgroundColor: '#f5f5f5',
+    height: 300,
+    position: 'relative',
   },
   heroImage: {
     width: '100%',
     height: '100%',
   },
+  heroGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 100,
+    backgroundColor: 'transparent',
+  },
   titleSection: {
-    padding: 16,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  titleContent: {
+    flex: 1,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700',
     letterSpacing: -0.5,
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
-    marginTop: 4,
+    fontSize: 17,
+    lineHeight: 22,
   },
   quickInfo: {
     flexDirection: 'row',
-    marginTop: 12,
+    flexWrap: 'wrap',
     gap: 8,
   },
-  infoBadge: {
+  difficultyPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingVertical: 8,
+    borderRadius: 10,
+    gap: 6,
   },
-  infoBadgeText: {
+  difficultyDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  difficultyText: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: '600',
     textTransform: 'capitalize',
+  },
+  infoPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    gap: 6,
+  },
+  infoPillText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
   tabContainer: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    marginHorizontal: 16,
+    marginHorizontal: 20,
+    padding: 4,
+    borderRadius: 14,
+    marginBottom: 20,
   },
   tab: {
     flex: 1,
-    paddingVertical: 12,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 6,
   },
   tabText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
   },
   content: {
-    padding: 16,
-    paddingBottom: 40,
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
-  recipeCard: {
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '700',
     marginBottom: 16,
   },
-  recipeRow: {
+  recipeCard: {
+    padding: 16,
+    marginBottom: 16,
+  },
+  recipeGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
+    flexWrap: 'wrap',
+    gap: 10,
   },
-  recipeLabel: {
-    fontSize: 15,
-  },
-  recipeValue: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  timerCard: {
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    marginBottom: 24,
+  recipeItem: {
+    minWidth: '30%',
+    flex: 1,
+    padding: 12,
+    borderRadius: 12,
     alignItems: 'center',
   },
-  timerLabel: {
-    fontSize: 14,
-    marginBottom: 8,
+  recipeLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  recipeValue: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  timerCard: {
+    padding: 16,
+    marginBottom: 16,
+    alignItems: 'center',
   },
   timerDisplay: {
+    width: '100%',
+    paddingVertical: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  timerText: {
     fontSize: 48,
     fontWeight: '700',
     fontVariant: ['tabular-nums'],
-    marginBottom: 16,
   },
   timerButtons: {
     flexDirection: 'row',
     gap: 12,
   },
-  timerButton: {
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 24,
-  },
-  timerButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  timerButtonSecondary: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-    borderWidth: 1,
-  },
-  timerButtonSecondaryText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 12,
-    marginTop: 8,
+  stepsCard: {
+    padding: 16,
+    marginBottom: 16,
   },
   stepRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 16,
+    gap: 12,
   },
   stepNumber: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
-    marginTop: 2,
   },
   stepNumberText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
   },
   stepText: {
     flex: 1,
     fontSize: 15,
     lineHeight: 22,
   },
+  aboutCard: {
+    padding: 16,
+    marginBottom: 16,
+  },
   description: {
     fontSize: 16,
     lineHeight: 24,
-    marginBottom: 20,
+  },
+  flavorCard: {
+    padding: 16,
+    marginBottom: 16,
   },
   flavorTags: {
     flexDirection: 'row',
@@ -457,20 +577,30 @@ const styles = StyleSheet.create({
   flavorTag: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
+    borderRadius: 10,
   },
   flavorTagText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   tipCard: {
-    borderRadius: 12,
     padding: 16,
-    borderWidth: 1,
     marginBottom: 12,
   },
+  tipContent: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  tipIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   tipText: {
+    flex: 1,
     fontSize: 15,
     lineHeight: 22,
   },
