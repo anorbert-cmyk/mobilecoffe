@@ -87,3 +87,12 @@
 - [ ] User favorites/bookmarks
 - [ ] Brewing timer with notifications
 - [ ] Cloud sync for user data
+
+
+## v5 Make Coffee Apple-Quality Redesign
+- [x] Research Apple app design patterns (App Store, Music, Fitness+)
+- [x] Redesign Make Coffee screen with Apple-quality layout
+- [x] Add featured/hero section at top
+- [x] Implement horizontal scrolling categories
+- [x] Add large card design with rich visuals
+- [x] Polish animations and transitions
