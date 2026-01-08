@@ -634,20 +634,24 @@ const styles = StyleSheet.create({
 
   // Horizontal Scroll Cards
   horizontalScrollContent: {
-    paddingHorizontal: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
     gap: 14,
   },
   horizontalCard: {
     width: HORIZONTAL_CARD_WIDTH,
+    height: 240,
     borderRadius: 16,
     overflow: 'hidden',
   },
   horizontalCardImage: {
     width: '100%',
-    height: 160,
+    height: 140,
   },
   horizontalCardContent: {
     padding: 14,
+    flex: 1,
+    justifyContent: 'space-between',
   },
   difficultyDot: {
     width: 8,
@@ -659,10 +663,12 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     marginBottom: 2,
+    lineHeight: 22,
   },
   horizontalCardSubtitle: {
     fontSize: 14,
     marginBottom: 8,
+    lineHeight: 18,
   },
   horizontalCardMeta: {
     flexDirection: 'row',
@@ -712,14 +718,17 @@ const styles = StyleSheet.create({
   },
   smallCardContent: {
     padding: 12,
+    minHeight: 56,
   },
   smallCardTitle: {
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 2,
+    lineHeight: 20,
   },
   smallCardSubtitle: {
     fontSize: 13,
+    lineHeight: 17,
   },
 
   // Tips Card

@@ -12,9 +12,14 @@ export interface CoffeeRecipe {
   outputGrams?: number;
   outputMl?: number;
   extractionTime?: string;
+  
+  // Ratio visualization
+  espressoMl?: number;
   milkMl?: number;
-  milkFoamDepth?: string;
+  foamMl?: number;
   waterMl?: number;
+  milkFoamDepth?: string;
+  
   ratio: string;
   temperature?: string;
   
@@ -41,6 +46,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     inputGrams: 18,
     outputGrams: 36,
     extractionTime: '25-30 seconds',
+    
+    espressoMl: 36,
     ratio: '1:2',
     temperature: '93°C (200°F)',
     description: 'The foundation of all espresso drinks. A concentrated coffee brewed by forcing hot water through finely-ground coffee at high pressure.',
@@ -70,6 +77,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     inputGrams: 18,
     outputGrams: 36,
     extractionTime: '25-30 seconds',
+    
+    espressoMl: 60,
     ratio: '1:2',
     temperature: '93°C (200°F)',
     description: 'A double shot of espresso, the standard serving size in most specialty coffee shops. Same ratio as single, just more coffee.',
@@ -98,6 +107,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     inputGrams: 18,
     outputGrams: 22,
     extractionTime: '15-20 seconds',
+    
+    espressoMl: 25,
     ratio: '1:1.2',
     temperature: '93°C (200°F)',
     description: 'A "restricted" shot using less water for a more concentrated, sweeter espresso with less bitterness.',
@@ -126,6 +137,9 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     inputGrams: 18,
     outputMl: 110,
     extractionTime: '35-45 seconds',
+    
+    espressoMl: 60,
+    waterMl: 40,
     ratio: '1:3 to 1:4',
     temperature: '93°C (200°F)',
     description: 'A "long" espresso shot with more water passed through the coffee, resulting in a larger, milder drink.',
@@ -156,7 +170,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     extractionTime: '25-30 seconds',
     milkMl: 110,
     milkFoamDepth: '1-2mm microfoam',
-    ratio: '1:3 (espresso to milk)',
+    
+    espressoMl: 60,    ratio: '1:3 (espresso to milk)',
     temperature: '60-65°C (140-150°F)',
     description: 'A velvety smooth coffee with a double shot of espresso and silky steamed milk with minimal foam. Originated in Australia/New Zealand.',
     flavorProfile: ['Velvety', 'Strong coffee flavor', 'Creamy', 'Balanced'],
@@ -184,9 +199,11 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     prepTime: '2 min',
     inputGrams: 18,
     outputGrams: 36,
-    extractionTime: '25-30 seconds',
+    extractionTime: '25-30 seconds',    milkFoamDepth: '1cm thick foam',
+    
+    espressoMl: 30,
     milkMl: 60,
-    milkFoamDepth: '1cm thick foam',
+    foamMl: 60,
     ratio: '1:1:1 (espresso:milk:foam)',
     temperature: '60-65°C (140-150°F)',
     description: 'The classic Italian coffee drink with equal parts espresso, steamed milk, and thick milk foam. Often dusted with cocoa.',
@@ -218,6 +235,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     extractionTime: '25-30 seconds',
     milkMl: 200,
     milkFoamDepth: '5-10mm foam',
+    
+    espressoMl: 60,    foamMl: 20,
     ratio: '1:4 (espresso to milk)',
     temperature: '60-65°C (140-150°F)',
     description: 'A mild, milky coffee drink with espresso and lots of steamed milk. Perfect for those who prefer a gentler coffee flavor.',
@@ -248,6 +267,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     outputGrams: 36,
     milkMl: 200,
     milkFoamDepth: '15-20mm foam',
+    
+    espressoMl: 30,    foamMl: 30,
     ratio: '1:6 (espresso to milk)',
     temperature: '60-65°C (140-150°F)',
     description: 'Steamed milk "stained" with espresso, poured to create distinct layers. The reverse of a caffè latte.',
@@ -279,6 +300,9 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     extractionTime: '25-30 seconds',
     milkMl: 15,
     milkFoamDepth: 'Dollop of foam',
+    
+    espressoMl: 30,
+    foamMl: 15,
     ratio: '4:1 (espresso to foam)',
     temperature: '60-65°C (140-150°F)',
     description: 'An espresso "marked" or "stained" with just a dollop of milk foam. Strong coffee with a hint of creaminess.',
@@ -308,7 +332,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     outputGrams: 36,
     extractionTime: '25-30 seconds',
     waterMl: 150,
-    ratio: '1:4 (espresso to water)',
+    
+    espressoMl: 60,    ratio: '1:4 (espresso to water)',
     temperature: '90-95°C (194-203°F)',
     description: 'Espresso diluted with hot water, creating a coffee similar in strength to drip coffee but with espresso\'s flavor profile.',
     flavorProfile: ['Smooth', 'Less intense', 'Clean', 'Drip-like strength'],
@@ -339,7 +364,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     extractionTime: '25-30 seconds',
     milkMl: 60,
     milkFoamDepth: 'Minimal foam',
-    ratio: '1:1 (espresso to milk)',
+    
+    espressoMl: 30,    ratio: '1:1 (espresso to milk)',
     temperature: '60-65°C (140-150°F)',
     description: 'A Spanish drink meaning "cut" - espresso cut with an equal amount of warm milk to reduce acidity. Small but perfectly balanced.',
     flavorProfile: ['Balanced', 'Smooth', 'Strong', 'Reduced acidity'],
@@ -366,6 +392,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     prepTime: '5 min',
     inputGrams: 18,
     outputMl: 130,
+    
+    espressoMl: 120,
     ratio: '1:7 (coffee to water)',
     temperature: '100°C (212°F) starting water',
     description: 'Strong, rich coffee brewed on the stovetop using a Moka pot. Not true espresso, but a beloved Italian tradition.',

@@ -10,6 +10,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { PremiumCard } from "@/components/ui/premium-card";
 import { PremiumButton } from "@/components/ui/premium-button";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { CoffeeRatioViz } from "@/components/coffee-ratio-viz";
 import { getCoffeeById } from "@/data/coffees";
 import { useColors } from "@/hooks/use-colors";
 
@@ -209,6 +210,19 @@ export default function CoffeeDetailScreen() {
           >
             {activeTab === 'recipe' && (
               <View>
+                {/* Coffee Ratio Visualization */}
+                {(coffee.espressoMl || coffee.milkMl || coffee.foamMl || coffee.waterMl) && (
+                  <CoffeeRatioViz
+                    ratio={{
+                      espresso: coffee.espressoMl,
+                      milk: coffee.milkMl,
+                      foam: coffee.foamMl,
+                      water: coffee.waterMl,
+                    }}
+                    title="Coffee Composition"
+                  />
+                )}
+
                 {/* Recipe Details Card */}
                 <PremiumCard style={styles.recipeCard} elevated>
                   <Text style={[styles.cardTitle, { color: colors.foreground }]}>

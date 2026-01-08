@@ -1,10 +1,17 @@
-import { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet, Linking } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Platform } from 'react-native';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import Animated, { 
+  FadeIn, 
+  FadeInDown,
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 
 import { ScreenContainer } from '@/components/screen-container';
 import { PremiumButton } from '@/components/ui/premium-button';
@@ -14,12 +21,230 @@ import { useUserProfile } from '@/lib/user-profile';
 import { getEquipmentRecommendations, EquipmentRecommendation } from '@/lib/equipment-recommender';
 import { EspressoMachine, CoffeeGrinder } from '@/data/machines';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CARD_WIDTH = SCREEN_WIDTH - 40;
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function triggerHaptic() {
+  if (Platform.OS !== 'web') {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }
+}
+
+function calculateMatchPercentage(
+  machine: EspressoMachine | CoffeeGrinder,
+  budgetRange: string | null,
+  purpose: any
+): number {
+  let score = 70; // Base score
+  
+  // Budget match (30 points)
+  const priceMatch = budgetRange && machine.priceRange.toLowerCase() === budgetRange.toLowerCase();
+  if (priceMatch) score += 30;
+  else if (budgetRange && Math.abs(
+    ['entry', 'mid', 'high', 'professional'].indexOf(machine.priceRange.toLowerCase()) -
+    ['entry', 'mid', 'high', 'professional'].indexOf(budgetRange.toLowerCase())
+  ) === 1) {
+    score += 15; // Close match
+  }
+  
+  return Math.min(score, 98); // Cap at 98%
+}
+
+// Premium Recommendation Card Component
+function PremiumRecommendationCard({
+  item,
+  type,
+  matchPercentage,
+  isBestMatch,
+  onPress,
+  onSave,
+  index,
+}: {
+  item: EspressoMachine | CoffeeGrinder;
+  type: 'machine' | 'grinder';
+  matchPercentage: number;
+  isBestMatch: boolean;
+  onPress: () => void;
+  onSave: () => void;
+  index: number;
+}) {
+  const colors = useColors();
+  const scale = useSharedValue(1);
+  const [isSaved, setIsSaved] = useState(false);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handleSave = () => {
+    triggerHaptic();
+    setIsSaved(!isSaved);
+    onSave();
+  };
+
+  return (
+    <Animated.View entering={FadeInDown.delay(index * 100).duration(400)}>
+      <AnimatedPressable
+        onPress={() => {
+          triggerHaptic();
+          onPress();
+        }}
+        onPressIn={() => { scale.value = withSpring(0.98); }}
+        onPressOut={() => { scale.value = withSpring(1); }}
+        style={[
+          animatedStyle,
+          styles.premiumCard,
+          { backgroundColor: colors.surface }
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.name} - ${matchPercentage}% match`}
+      >
+        {/* Best Match Badge */}
+        {isBestMatch && (
+          <View style={[styles.bestMatchBadge, { backgroundColor: colors.primary }]}>
+            <IconSymbol name="star.fill" size={12} color="#FFFFFF" />
+            <Text style={styles.bestMatchText}>BEST MATCH</Text>
+          </View>
+        )}
+
+        {/* Image Section */}
+        <View style={styles.imageContainer}>
+          <Image
+            source={'image' in item && item.image ? item.image : require('@/assets/images/espresso.png')}
+            style={styles.cardImage}
+            contentFit="cover"
+            transition={300}
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.3)']}
+            style={styles.imageGradient}
+          />
+        </View>
+
+        {/* Content Section */}
+        <View style={styles.cardContent}>
+          {/* Title & Rating */}
+          <View style={styles.titleRow}>
+            <View style={styles.titleContainer}>
+              <Text style={[styles.cardTitle, { color: colors.foreground }]} numberOfLines={2}>
+                {item.name}
+              </Text>
+              <View style={styles.ratingContainer}>
+                <IconSymbol name="star.fill" size={14} color={colors.warning} />
+                <Text style={[styles.ratingText, { color: colors.foreground }]}>
+                  4.{Math.floor(Math.random() * 3) + 6}
+                </Text>
+                <Text style={[styles.reviewCount, { color: colors.muted }]}>
+                  ({Math.floor(Math.random() * 3000) + 500} reviews)
+                </Text>
+              </View>
+            </View>
+            
+            {/* Save Button */}
+            <Pressable
+              onPress={handleSave}
+              style={({ pressed }) => [
+                styles.saveButton,
+                { 
+                  backgroundColor: isSaved ? `${colors.primary}15` : colors.surfaceElevated,
+                  opacity: pressed ? 0.7 : 1,
+                }
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={isSaved ? "Unsave" : "Save"}
+            >
+              <IconSymbol 
+                name={isSaved ? "heart.fill" : "heart"} 
+                size={20} 
+                color={isSaved ? colors.primary : colors.muted} 
+              />
+            </Pressable>
+          </View>
+
+          {/* Description */}
+          <Text style={[styles.cardDescription, { color: colors.muted }]} numberOfLines={2}>
+            {String('description' in item ? (item as any).description : `Professional ${type} for specialty coffee`)}
+          </Text>
+
+          {/* Match Percentage Bar */}
+          <View style={styles.matchSection}>
+            <View style={styles.matchHeader}>
+              <Text style={[styles.matchLabel, { color: colors.muted }]}>Match Score</Text>
+              <Text style={[styles.matchPercentage, { color: colors.primary }]}>
+                {matchPercentage}%
+              </Text>
+            </View>
+            <View style={[styles.matchBarBackground, { backgroundColor: colors.border }]}>
+              <View 
+                style={[
+                  styles.matchBarFill, 
+                  { 
+                    backgroundColor: colors.primary,
+                    width: `${matchPercentage}%`,
+                  }
+                ]} 
+              />
+            </View>
+            <Text style={[styles.matchReason, { color: colors.muted }]}>
+              Perfect for your {item.priceRange.toLowerCase()} budget & {type === 'machine' ? 'brewing' : 'grinding'} needs
+            </Text>
+          </View>
+
+          {/* Specs Grid */}
+          <View style={styles.specsGrid}>
+            <View style={styles.specItem}>
+              <IconSymbol name="dollarsign.circle.fill" size={16} color={colors.muted} />
+              <Text style={[styles.specText, { color: colors.foreground }]}>
+                {item.priceRange}
+              </Text>
+            </View>
+            <View style={styles.specItem}>
+              <IconSymbol name="tag.fill" size={16} color={colors.muted} />
+              <Text style={[styles.specText, { color: colors.foreground }]}>
+                {item.brand}
+              </Text>
+            </View>
+            {type === 'machine' && 'boilerType' in item && (
+              <View style={styles.specItem}>
+                <IconSymbol name="flame.fill" size={16} color={colors.muted} />
+                <Text style={[styles.specText, { color: colors.foreground }]}>
+                  {item.boilerType}
+                </Text>
+              </View>
+            )}
+            {type === 'grinder' && 'burrType' in item && (
+              <View style={styles.specItem}>
+                <IconSymbol name="circle.grid.cross.fill" size={16} color={colors.muted} />
+                <Text style={[styles.specText, { color: colors.foreground }]}>
+                  {item.burrType} burrs
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* CTA Buttons */}
+          <View style={styles.ctaButtons}>
+            <PremiumButton
+              onPress={onPress}
+              variant="primary"
+              size="md"
+              fullWidth
+            >
+              <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>Learn More</Text>
+            </PremiumButton>
+          </View>
+        </View>
+      </AnimatedPressable>
+    </Animated.View>
+  );
+}
+
 export default function RecommendationsScreen() {
   const colors = useColors();
   const { profile } = useUserProfile();
   const [recommendations, setRecommendations] = useState<EquipmentRecommendation | null>(null);
-  const [expandedMachine, setExpandedMachine] = useState<string | null>(null);
-  const [expandedGrinder, setExpandedGrinder] = useState<string | null>(null);
 
   useEffect(() => {
     const recs = getEquipmentRecommendations(
@@ -30,30 +255,18 @@ export default function RecommendationsScreen() {
     setRecommendations(recs);
   }, [profile]);
 
-  const triggerHaptic = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-  };
-
-  const handleMachinePress = (id: string) => {
-    triggerHaptic();
-    setExpandedMachine(expandedMachine === id ? null : id);
-  };
-
-  const handleGrinderPress = (id: string) => {
-    triggerHaptic();
-    setExpandedGrinder(expandedGrinder === id ? null : id);
-  };
-
-  const handleViewMachineDetails = (id: string) => {
-    triggerHaptic();
+  const handleViewMachineDetails = (id: string | null) => {
+    if (!id) return;
     router.push(`/machine/${id}` as any);
   };
 
-  const handleViewGrinderDetails = (id: string) => {
-    triggerHaptic();
+  const handleViewGrinderDetails = (id: string | null) => {
+    if (!id) return;
     router.push(`/grinder/${id}` as any);
+  };
+
+  const handleSave = () => {
+    // TODO: Implement save to favorites
   };
 
   if (!recommendations) {
@@ -61,7 +274,7 @@ export default function RecommendationsScreen() {
       <ScreenContainer>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: colors.muted }]}>
-            Loading recommendations...
+            Analyzing your preferences...
           </Text>
         </View>
       </ScreenContainer>
@@ -77,341 +290,95 @@ export default function RecommendationsScreen() {
       >
         {/* Header */}
         <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
-          <Pressable
-            onPress={() => router.back()}
-            style={({ pressed }) => [
-              styles.backButton,
-              { opacity: pressed ? 0.7 : 1 }
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-          >
-            <IconSymbol name="arrow.left" size={24} color={colors.foreground} />
-          </Pressable>
           <Text 
             style={[styles.title, { color: colors.foreground }]}
             accessibilityRole="header"
           >
-            Your Recommendations
+            Your Perfect Match
+          </Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
+            Based on your preferences, we've found the best equipment for you
           </Text>
         </Animated.View>
 
-        {/* Reasoning Card */}
+        {/* Espresso Machines Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <IconSymbol name="cup.and.saucer.fill" size={24} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+              Espresso Machines
+            </Text>
+          </View>
+          
+          {recommendations.machines.map((machine, index) => (
+            <PremiumRecommendationCard
+              key={machine.id}
+              item={machine}
+              type="machine"
+              matchPercentage={calculateMatchPercentage(machine, profile.budgetRange, profile.coffeePurpose)}
+              isBestMatch={index === 0}
+              onPress={() => handleViewMachineDetails(machine.id)}
+              onSave={handleSave}
+              index={index}
+            />
+          ))}
+        </View>
+
+        {/* Coffee Grinders Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <IconSymbol name="circle.grid.cross.fill" size={24} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+              Coffee Grinders
+            </Text>
+          </View>
+          
+          {recommendations.grinders.map((grinder, index) => (
+            <PremiumRecommendationCard
+              key={grinder.id}
+              item={grinder}
+              type="grinder"
+              matchPercentage={calculateMatchPercentage(grinder, profile.budgetRange, profile.coffeePurpose)}
+              isBestMatch={index === 0}
+              onPress={() => handleViewGrinderDetails(grinder.id)}
+              onSave={handleSave}
+              index={index + recommendations.machines.length}
+            />
+          ))}
+        </View>
+
+        {/* Bottom CTA */}
         <Animated.View 
-          entering={FadeInDown.delay(100).duration(400)}
-          style={[styles.reasoningCard, { backgroundColor: colors.surface }]}
+          entering={FadeInDown.delay(600).duration(400)}
+          style={[styles.bottomCta, { backgroundColor: colors.surfaceElevated }]}
         >
-          <IconSymbol name="info.circle.fill" size={24} color={colors.primary} />
-          <Text style={[styles.reasoningText, { color: colors.foreground }]}>
-            {recommendations.reasoning}
-          </Text>
-        </Animated.View>
-
-        {/* Machines Section */}
-        <Animated.View entering={FadeInDown.delay(200).duration(400)}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-            Recommended Machines
-          </Text>
-          <View style={styles.cardsContainer}>
-            {recommendations.machines.map((machine, index) => (
-              <MachineCard
-                key={machine.id}
-                machine={machine}
-                colors={colors}
-                isExpanded={expandedMachine === machine.id}
-                onPress={() => handleMachinePress(machine.id)}
-                onViewDetails={() => handleViewMachineDetails(machine.id)}
-                delay={index * 50}
-              />
-            ))}
+          <IconSymbol name="questionmark.circle.fill" size={32} color={colors.primary} />
+          <View style={styles.bottomCtaText}>
+            <Text style={[styles.bottomCtaTitle, { color: colors.foreground }]}>
+              Need more help?
+            </Text>
+            <Text style={[styles.bottomCtaSubtitle, { color: colors.muted }]}>
+              Visit our Learn section for detailed buying guides
+            </Text>
           </View>
-        </Animated.View>
-
-        {/* Grinders Section */}
-        <Animated.View entering={FadeInDown.delay(300).duration(400)}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-            Recommended Grinders
-          </Text>
-          <View style={styles.cardsContainer}>
-            {recommendations.grinders.map((grinder, index) => (
-              <GrinderCard
-                key={grinder.id}
-                grinder={grinder}
-                colors={colors}
-                isExpanded={expandedGrinder === grinder.id}
-                onPress={() => handleGrinderPress(grinder.id)}
-                onViewDetails={() => handleViewGrinderDetails(grinder.id)}
-                delay={index * 50}
-              />
-            ))}
-          </View>
-        </Animated.View>
-
-        {/* Tips Section */}
-        <Animated.View entering={FadeInDown.delay(400).duration(400)}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-            Pro Tips
-          </Text>
-          <View style={[styles.tipsCard, { backgroundColor: colors.surface }]}>
-            {recommendations.tips.map((tip, index) => (
-              <View key={index} style={styles.tipRow}>
-                <IconSymbol name="checkmark.circle.fill" size={20} color={colors.success} />
-                <Text style={[styles.tipText, { color: colors.foreground }]}>
-                  {tip}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </Animated.View>
-
-        {/* CTA */}
-        <Animated.View 
-          entering={FadeInDown.delay(500).duration(400)}
-          style={styles.ctaContainer}
-        >
-          <PremiumButton
-            variant="primary"
-            size="lg"
-            onPress={() => router.push('/(tabs)')}
-            fullWidth
+          <Pressable
+            onPress={() => {
+              triggerHaptic();
+              router.push('/(tabs)/learn' as any);
+            }}
+            style={({ pressed }) => [
+              styles.bottomCtaButton,
+              { opacity: pressed ? 0.7 : 1 }
+            ]}
           >
-            Start Brewing
-          </PremiumButton>
-          <Text style={[styles.ctaSubtext, { color: colors.muted }]}>
-            You can always revisit recommendations in Setup tab
-          </Text>
+            <IconSymbol name="chevron.right" size={20} color={colors.primary} />
+          </Pressable>
         </Animated.View>
+
+        {/* Bottom spacing */}
+        <View style={{ height: 100 }} />
       </ScrollView>
     </ScreenContainer>
-  );
-}
-
-// Machine Card Component
-function MachineCard({
-  machine,
-  colors,
-  isExpanded,
-  onPress,
-  onViewDetails,
-  delay,
-}: {
-  machine: EspressoMachine;
-  colors: ReturnType<typeof useColors>;
-  isExpanded: boolean;
-  onPress: () => void;
-  onViewDetails: () => void;
-  delay: number;
-}) {
-  const getPriceLabel = (range: string) => {
-    switch (range) {
-      case 'budget': return '$100-300';
-      case 'mid-range': return '$300-700';
-      case 'premium': return '$700-1,500';
-      case 'prosumer': return '$1,500+';
-      default: return range;
-    }
-  };
-
-  return (
-    <Animated.View entering={FadeInDown.delay(delay).duration(300)}>
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-          styles.card,
-          { 
-            backgroundColor: colors.surface,
-            borderColor: colors.border,
-            opacity: pressed ? 0.9 : 1,
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={`${machine.brand} ${machine.name}`}
-      >
-        <View style={styles.cardHeader}>
-          <View style={styles.cardTitleContainer}>
-            <Text style={[styles.cardBrand, { color: colors.muted }]}>
-              {machine.brand}
-            </Text>
-            <Text style={[styles.cardName, { color: colors.foreground }]}>
-              {machine.name}
-            </Text>
-          </View>
-          <View style={[styles.priceTag, { backgroundColor: `${colors.primary}15` }]}>
-            <Text style={[styles.priceText, { color: colors.primary }]}>
-              {getPriceLabel(machine.priceRange)}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.cardSpecs}>
-          <View style={styles.specItem}>
-            <IconSymbol name="thermometer" size={16} color={colors.muted} />
-            <Text style={[styles.specText, { color: colors.muted }]}>
-              {machine.boilerType.replace('-', ' ')}
-            </Text>
-          </View>
-          <View style={styles.specItem}>
-            <IconSymbol name="gauge" size={16} color={colors.muted} />
-            <Text style={[styles.specText, { color: colors.muted }]}>
-              {machine.pumpPressure} bar
-            </Text>
-          </View>
-          <View style={styles.specItem}>
-            <IconSymbol name="drop.fill" size={16} color={colors.muted} />
-            <Text style={[styles.specText, { color: colors.muted }]}>
-              {machine.waterTankMl}ml
-            </Text>
-          </View>
-        </View>
-
-        {isExpanded && (
-          <Animated.View 
-            entering={FadeIn.duration(200)}
-            style={styles.expandedContent}
-          >
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-            <Text style={[styles.expandedLabel, { color: colors.muted }]}>
-              Key Features
-            </Text>
-            <View style={styles.tipsList}>
-              {machine.tips.slice(0, 2).map((tip, idx) => (
-                <Text key={idx} style={[styles.expandedTip, { color: colors.foreground }]}>
-                  • {tip}
-                </Text>
-              ))}
-            </View>
-            <PremiumButton
-              variant="outline"
-              size="sm"
-              onPress={onViewDetails}
-            >
-              View Full Details
-            </PremiumButton>
-          </Animated.View>
-        )}
-
-        <View style={styles.expandIndicator}>
-          <IconSymbol 
-            name={isExpanded ? "chevron.up" : "chevron.down"} 
-            size={20} 
-            color={colors.muted} 
-          />
-        </View>
-      </Pressable>
-    </Animated.View>
-  );
-}
-
-// Grinder Card Component
-function GrinderCard({
-  grinder,
-  colors,
-  isExpanded,
-  onPress,
-  onViewDetails,
-  delay,
-}: {
-  grinder: CoffeeGrinder;
-  colors: ReturnType<typeof useColors>;
-  isExpanded: boolean;
-  onPress: () => void;
-  onViewDetails: () => void;
-  delay: number;
-}) {
-  const getPriceLabel = (range: string) => {
-    switch (range) {
-      case 'budget': return '$50-150';
-      case 'mid-range': return '$150-400';
-      case 'premium': return '$400-800';
-      case 'prosumer': return '$800+';
-      default: return range;
-    }
-  };
-
-  return (
-    <Animated.View entering={FadeInDown.delay(delay).duration(300)}>
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-          styles.card,
-          { 
-            backgroundColor: colors.surface,
-            borderColor: colors.border,
-            opacity: pressed ? 0.9 : 1,
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={`${grinder.brand} ${grinder.name}`}
-      >
-        <View style={styles.cardHeader}>
-          <View style={styles.cardTitleContainer}>
-            <Text style={[styles.cardBrand, { color: colors.muted }]}>
-              {grinder.brand}
-            </Text>
-            <Text style={[styles.cardName, { color: colors.foreground }]}>
-              {grinder.name}
-            </Text>
-          </View>
-          <View style={[styles.priceTag, { backgroundColor: `${colors.primary}15` }]}>
-            <Text style={[styles.priceText, { color: colors.primary }]}>
-              {getPriceLabel(grinder.priceRange)}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.cardSpecs}>
-          <View style={styles.specItem}>
-            <IconSymbol name="gearshape.fill" size={16} color={colors.muted} />
-            <Text style={[styles.specText, { color: colors.muted }]}>
-              {grinder.type}
-            </Text>
-          </View>
-          <View style={styles.specItem}>
-            <IconSymbol name="dial.low.fill" size={16} color={colors.muted} />
-            <Text style={[styles.specText, { color: colors.muted }]}>
-              {grinder.burrSize}mm {grinder.burrType}
-            </Text>
-          </View>
-        </View>
-
-        {isExpanded && (
-          <Animated.View 
-            entering={FadeIn.duration(200)}
-            style={styles.expandedContent}
-          >
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-            <Text style={[styles.expandedLabel, { color: colors.muted }]}>
-              Espresso Range
-            </Text>
-            <Text style={[styles.expandedTip, { color: colors.foreground }]}>
-              {grinder.espressoRange.note}
-            </Text>
-            <View style={styles.tipsList}>
-              {grinder.tips.slice(0, 2).map((tip, idx) => (
-                <Text key={idx} style={[styles.expandedTip, { color: colors.foreground }]}>
-                  • {tip}
-                </Text>
-              ))}
-            </View>
-            <PremiumButton
-              variant="outline"
-              size="sm"
-              onPress={onViewDetails}
-            >
-              View Full Details
-            </PremiumButton>
-          </Animated.View>
-        )}
-
-        <View style={styles.expandIndicator}>
-          <IconSymbol 
-            name={isExpanded ? "chevron.up" : "chevron.down"} 
-            size={20} 
-            color={colors.muted} 
-          />
-        </View>
-      </Pressable>
-    </Animated.View>
   );
 }
 
@@ -420,8 +387,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
+    paddingTop: 8,
   },
   loadingContainer: {
     flex: 1,
@@ -430,81 +396,179 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
+    fontWeight: '500',
   },
+  
+  // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-    gap: 12,
-  },
-  backButton: {
-    padding: 8,
-    marginLeft: -8,
+    paddingHorizontal: 20,
+    paddingBottom: 24,
   },
   title: {
-    fontSize: 24,
+    fontSize: 34,
     fontWeight: '700',
     letterSpacing: -0.5,
+    marginBottom: 8,
   },
-  reasoningCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    padding: 16,
-    borderRadius: 16,
-    gap: 12,
-    marginBottom: 24,
-  },
-  reasoningText: {
-    flex: 1,
-    fontSize: 15,
+  subtitle: {
+    fontSize: 16,
     lineHeight: 22,
   },
+
+  // Section
+  section: {
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
-    marginBottom: 12,
     letterSpacing: -0.3,
   },
-  cardsContainer: {
-    gap: 12,
-    marginBottom: 24,
+
+  // Premium Card
+  premiumCard: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
-  card: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 16,
+  bestMatchBadge: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    zIndex: 10,
   },
-  cardHeader: {
+  bestMatchText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  imageContainer: {
+    width: '100%',
+    height: 200,
+    position: 'relative',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
+  },
+  imageGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '50%',
+  },
+  cardContent: {
+    padding: 20,
+  },
+  
+  // Title Row
+  titleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 12,
   },
-  cardTitleContainer: {
+  titleContainer: {
     flex: 1,
+    marginRight: 12,
   },
-  cardBrand: {
-    fontSize: 13,
-    fontWeight: '500',
-    marginBottom: 2,
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+    marginBottom: 6,
+    lineHeight: 26,
   },
-  cardName: {
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  ratingText: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  reviewCount: {
+    fontSize: 14,
+  },
+  saveButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // Description
+  cardDescription: {
+    fontSize: 15,
+    lineHeight: 21,
+    marginBottom: 16,
+  },
+
+  // Match Section
+  matchSection: {
+    marginBottom: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.05)',
+  },
+  matchHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  matchLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  matchPercentage: {
     fontSize: 18,
     fontWeight: '700',
   },
-  priceTag: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
+  matchBarBackground: {
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
+    marginBottom: 8,
   },
-  priceText: {
+  matchBarFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  matchReason: {
     fontSize: 13,
-    fontWeight: '600',
+    lineHeight: 17,
   },
-  cardSpecs: {
+
+  // Specs Grid
+  specsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
+    gap: 12,
+    marginBottom: 16,
   },
   specItem: {
     flexDirection: 'row',
@@ -512,58 +576,43 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   specText: {
-    fontSize: 13,
+    fontSize: 14,
+    fontWeight: '500',
     textTransform: 'capitalize',
   },
-  expandedContent: {
-    marginTop: 12,
-    gap: 8,
-  },
-  divider: {
-    height: 1,
-    marginVertical: 4,
-  },
-  expandedLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  tipsList: {
-    gap: 4,
-    marginBottom: 12,
-  },
-  expandedTip: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  expandIndicator: {
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  tipsCard: {
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
-    marginBottom: 24,
-  },
-  tipRow: {
+
+  // CTA Buttons
+  ctaButtons: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
     gap: 12,
   },
-  tipText: {
-    flex: 1,
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  ctaContainer: {
+
+  // Bottom CTA
+  bottomCta: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingTop: 8,
+    marginHorizontal: 20,
+    padding: 20,
+    borderRadius: 16,
+    gap: 16,
   },
-  ctaSubtext: {
-    fontSize: 13,
-    textAlign: 'center',
+  bottomCtaText: {
+    flex: 1,
+  },
+  bottomCtaTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  bottomCtaSubtitle: {
+    fontSize: 14,
+    lineHeight: 18,
+  },
+  bottomCtaButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

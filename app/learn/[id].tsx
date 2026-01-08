@@ -1,10 +1,33 @@
 import { useState } from "react";
-import { ScrollView, Text, View, Pressable, StyleSheet } from "react-native";
+import { ScrollView, Text, View, Pressable, StyleSheet, Dimensions } from "react-native";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
+import { Platform } from 'react-native';
 
 import { ScreenContainer } from "@/components/screen-container";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { getCategoryById, Article } from "@/data/learning";
 import { useColors } from "@/hooks/use-colors";
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+function triggerHaptic() {
+  if (Platform.OS !== 'web') {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }
+}
+
+// Hero image mapping for articles
+const articleHeroImages: Record<string, any> = {
+  'brewing-basics': require('@/assets/images/moka_pot_coffee.png'),
+  'roast-levels': require('@/assets/images/espresso.png'),
+  'origins': require('@/assets/images/flat_white.png'),
+  'equipment': require('@/assets/images/cappuccino.png'),
+  'home-setup': require('@/assets/images/latte.png'),
+};
 
 export default function LearnCategoryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,58 +46,153 @@ export default function LearnCategoryScreen() {
   }
 
   if (selectedArticle) {
+    const heroImage = articleHeroImages[category.id] || require('@/assets/images/espresso.png');
+    
     return (
       <>
         <Stack.Screen
           options={{
-            headerShown: true,
-            headerTitle: selectedArticle.title,
-            headerBackTitle: "Back",
-            headerStyle: { backgroundColor: colors.background },
-            headerTintColor: colors.primary,
-            headerTitleStyle: { color: colors.foreground },
+            headerShown: false,
           }}
         />
-        <ScreenContainer edges={["left", "right"]}>
-          <ScrollView 
-            contentContainerStyle={styles.articleContent}
-            showsVerticalScrollIndicator={false}
-          >
-            <Pressable
-              onPress={() => setSelectedArticle(null)}
-              style={[styles.backButton, { backgroundColor: colors.surface }]}
-            >
-              <Text style={[styles.backButtonText, { color: colors.primary }]}>
-                ← Back to {category.title}
-              </Text>
-            </Pressable>
+        <ScrollView 
+          style={{ flex: 1, backgroundColor: colors.background }}
+          contentContainerStyle={styles.articleContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Hero Section */}
+          <View style={styles.heroSection}>
+            <Image
+              source={heroImage}
+              style={styles.heroImage}
+              contentFit="cover"
+              transition={300}
+            />
+            <LinearGradient
+              colors={['transparent', colors.background]}
+              style={styles.heroGradient}
+            />
             
+            {/* Back Button */}
+            <Pressable
+              onPress={() => {
+                triggerHaptic();
+                setSelectedArticle(null);
+              }}
+              style={[styles.floatingBackButton, { backgroundColor: `${colors.background}CC` }]}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
+              <IconSymbol name="arrow.left" size={20} color={colors.foreground} />
+            </Pressable>
+          </View>
+
+          {/* Article Content */}
+          <Animated.View entering={FadeIn.duration(400)} style={styles.content}>
+            {/* Category Badge */}
+            <View style={[styles.categoryBadge, { backgroundColor: `${colors.primary}15` }]}>
+              <Text style={[styles.categoryBadgeText, { color: colors.primary }]}>
+                {category.title}
+              </Text>
+            </View>
+
+            {/* Title */}
             <Text style={[styles.articleTitle, { color: colors.foreground }]}>
               {selectedArticle.title}
             </Text>
-            
+
+            {/* Meta Info */}
+            <View style={styles.metaInfo}>
+              <View style={styles.metaItem}>
+                <IconSymbol name="clock.fill" size={16} color={colors.muted} />
+                <Text style={[styles.metaText, { color: colors.muted }]}>
+                  {selectedArticle.readTime || '5 min read'}
+                </Text>
+              </View>
+              <View style={styles.metaDivider} />
+              <View style={styles.metaItem}>
+                <IconSymbol name="book.fill" size={16} color={colors.muted} />
+                <Text style={[styles.metaText, { color: colors.muted }]}>
+                  {category.title}
+                </Text>
+              </View>
+            </View>
+
             {/* Render markdown-like content */}
             {selectedArticle.content.split('\n\n').map((paragraph, index) => {
               // Handle headers
               if (paragraph.startsWith('# ')) {
                 return (
-                  <Text key={index} style={[styles.h1, { color: colors.foreground }]}>
+                  <Animated.Text 
+                    key={index} 
+                    entering={FadeInDown.delay(index * 50).duration(400)}
+                    style={[styles.h1, { color: colors.foreground }]}
+                  >
                     {paragraph.replace('# ', '')}
-                  </Text>
+                  </Animated.Text>
                 );
               }
               if (paragraph.startsWith('## ')) {
                 return (
-                  <Text key={index} style={[styles.h2, { color: colors.foreground }]}>
+                  <Animated.Text 
+                    key={index} 
+                    entering={FadeInDown.delay(index * 50).duration(400)}
+                    style={[styles.h2, { color: colors.foreground }]}
+                  >
                     {paragraph.replace('## ', '')}
-                  </Text>
+                  </Animated.Text>
                 );
               }
               if (paragraph.startsWith('### ')) {
                 return (
-                  <Text key={index} style={[styles.h3, { color: colors.foreground }]}>
+                  <Animated.Text 
+                    key={index} 
+                    entering={FadeInDown.delay(index * 50).duration(400)}
+                    style={[styles.h3, { color: colors.foreground }]}
+                  >
                     {paragraph.replace('### ', '')}
-                  </Text>
+                  </Animated.Text>
+                );
+              }
+              
+              // Handle pull quotes (> prefix)
+              if (paragraph.startsWith('> ')) {
+                return (
+                  <Animated.View 
+                    key={index} 
+                    entering={FadeInDown.delay(index * 50).duration(400)}
+                    style={[styles.pullQuote, { 
+                      backgroundColor: `${colors.primary}10`,
+                      borderLeftColor: colors.primary,
+                    }]}
+                  >
+                    <IconSymbol name="quote.opening" size={24} color={colors.primary} style={styles.quoteIcon} />
+                    <Text style={[styles.pullQuoteText, { color: colors.foreground }]}>
+                      {paragraph.replace('> ', '')}
+                    </Text>
+                  </Animated.View>
+                );
+              }
+
+              // Handle tip boxes (! prefix)
+              if (paragraph.startsWith('! ')) {
+                return (
+                  <Animated.View 
+                    key={index} 
+                    entering={FadeInDown.delay(index * 50).duration(400)}
+                    style={[styles.tipBox, { 
+                      backgroundColor: `${colors.warning}15`,
+                      borderColor: colors.warning,
+                    }]}
+                  >
+                    <View style={styles.tipHeader}>
+                      <IconSymbol name="lightbulb.fill" size={20} color={colors.warning} />
+                      <Text style={[styles.tipTitle, { color: colors.warning }]}>Pro Tip</Text>
+                    </View>
+                    <Text style={[styles.tipText, { color: colors.foreground }]}>
+                      {paragraph.replace('! ', '')}
+                    </Text>
+                  </Animated.View>
                 );
               }
               
@@ -82,12 +200,16 @@ export default function LearnCategoryScreen() {
               if (paragraph.includes('\n- ')) {
                 const lines = paragraph.split('\n');
                 return (
-                  <View key={index} style={styles.listContainer}>
+                  <Animated.View 
+                    key={index} 
+                    entering={FadeInDown.delay(index * 50).duration(400)}
+                    style={styles.listContainer}
+                  >
                     {lines.map((line, lineIndex) => {
                       if (line.startsWith('- ')) {
                         return (
                           <View key={lineIndex} style={styles.listItem}>
-                            <Text style={[styles.bullet, { color: colors.primary }]}>•</Text>
+                            <View style={[styles.bulletPoint, { backgroundColor: colors.primary }]} />
                             <Text style={[styles.listText, { color: colors.foreground }]}>
                               {line.replace('- ', '').replace(/\*\*(.*?)\*\*/g, '$1')}
                             </Text>
@@ -103,64 +225,35 @@ export default function LearnCategoryScreen() {
                       }
                       return null;
                     })}
-                  </View>
+                  </Animated.View>
                 );
               }
               
-              // Handle tables (simplified)
-              if (paragraph.includes('|')) {
-                const rows = paragraph.split('\n').filter(row => row.includes('|') && !row.includes('---'));
-                return (
-                  <View key={index} style={[styles.table, { borderColor: colors.border }]}>
-                    {rows.map((row, rowIndex) => {
-                      const cells = row.split('|').filter(cell => cell.trim());
-                      return (
-                        <View 
-                          key={rowIndex} 
-                          style={[
-                            styles.tableRow, 
-                            { borderBottomColor: colors.border },
-                            rowIndex === 0 && { backgroundColor: colors.surface }
-                          ]}
-                        >
-                          {cells.map((cell, cellIndex) => (
-                            <Text 
-                              key={cellIndex} 
-                              style={[
-                                styles.tableCell, 
-                                { color: colors.foreground },
-                                rowIndex === 0 && styles.tableHeader
-                              ]}
-                            >
-                              {cell.trim()}
-                            </Text>
-                          ))}
-                        </View>
-                      );
-                    })}
-                  </View>
-                );
-              }
-              
-              // Regular paragraph
+              // Regular paragraphs
               if (paragraph.trim()) {
-                // Remove bold markers for display
-                const cleanText = paragraph.replace(/\*\*(.*?)\*\*/g, '$1');
                 return (
-                  <Text key={index} style={[styles.paragraph, { color: colors.foreground }]}>
-                    {cleanText}
-                  </Text>
+                  <Animated.Text 
+                    key={index} 
+                    entering={FadeInDown.delay(index * 50).duration(400)}
+                    style={[styles.paragraph, { color: colors.foreground }]}
+                  >
+                    {paragraph.replace(/\*\*(.*?)\*\*/g, '$1')}
+                  </Animated.Text>
                 );
               }
               
               return null;
             })}
-          </ScrollView>
-        </ScreenContainer>
+
+            {/* Bottom Spacing */}
+            <View style={{ height: 100 }} />
+          </Animated.View>
+        </ScrollView>
       </>
     );
   }
 
+  // Category list view
   return (
     <>
       <Stack.Screen
@@ -173,47 +266,46 @@ export default function LearnCategoryScreen() {
           headerTitleStyle: { color: colors.foreground },
         }}
       />
-      <ScreenContainer edges={["left", "right"]}>
+      <ScreenContainer>
         <ScrollView 
-          contentContainerStyle={styles.content}
+          contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.categoryHeader}>
-            <Text style={styles.categoryEmoji}>{category.emoji}</Text>
-            <Text style={[styles.categoryTitle, { color: colors.foreground }]}>
-              {category.title}
-            </Text>
-            <Text style={[styles.categoryDescription, { color: colors.muted }]}>
-              {category.description}
-            </Text>
-          </View>
-          
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-            Articles
+          <Text style={[styles.categoryDescription, { color: colors.muted }]}>
+            {category.description}
           </Text>
           
           {category.articles.map((article, index) => (
-            <Pressable
-              key={article.id}
-              onPress={() => setSelectedArticle(article)}
-              style={({ pressed }) => [
-                styles.articleCard,
-                { backgroundColor: colors.surface, borderColor: colors.border },
-                pressed && styles.articleCardPressed
-              ]}
-            >
-              <View style={[styles.articleNumber, { backgroundColor: colors.primary }]}>
-                <Text style={styles.articleNumberText}>{index + 1}</Text>
-              </View>
-              <View style={styles.articleInfo}>
-                <Text style={[styles.articleCardTitle, { color: colors.foreground }]}>
-                  {article.title}
-                </Text>
-                <Text style={[styles.readTime, { color: colors.muted }]}>
-                  {Math.ceil(article.content.split(' ').length / 200)} min read
-                </Text>
-              </View>
-            </Pressable>
+            <Animated.View key={article.id} entering={FadeInDown.delay(index * 100).duration(400)}>
+              <Pressable
+                onPress={() => {
+                  triggerHaptic();
+                  setSelectedArticle(article);
+                }}
+                style={({ pressed }) => [
+                  styles.articleCard,
+                  { 
+                    backgroundColor: colors.surface,
+                    opacity: pressed ? 0.7 : 1,
+                  }
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={`Read ${article.title}`}
+              >
+                <View style={styles.articleCardContent}>
+                  <Text style={[styles.articleCardTitle, { color: colors.foreground }]}>
+                    {article.title}
+                  </Text>
+                  <View style={styles.articleCardMeta}>
+                    <IconSymbol name="clock.fill" size={14} color={colors.muted} />
+                    <Text style={[styles.articleCardMetaText, { color: colors.muted }]}>
+                      {article.readTime || '5 min'}
+                    </Text>
+                  </View>
+                </View>
+                <IconSymbol name="chevron.right" size={20} color={colors.muted} />
+              </Pressable>
+            </Animated.View>
           ))}
         </ScrollView>
       </ScreenContainer>
@@ -222,147 +314,227 @@ export default function LearnCategoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: {
-    padding: 16,
-    paddingBottom: 40,
+  // Article View
+  articleContainer: {
+    flexGrow: 1,
   },
-  categoryHeader: {
+  heroSection: {
+    width: '100%',
+    height: 300,
+    position: 'relative',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '60%',
+  },
+  floatingBackButton: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
-    marginBottom: 32,
-    paddingTop: 16,
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  categoryEmoji: {
-    fontSize: 64,
+  content: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  categoryBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     marginBottom: 16,
   },
-  categoryTitle: {
+  categoryBadgeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  articleTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+    lineHeight: 40,
+    marginBottom: 16,
+  },
+  metaInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 32,
+    paddingBottom: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  metaDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    marginHorizontal: 12,
+  },
+  metaText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  
+  // Typography
+  h1: {
     fontSize: 28,
     fontWeight: '700',
-    marginBottom: 8,
+    letterSpacing: -0.4,
+    lineHeight: 36,
+    marginTop: 32,
+    marginBottom: 16,
+  },
+  h2: {
+    fontSize: 24,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+    lineHeight: 32,
+    marginTop: 28,
+    marginBottom: 14,
+  },
+  h3: {
+    fontSize: 20,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+    lineHeight: 28,
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  paragraph: {
+    fontSize: 17,
+    lineHeight: 28,
+    marginBottom: 20,
+  },
+  
+  // Pull Quote
+  pullQuote: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 24,
+    paddingBottom: 24,
+    borderLeftWidth: 4,
+    borderRadius: 8,
+    marginVertical: 24,
+    position: 'relative',
+  },
+  quoteIcon: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    opacity: 0.3,
+  },
+  pullQuoteText: {
+    fontSize: 20,
+    lineHeight: 32,
+    fontWeight: '600',
+    fontStyle: 'italic',
+  },
+
+  // Tip Box
+  tipBox: {
+    padding: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginVertical: 20,
+  },
+  tipHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  tipTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  tipText: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  
+  // Lists
+  listContainer: {
+    marginBottom: 20,
+  },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  bulletPoint: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: 10,
+    marginRight: 12,
+  },
+  listText: {
+    flex: 1,
+    fontSize: 17,
+    lineHeight: 28,
+  },
+
+  // Category List View
+  listContent: {
+    padding: 20,
   },
   categoryDescription: {
     fontSize: 16,
-    textAlign: 'center',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 16,
+    lineHeight: 24,
+    marginBottom: 24,
   },
   articleCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    marginBottom: 12,
-  },
-  articleCardPressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.98 }],
-  },
-  articleNumber: {
-    width: 32,
-    height: 32,
+    justifyContent: 'space-between',
+    padding: 20,
     borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  articleNumberText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  articleInfo: {
+  articleCardContent: {
     flex: 1,
+    marginRight: 12,
   },
   articleCardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  readTime: {
-    fontSize: 13,
-  },
-  // Article view styles
-  articleContent: {
-    padding: 16,
-    paddingBottom: 40,
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginBottom: 24,
-  },
-  backButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  articleTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 24,
-    lineHeight: 36,
-  },
-  h1: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginTop: 24,
-    marginBottom: 16,
-  },
-  h2: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginTop: 20,
-    marginBottom: 12,
-  },
-  h3: {
     fontSize: 17,
-    fontWeight: '600',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  paragraph: {
-    fontSize: 16,
-    lineHeight: 26,
-    marginBottom: 16,
-  },
-  listContainer: {
-    marginBottom: 16,
-  },
-  listItem: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  bullet: {
-    fontSize: 16,
-    marginRight: 8,
-    marginTop: 2,
-  },
-  listText: {
-    flex: 1,
-    fontSize: 16,
+    fontWeight: '700',
     lineHeight: 24,
+    marginBottom: 8,
   },
-  table: {
-    borderWidth: 1,
-    borderRadius: 8,
-    overflow: 'hidden',
-    marginBottom: 16,
-  },
-  tableRow: {
+  articleCardMeta: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
+    alignItems: 'center',
+    gap: 6,
   },
-  tableCell: {
-    flex: 1,
-    padding: 12,
+  articleCardMetaText: {
     fontSize: 14,
-  },
-  tableHeader: {
-    fontWeight: '600',
+    fontWeight: '500',
   },
 });
