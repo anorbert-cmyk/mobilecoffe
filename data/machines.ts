@@ -1,3 +1,20 @@
+// Equipment Images
+import brevilleBambinoPlus from '@/assets/images/equipment/breville-bambino-plus.png';
+import gaggiaClassicPro from '@/assets/images/equipment/gaggia-classic-pro.png';
+import delonghiStilosa from '@/assets/images/equipment/delonghi-stilosa.png';
+import brevilleExpressImpress from '@/assets/images/equipment/breville-barista-express-impress.png';
+import brevilleBaristaPro from '@/assets/images/equipment/breville-barista-pro.png';
+import rancilioSilvia from '@/assets/images/equipment/rancilio-silvia.png';
+import delonghiSpecialistaTouch from '@/assets/images/equipment/delonghi-specialista-touch.png';
+import lelitMarax from '@/assets/images/equipment/lelit-marax.png';
+import brevilleOracleJet from '@/assets/images/equipment/breville-oracle-jet.png';
+import brevilleOracleDualBoiler from '@/assets/images/equipment/breville-oracle-dual-boiler.png';
+import baratzaEncoreEsp from '@/assets/images/equipment/baratza-encore-esp.png';
+import baratzaSette270 from '@/assets/images/equipment/baratza-sette-270.png';
+import eurekaMignonSpecialita from '@/assets/images/equipment/eureka-mignon-specialita.png';
+import nicheZero from '@/assets/images/equipment/niche-zero.png';
+import baratzaSette270wi from '@/assets/images/equipment/baratza-sette-270wi.png';
+
 export interface EspressoMachine {
   id: string;
   name: string;
@@ -92,7 +109,7 @@ export const espressoMachines: EspressoMachine[] = [
     price: 372,
     rating: 4.8,
     description: 'Compact espresso machine with PID temperature control and automatic milk frothing. Fast 3-second heat-up time makes it perfect for small kitchens.',
-    image: 'https://m.media-amazon.com/images/I/71zKufZ9pNL._AC_SL1500_.jpg',
+    image: brevilleBambinoPlus,
     boilerType: 'thermoblock',
     pumpPressure: 15,
     waterTankMl: 1900,
@@ -142,7 +159,7 @@ export const espressoMachines: EspressoMachine[] = [
     price: 452,
     rating: 4.5,
     description: 'Commercial-style 58mm portafilter with brass boiler. Highly moddable and beloved by enthusiasts for its durability and upgrade potential.',
-    image: 'https://m.media-amazon.com/images/I/61QqY+zKZPL._AC_SL1500_.jpg',
+    image: gaggiaClassicPro,
     boilerType: 'single',
     pumpPressure: 15,
     waterTankMl: 2100,
@@ -192,7 +209,7 @@ export const espressoMachines: EspressoMachine[] = [
     price: 78,
     rating: 3.8,
     description: 'Ultra-budget espresso machine with manual milk frother. Perfect for absolute beginners wanting to try espresso without breaking the bank.',
-    image: 'https://m.media-amazon.com/images/I/71wJKMZFmEL._AC_SL1500_.jpg',
+    image: delonghiStilosa,
     boilerType: 'thermoblock',
     pumpPressure: 15,
     waterTankMl: 1000,
@@ -242,7 +259,7 @@ export const espressoMachines: EspressoMachine[] = [
     price: 581,
     rating: 4.9,
     description: 'All-in-one solution with integrated conical burr grinder and assisted tamping system. PID temperature control and automatic milk texturing make it perfect for home baristas.',
-    image: 'https://m.media-amazon.com/images/I/71R8vZqKZTL._AC_SL1500_.jpg',
+    image: brevilleExpressImpress,
     boilerType: 'thermoblock',
     pumpPressure: 15,
     waterTankMl: 2000,
@@ -293,7 +310,7 @@ export const espressoMachines: EspressoMachine[] = [
     price: 651,
     rating: 4.6,
     description: 'Fast heat-up espresso machine with LCD display and integrated grinder. Perfect for those who value speed without sacrificing quality.',
-    image: 'https://m.media-amazon.com/images/I/71uQdT9KJSL._AC_SL1500_.jpg',
+    image: brevilleBaristaPro,
     boilerType: 'thermoblock',
     pumpPressure: 15,
     waterTankMl: 2000,
@@ -344,7 +361,7 @@ export const espressoMachines: EspressoMachine[] = [
     price: 995,
     rating: 4.7,
     description: 'Commercial-grade components with brass boiler. Excellent build quality and long-lasting durability make it a favorite among serious home baristas.',
-    image: 'https://m.media-amazon.com/images/I/61Y7xZqKZTL._AC_SL1500_.jpg',
+    image: rancilioSilvia,
     boilerType: 'single',
     pumpPressure: 15,
     waterTankMl: 2500,
@@ -394,7 +411,7 @@ export const espressoMachines: EspressoMachine[] = [
     price: 892,
     rating: 4.4,
     description: 'Sensor grinding technology with active temperature control. Touchscreen interface and automatic milk frothing make it perfect for tech-savvy users.',
-    image: 'https://m.media-amazon.com/images/I/71wJKMZFmEL._AC_SL1500_.jpg',
+    image: delonghiSpecialistaTouch,
     boilerType: 'thermoblock',
     pumpPressure: 15,
     waterTankMl: 2000,
@@ -447,7 +464,7 @@ export const espressoMachines: EspressoMachine[] = [
     price: 1700,
     rating: 4.9,
     description: 'Italian-made heat exchanger machine with temperature configuration button. Insulated steam wand and PID control deliver commercial-quality results at home.',
-    image: 'https://m.media-amazon.com/images/I/61Y7xZqKZTL._AC_SL1500_.jpg',
+    image: lelitMarax,
     boilerType: 'heat-exchanger',
     pumpPressure: 9,
     waterTankMl: 2500,
@@ -499,13 +516,13 @@ export const espressoMachines: EspressoMachine[] = [
     price: 1820,
     rating: 4.8,
     description: 'Super-automatic with Baratza burrs, automatic grinding, dosing, tamping, and milk steaming. Touchscreen interface with shot timing alerts makes it the ultimate convenience machine.',
-    image: 'https://m.media-amazon.com/images/I/71R8vZqKZTL._AC_SL1500_.jpg',
+    image: brevilleOracleJet,
     boilerType: 'dual',
     pumpPressure: 15,
     waterTankMl: 2500,
     portafilterSize: 58,
     features: [
-      'Built-in grinder (Baratza burrs)',
+      'Fully automatic grinding (Baratza burrs)',
       'Automatic portioning',
       'Automatic tamping',
       'Touchscreen',
@@ -553,7 +570,7 @@ export const espressoMachines: EspressoMachine[] = [
     price: 3000,
     rating: 4.9,
     description: 'Dual stainless steel boilers with PID control. Automatic grinding, dosing, tamping, and microfoam milk texturing deliver ultimate convenience with professional results.',
-    image: 'https://m.media-amazon.com/images/I/71uQdT9KJSL._AC_SL1500_.jpg',
+    image: brevilleOracleDualBoiler,
     boilerType: 'dual',
     pumpPressure: 15,
     waterTankMl: 2500,
@@ -612,7 +629,7 @@ export const coffeeGrinders: CoffeeGrinder[] = [
     price: 170,
     rating: 4.5,
     description: 'Entry-level espresso grinder with 40mm conical burrs. 16 grind settings optimized for espresso make it perfect for beginners.',
-    image: 'https://m.media-amazon.com/images/I/61Y7xZqKZTL._AC_SL1500_.jpg',
+    image: baratzaEncoreEsp,
     features: [
       '40mm conical burrs',
       '16 grind settings',
@@ -644,7 +661,7 @@ export const coffeeGrinders: CoffeeGrinder[] = [
     price: 449,
     rating: 4.7,
     description: 'Espresso-focused grinder with 270 grind settings and low retention. Perfect for dialing in espresso with precision.',
-    image: 'https://m.media-amazon.com/images/I/71wJKMZFmEL._AC_SL1500_.jpg',
+    image: baratzaSette270,
     features: [
       '40mm conical burrs',
       '270 grind settings',
@@ -674,7 +691,7 @@ export const coffeeGrinders: CoffeeGrinder[] = [
     price: 499,
     rating: 4.8,
     description: 'Quiet flat burr grinder with 55mm burrs and stepless adjustment. Perfect for home baristas who value precision and low noise.',
-    image: 'https://m.media-amazon.com/images/I/61Y7xZqKZTL._AC_SL1500_.jpg',
+    image: eurekaMignonSpecialita,
     features: [
       '55mm flat burrs',
       'Stepless adjustment',
@@ -706,7 +723,7 @@ export const coffeeGrinders: CoffeeGrinder[] = [
     price: 699,
     rating: 4.9,
     description: 'Single-dosing grinder with 63mm conical burrs and zero retention. Perfect for enthusiasts who want to taste different beans without waste.',
-    image: 'https://m.media-amazon.com/images/I/71R8vZqKZTL._AC_SL1500_.jpg',
+    image: nicheZero,
     features: [
       '63mm conical burrs',
       'Zero retention design',
@@ -736,7 +753,7 @@ export const coffeeGrinders: CoffeeGrinder[] = [
     price: 699,
     rating: 4.6,
     description: 'Precision grinder with built-in scale and programmable dosing. 270 grind settings and weight-based dosing deliver ultimate consistency.',
-    image: 'https://m.media-amazon.com/images/I/71uQdT9KJSL._AC_SL1500_.jpg',
+    image: baratzaSette270wi,
     features: [
       '40mm conical burrs',
       'Built-in scale',

@@ -120,6 +120,7 @@ export default function CoffeeDetailScreen() {
                 source={coffee.image}
                 style={styles.heroImage}
                 contentFit="cover"
+                contentPosition="center"
                 transition={300}
               />
               {/* Gradient overlay */}
@@ -440,6 +441,8 @@ const styles = StyleSheet.create({
   heroContainer: {
     height: 300,
     position: 'relative',
+    overflow: 'hidden',
+    backgroundColor: '#f5f5f5',
   },
   heroImage: {
     width: '100%',
