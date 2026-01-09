@@ -170,7 +170,13 @@ export default function OnboardingScreen() {
   const handleComplete = async () => {
     triggerHaptic();
     await completeOnboarding();
-    router.replace('/(tabs)');
+    
+    // If user wants to buy equipment, navigate to recommendations
+    if (wantsToBuy && budget) {
+      router.replace('/recommendations');
+    } else {
+      router.replace('/(tabs)');
+    }
   };
 
   const visibleSteps = getVisibleSteps();

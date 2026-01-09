@@ -116,3 +116,9 @@
 - [x] Add detailed specs to machine cards (price, features, ratings)
 - [x] Implement image zoom/modal for coffee detail images
 - [ ] Update equipment recommender with real data
+
+
+## v10 Onboarding Navigation Fix
+- [x] Update onboarding completion to navigate to recommendations if wantsToBuyEquipment === true
+- [x] Navigate to tab bar (Make Coffee) if wantsToBuyEquipment === false
+- [x] Test onboarding flow end-to-end
