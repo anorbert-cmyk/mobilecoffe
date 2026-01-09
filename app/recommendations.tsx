@@ -112,7 +112,7 @@ function PremiumRecommendationCard({
         {/* Image Section */}
         <View style={styles.imageContainer}>
           <Image
-            source={item.image ? { uri: item.image } : require('@/assets/images/icon.png')}
+            source={item.image || require('@/assets/images/icon.png')}
             style={styles.cardImage}
             contentFit="contain"
             transition={300}

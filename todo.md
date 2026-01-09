@@ -151,3 +151,6 @@
 - [x] Update equipment database with generated local image paths
 - [x] Verify all equipment images display correctly
 - [x] Fix coffee category header images to have perfect aspect ratio without stretching
+
+## v17 Critical Bug Fix
+- [x] Fix str.startsWith is not a function error in expo-image on recommendations screen
