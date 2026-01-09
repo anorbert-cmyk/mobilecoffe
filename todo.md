@@ -154,3 +154,8 @@
 
 ## v17 Critical Bug Fix
 - [x] Fix str.startsWith is not a function error in expo-image on recommendations screen
+
+## v18 Bug Fix
+- [x] Fix str.startsWith error on grinder detail screen
+- [x] Fix str.startsWith error on machine detail screen (not needed - no images used)
+- [x] Verify all equipment images work across all screens

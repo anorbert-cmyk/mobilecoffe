@@ -74,7 +74,7 @@ export default function GrinderDetailScreen() {
               accessibilityLabel="Tap to view full image"
             >
               <Image
-                source={{ uri: grinder.image }}
+                source={grinder.image || require('@/assets/images/icon.png')}
                 style={styles.heroImage}
                 contentFit="contain"
                 transition={300}
@@ -106,8 +106,8 @@ export default function GrinderDetailScreen() {
               accessibilityLabel="Close image viewer"
             >
               <View style={styles.modalContent}>
-                <Image
-                  source={{ uri: grinder.image }}
+            <Image
+              source={grinder.image || require('@/assets/images/icon.png')}
                   style={styles.modalImage}
                   contentFit="contain"
                   transition={300}
