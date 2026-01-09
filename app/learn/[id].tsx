@@ -61,11 +61,12 @@ export default function LearnCategoryScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Hero Section */}
-          <View style={styles.heroSection}>
+          <View style={[styles.heroSection, { backgroundColor: colors.surface }]}>
             <Image
               source={heroImage}
               style={styles.heroImage}
               contentFit="cover"
+              contentPosition="center"
               transition={300}
             />
             <LinearGradient
@@ -320,8 +321,9 @@ const styles = StyleSheet.create({
   },
   heroSection: {
     width: '100%',
-    height: 300,
+    height: 280,
     position: 'relative',
+    overflow: 'hidden',
   },
   heroImage: {
     width: '100%',

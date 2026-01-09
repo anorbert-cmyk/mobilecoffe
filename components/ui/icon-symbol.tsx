@@ -57,6 +57,11 @@ const MAPPING = {
   "xmark.circle.fill": "cancel",
   "checkmark": "check",
   
+  // Equipment
+  "arrow.down.circle.fill": "download",
+  "lightbulb.fill": "lightbulb",
+  "list.bullet": "list",
+  
   // Misc
   "map.fill": "map",
   "phone.fill": "phone",

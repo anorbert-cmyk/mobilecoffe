@@ -135,3 +135,9 @@
 - [x] Verify coffee composition SVG renders correctly on all platforms
 - [x] Verify equipment images load from Amazon URLs
 - [x] Verify grinder layout and all specs display correctly
+
+## v14 Bug Fixes
+- [x] Fix grinder detail screen layout issues
+- [x] Fix grinder images not displaying properly
+- [x] Fix image zoom functionality not working
+- [x] Fix learning header images being stretched
