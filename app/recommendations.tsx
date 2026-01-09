@@ -112,12 +112,12 @@ function PremiumRecommendationCard({
         {/* Image Section */}
         <View style={styles.imageContainer}>
           <Image
-            source={'image' in item && item.image ? { uri: item.image } : require('@/assets/images/espresso.png')}
+            source={item.image ? { uri: item.image } : require('@/assets/images/icon.png')}
             style={styles.cardImage}
-            contentFit="cover"
+            contentFit="contain"
             transition={300}
-            placeholder={require('@/assets/images/espresso.png')}
-            placeholderContentFit="cover"
+            placeholder={require('@/assets/images/icon.png')}
+            placeholderContentFit="contain"
             cachePolicy="memory-disk"
           />
           <LinearGradient
@@ -469,6 +469,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     position: 'relative',
+    backgroundColor: '#FFFFFF',
   },
   cardImage: {
     width: '100%',

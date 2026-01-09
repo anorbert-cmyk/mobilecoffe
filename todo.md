@@ -141,3 +141,6 @@
 - [x] Fix grinder images not displaying properly
 - [x] Fix image zoom functionality not working
 - [x] Fix learning header images being stretched
+
+## v15 Bug Fix
+- [x] Fix recommendations screen showing coffee images instead of machine/grinder images
