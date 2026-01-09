@@ -20,13 +20,13 @@ function triggerHaptic() {
   }
 }
 
-// Hero image mapping for articles
+// Hero image mapping for articles - using generated premium header images
 const articleHeroImages: Record<string, any> = {
-  'brewing-basics': require('@/assets/images/moka_pot_coffee.png'),
-  'roast-levels': require('@/assets/images/espresso.png'),
-  'origins': require('@/assets/images/flat_white.png'),
-  'equipment': require('@/assets/images/cappuccino.png'),
-  'home-setup': require('@/assets/images/latte.png'),
+  'brewing-basics': require('@/assets/images/learning/brewing-basics.png'),
+  'roast-levels': require('@/assets/images/learning/roast-levels.png'),
+  'coffee-origins': require('@/assets/images/learning/coffee-origins.png'),
+  'equipment-guide': require('@/assets/images/learning/equipment-guide.png'),
+  'home-setup': require('@/assets/images/learning/home-setup.png'),
 };
 
 export default function LearnCategoryScreen() {

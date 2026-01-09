@@ -129,3 +129,9 @@
 
 ## v12 Bug Fix
 - [x] Fix coffee composition image not displaying
+
+## v13 Comprehensive Audit Fixes
+- [x] Fix learning article header images to use generated images from /assets/images/learning/
+- [x] Verify coffee composition SVG renders correctly on all platforms
+- [x] Verify equipment images load from Amazon URLs
+- [x] Verify grinder layout and all specs display correctly
