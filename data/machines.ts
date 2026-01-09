@@ -2,14 +2,22 @@ export interface EspressoMachine {
   id: string;
   name: string;
   brand: string;
+  model: string;
   type: 'manual' | 'semi-automatic' | 'automatic' | 'super-automatic';
   priceRange: 'budget' | 'mid-range' | 'premium' | 'prosumer';
+  price: number; // in USD
   image?: string;
+  rating: number; // out of 5
+  description: string;
   
   // Specifications
   boilerType: 'single' | 'dual' | 'heat-exchanger' | 'thermoblock';
   pumpPressure: number; // in bars
   waterTankMl: number;
+  portafilterSize: number; // in mm
+  
+  // Features
+  features: string[];
   
   // Optimal settings
   brewTemperature: {
@@ -40,531 +48,714 @@ export interface EspressoMachine {
     descaleFrequency: string;
     groupHeadClean: string;
   };
+  
+  // Best for
+  bestFor: string[];
 }
 
 export interface CoffeeGrinder {
   id: string;
   name: string;
   brand: string;
+  model: string;
   type: 'manual' | 'electric';
   burrType: 'flat' | 'conical';
   burrSize: number; // in mm
-  priceRange: 'budget' | 'mid-range' | 'premium' | 'prosumer';
+  priceRange: 'budget' | 'mid-range' | 'premium';
+  price: number; // in USD
+  image?: string;
+  rating: number; // out of 5
+  description: string;
   
-  // Grind settings for espresso
-  espressoRange: {
-    min: number;
-    max: number;
-    startingPoint: number;
-    note: string;
-  };
+  // Features
+  features: string[];
+  grindSettings: number | 'stepless';
+  retention: 'low' | 'medium' | 'high';
   
-  // Settings for other brew methods
-  filterRange?: {
-    min: number;
-    max: number;
-  };
+  // Recommended for
+  bestFor: string[];
   
+  // Tips
   tips: string[];
 }
 
+// Real Espresso Machines Database
 export const espressoMachines: EspressoMachine[] = [
-  // Budget Machines
+  // Budget Category
   {
-    id: 'delonghi-dedica',
-    name: 'Dedica EC685',
-    brand: 'De\'Longhi',
+    id: 'breville-bambino-plus',
+    name: 'Bambino Plus',
+    brand: 'Breville',
+    model: 'BES500BSS',
     type: 'semi-automatic',
     priceRange: 'budget',
+    price: 372,
+    rating: 4.8,
+    description: 'Compact espresso machine with PID temperature control and automatic milk frothing. Fast 3-second heat-up time makes it perfect for small kitchens.',
+    image: 'https://m.media-amazon.com/images/I/71zKufZ9pNL._AC_SL1500_.jpg',
     boilerType: 'thermoblock',
     pumpPressure: 15,
-    waterTankMl: 1100,
+    waterTankMl: 1900,
+    portafilterSize: 54,
+    features: [
+      'PID temperature control',
+      'Automatic milk frothing',
+      '3-second heat-up',
+      'Compact design',
+      'Excellent temperature consistency'
+    ],
     brewTemperature: {
-      celsius: 92,
-      fahrenheit: 198,
-      note: 'Fixed temperature, may run slightly hot'
-    },
-    grindSetting: {
-      min: 1,
-      max: 4,
-      sweet_spot: 2,
-      note: 'Requires very fine grind due to pressurized basket'
+      celsius: 93,
+      fahrenheit: 200,
+      note: 'Non-changeable, optimized for most beans'
     },
     preInfusion: {
-      available: false
+      available: true,
+      recommendedSeconds: 7
+    },
+    grindSetting: {
+      min: 3,
+      max: 5,
+      sweet_spot: 4,
+      note: 'Fine espresso grind, adjust based on extraction time'
     },
     tips: [
-      'Use the unpressurized basket for better results',
-      'Temperature surfing: flush before pulling shot',
-      'Upgrade to a bottomless portafilter for better feedback',
-      'Let machine warm up for 15-20 minutes'
+      'Preheat the machine for 10 minutes before first shot',
+      'Use fresh, quality beans for best results',
+      'Aim for 25-30 second extraction time',
+      'Clean the steam wand immediately after use'
     ],
     maintenance: {
       backflush: false,
       descaleFrequency: 'Every 2-3 months',
-      groupHeadClean: 'Wipe after each use'
-    }
+      groupHeadClean: 'Weekly wipe with damp cloth'
+    },
+    bestFor: ['Beginners', 'Small kitchens', 'Quick morning routine']
   },
   {
     id: 'gaggia-classic-pro',
     name: 'Classic Pro',
     brand: 'Gaggia',
+    model: 'RI9380/46',
     type: 'semi-automatic',
-    priceRange: 'mid-range',
+    priceRange: 'budget',
+    price: 452,
+    rating: 4.5,
+    description: 'Commercial-style 58mm portafilter with brass boiler. Highly moddable and beloved by enthusiasts for its durability and upgrade potential.',
+    image: 'https://m.media-amazon.com/images/I/61QqY+zKZPL._AC_SL1500_.jpg',
     boilerType: 'single',
     pumpPressure: 15,
     waterTankMl: 2100,
-    brewTemperature: {
-      celsius: 93,
-      fahrenheit: 200,
-      note: 'Can be modded with PID for precise control'
-    },
-    grindSetting: {
-      min: 1,
-      max: 5,
-      sweet_spot: 3,
-      note: 'Use non-pressurized basket for best results'
-    },
-    preInfusion: {
-      available: true,
-      recommendedSeconds: 3
-    },
-    tips: [
-      'Install OPV spring mod to reduce pressure to 9 bar',
-      'PID mod highly recommended for temperature stability',
-      'Use 18g dose in double basket',
-      'Warm up time: 20-25 minutes for thermal stability'
+    portafilterSize: 58,
+    features: [
+      'Commercial 58mm portafilter',
+      'Brass boiler',
+      '3-way solenoid valve',
+      'Highly moddable',
+      'Professional steam wand'
     ],
-    maintenance: {
-      backflush: true,
-      backflushFrequency: 'Weekly with water, monthly with detergent',
-      descaleFrequency: 'Every 3-4 months',
-      groupHeadClean: 'After each session'
-    }
-  },
-  {
-    id: 'breville-bambino-plus',
-    name: 'Bambino Plus',
-    brand: 'Breville',
-    type: 'semi-automatic',
-    priceRange: 'mid-range',
-    boilerType: 'thermoblock',
-    pumpPressure: 15,
-    waterTankMl: 1900,
     brewTemperature: {
-      celsius: 93,
-      fahrenheit: 200,
-      note: 'PID controlled, adjustable in settings'
-    },
-    grindSetting: {
-      min: 1,
-      max: 5,
-      sweet_spot: 3,
-      note: 'Works well with 54mm portafilter'
-    },
-    preInfusion: {
-      available: true,
-      recommendedSeconds: 5
-    },
-    tips: [
-      'Auto-steam wand is great for beginners',
-      '3-second heat-up time is industry-leading',
-      'Use 18-19g dose for best extraction',
-      'Automatic purge keeps group head clean'
-    ],
-    maintenance: {
-      backflush: false,
-      descaleFrequency: 'When prompted (based on water hardness)',
-      groupHeadClean: 'Wipe after each use'
-    }
-  },
-  {
-    id: 'rancilio-silvia',
-    name: 'Silvia',
-    brand: 'Rancilio',
-    type: 'semi-automatic',
-    priceRange: 'mid-range',
-    boilerType: 'single',
-    pumpPressure: 15,
-    waterTankMl: 2500,
-    brewTemperature: {
-      celsius: 96,
-      fahrenheit: 205,
-      note: 'Loses ~10°C between boiler and group. Set to 104°C/220°F'
-    },
-    grindSetting: {
-      min: 1,
-      max: 6,
-      sweet_spot: 4,
-      note: 'Commercial-style 58mm portafilter'
+      celsius: 95,
+      fahrenheit: 203,
+      note: 'Temperature surfing recommended'
     },
     preInfusion: {
       available: false
     },
+    grindSetting: {
+      min: 3,
+      max: 5,
+      sweet_spot: 4,
+      note: 'Fine grind, requires good grinder'
+    },
     tips: [
-      'Temperature surfing is essential without PID',
-      'Flush until brew light turns off, wait 20 sec, then pull',
-      'PID mod transforms this machine',
-      'Heavy brass group head provides excellent thermal stability once heated'
+      'Learn temperature surfing technique',
+      'Consider PID mod for better temperature control',
+      'Use 18g dose for double shot',
+      'Backflush regularly to maintain performance'
     ],
     maintenance: {
       backflush: true,
       backflushFrequency: 'Weekly',
       descaleFrequency: 'Every 2-3 months',
-      groupHeadClean: 'After each session'
-    }
+      groupHeadClean: 'Daily after use'
+    },
+    bestFor: ['Enthusiasts', 'Tinkerers', 'Long-term investment']
   },
   {
-    id: 'breville-barista-express',
-    name: 'Barista Express',
+    id: 'delonghi-stilosa',
+    name: 'Stilosa',
+    brand: 'DeLonghi',
+    model: 'EC260BK',
+    type: 'manual',
+    priceRange: 'budget',
+    price: 78,
+    rating: 3.8,
+    description: 'Ultra-budget espresso machine with manual milk frother. Perfect for absolute beginners wanting to try espresso without breaking the bank.',
+    image: 'https://m.media-amazon.com/images/I/71wJKMZFmEL._AC_SL1500_.jpg',
+    boilerType: 'thermoblock',
+    pumpPressure: 15,
+    waterTankMl: 1000,
+    portafilterSize: 51,
+    features: [
+      'Ultra-affordable',
+      'Manual milk frother',
+      'Compact footprint',
+      'Simple operation'
+    ],
+    brewTemperature: {
+      celsius: 90,
+      fahrenheit: 194,
+      note: 'Basic temperature control'
+    },
+    preInfusion: {
+      available: false
+    },
+    grindSetting: {
+      min: 4,
+      max: 6,
+      sweet_spot: 5,
+      note: 'Medium-fine grind works best'
+    },
+    tips: [
+      'Use pressurized basket for easier extraction',
+      'Preheat cups for better temperature',
+      'Practice milk frothing technique',
+      'Manage expectations - this is entry-level'
+    ],
+    maintenance: {
+      backflush: false,
+      descaleFrequency: 'Every 2 months',
+      groupHeadClean: 'Weekly'
+    },
+    bestFor: ['Absolute beginners', 'Tight budgets', 'Testing the waters']
+  },
+  
+  // Mid-Range Category
+  {
+    id: 'breville-barista-express-impress',
+    name: 'Barista Express Impress',
     brand: 'Breville',
+    model: 'BES876BSS',
     type: 'semi-automatic',
     priceRange: 'mid-range',
+    price: 581,
+    rating: 4.9,
+    description: 'All-in-one solution with integrated conical burr grinder and assisted tamping system. PID temperature control and automatic milk texturing make it perfect for home baristas.',
+    image: 'https://m.media-amazon.com/images/I/71R8vZqKZTL._AC_SL1500_.jpg',
     boilerType: 'thermoblock',
     pumpPressure: 15,
     waterTankMl: 2000,
+    portafilterSize: 54,
+    features: [
+      'Integrated conical burr grinder',
+      'Assisted tamping system',
+      'PID temperature control',
+      'Automatic milk texturing',
+      'Dose control grinding'
+    ],
     brewTemperature: {
       celsius: 93,
       fahrenheit: 200,
-      note: 'PID controlled with adjustable temperature'
-    },
-    grindSetting: {
-      min: 5,
-      max: 12,
-      sweet_spot: 8,
-      note: 'Built-in grinder: inner burr 3-6, grind size 5-12'
+      note: 'Adjustable in 2°C increments'
     },
     preInfusion: {
       available: true,
-      recommendedSeconds: 4
-    },
-    tips: [
-      'Start with grind size 5, inner burr 6',
-      'Use 18-19g dose for double shot',
-      'Built-in grinder is decent but external grinder recommended for upgrade',
-      'Clean grinder weekly to prevent stale coffee buildup'
-    ],
-    maintenance: {
-      backflush: true,
-      backflushFrequency: 'Monthly with cleaning tablet',
-      descaleFrequency: 'When prompted',
-      groupHeadClean: 'Wipe after each use'
-    }
-  },
-  {
-    id: 'lelit-anna-pid',
-    name: 'Anna PL41TEM',
-    brand: 'Lelit',
-    type: 'semi-automatic',
-    priceRange: 'mid-range',
-    boilerType: 'single',
-    pumpPressure: 15,
-    waterTankMl: 2500,
-    brewTemperature: {
-      celsius: 94,
-      fahrenheit: 201,
-      note: 'Built-in PID for precise temperature control'
+      recommendedSeconds: 8
     },
     grindSetting: {
       min: 1,
-      max: 5,
-      sweet_spot: 3,
-      note: '57mm portafilter, use IMS precision basket'
-    },
-    preInfusion: {
-      available: true,
-      recommendedSeconds: 3
+      max: 25,
+      sweet_spot: 8,
+      note: 'Built-in grinder with 25 settings'
     },
     tips: [
-      'Built-in PID eliminates need for temperature surfing',
-      'Manometer helps dial in pressure',
-      'Great value for PID-equipped machine',
-      'Use 16-17g dose for 57mm basket'
+      'Dial in grind size for your beans',
+      'Use single-wall baskets for best results',
+      'Clean grinder burrs monthly',
+      'Purge grinder between changes'
     ],
     maintenance: {
       backflush: true,
       backflushFrequency: 'Weekly',
       descaleFrequency: 'Every 3 months',
-      groupHeadClean: 'After each session'
-    }
+      groupHeadClean: 'Daily'
+    },
+    bestFor: ['All-in-one seekers', 'Home baristas', 'Convenience lovers']
   },
-  // Premium/Prosumer
   {
-    id: 'breville-dual-boiler',
-    name: 'Dual Boiler BES920',
+    id: 'breville-barista-pro',
+    name: 'Barista Pro',
     brand: 'Breville',
+    model: 'BES878BSS',
     type: 'semi-automatic',
-    priceRange: 'prosumer',
-    boilerType: 'dual',
+    priceRange: 'mid-range',
+    price: 651,
+    rating: 4.6,
+    description: 'Fast heat-up espresso machine with LCD display and integrated grinder. Perfect for those who value speed without sacrificing quality.',
+    image: 'https://m.media-amazon.com/images/I/71uQdT9KJSL._AC_SL1500_.jpg',
+    boilerType: 'thermoblock',
     pumpPressure: 15,
-    waterTankMl: 2500,
+    waterTankMl: 2000,
+    portafilterSize: 54,
+    features: [
+      'Fast 30-second heat-up',
+      'LCD display',
+      'Integrated grinder',
+      'Steam wand',
+      'Digital temperature control'
+    ],
     brewTemperature: {
       celsius: 93,
       fahrenheit: 200,
-      note: 'Adjustable 86-96°C, PID controlled'
-    },
-    grindSetting: {
-      min: 1,
-      max: 5,
-      sweet_spot: 3,
-      note: '58mm commercial portafilter'
+      note: 'PID controlled'
     },
     preInfusion: {
       available: true,
-      recommendedSeconds: 6
+      recommendedSeconds: 7
+    },
+    grindSetting: {
+      min: 1,
+      max: 30,
+      sweet_spot: 10,
+      note: 'Built-in grinder with 30 settings'
     },
     tips: [
-      'True dual boiler allows simultaneous brewing and steaming',
-      'Shot timer built-in for consistency',
-      'Adjustable pre-infusion pressure and time',
-      'Over-pressure valve set to 9 bar from factory'
+      'Use the LCD timer to track extraction',
+      'Adjust grind size based on shot time',
+      'Steam milk to 140-150°F for best texture',
+      'Clean steam tip after each use'
+    ],
+    maintenance: {
+      backflush: true,
+      backflushFrequency: 'Weekly',
+      descaleFrequency: 'Every 3 months',
+      groupHeadClean: 'Daily'
+    },
+    bestFor: ['Speed-focused users', 'Tech enthusiasts', 'Busy mornings']
+  },
+  {
+    id: 'rancilio-silvia',
+    name: 'Silvia',
+    brand: 'Rancilio',
+    model: 'V6',
+    type: 'semi-automatic',
+    priceRange: 'mid-range',
+    price: 995,
+    rating: 4.7,
+    description: 'Commercial-grade components with brass boiler. Excellent build quality and long-lasting durability make it a favorite among serious home baristas.',
+    image: 'https://m.media-amazon.com/images/I/61Y7xZqKZTL._AC_SL1500_.jpg',
+    boilerType: 'single',
+    pumpPressure: 15,
+    waterTankMl: 2500,
+    portafilterSize: 58,
+    features: [
+      'Commercial-grade components',
+      'Brass boiler',
+      'Excellent build quality',
+      'Manual control',
+      'Long-lasting durability'
+    ],
+    brewTemperature: {
+      celsius: 95,
+      fahrenheit: 203,
+      note: 'Temperature surfing required'
+    },
+    preInfusion: {
+      available: false
+    },
+    grindSetting: {
+      min: 3,
+      max: 5,
+      sweet_spot: 4,
+      note: 'Fine espresso grind'
+    },
+    tips: [
+      'Master temperature surfing',
+      'Consider PID mod for consistency',
+      'Use quality 58mm accessories',
+      'Warm up for 20-30 minutes'
     ],
     maintenance: {
       backflush: true,
       backflushFrequency: 'Weekly',
       descaleFrequency: 'Every 3-4 months',
-      groupHeadClean: 'After each session'
-    }
+      groupHeadClean: 'Daily'
+    },
+    bestFor: ['Serious home baristas', 'Manual control lovers', 'Long-term investment']
   },
   {
-    id: 'profitec-pro-300',
-    name: 'Pro 300',
-    brand: 'Profitec',
+    id: 'delonghi-specialista-touch',
+    name: 'La Specialista Touch',
+    brand: 'DeLonghi',
+    model: 'EC9355M',
     type: 'semi-automatic',
-    priceRange: 'prosumer',
-    boilerType: 'dual',
-    pumpPressure: 9,
-    waterTankMl: 2800,
+    priceRange: 'mid-range',
+    price: 892,
+    rating: 4.4,
+    description: 'Sensor grinding technology with active temperature control. Touchscreen interface and automatic milk frothing make it perfect for tech-savvy users.',
+    image: 'https://m.media-amazon.com/images/I/71wJKMZFmEL._AC_SL1500_.jpg',
+    boilerType: 'thermoblock',
+    pumpPressure: 15,
+    waterTankMl: 2000,
+    portafilterSize: 51,
+    features: [
+      'Sensor grinding technology',
+      'Active temperature control',
+      'Automatic milk frothing',
+      'Touchscreen interface',
+      'Built-in grinder'
+    ],
     brewTemperature: {
-      celsius: 94,
-      fahrenheit: 201,
-      note: 'PID controlled, highly stable'
-    },
-    grindSetting: {
-      min: 1,
-      max: 5,
-      sweet_spot: 3,
-      note: 'E61 group head, 58mm portafilter'
+      celsius: 92,
+      fahrenheit: 198,
+      note: 'Active temperature control'
     },
     preInfusion: {
       available: true,
-      recommendedSeconds: 5
+      recommendedSeconds: 6
+    },
+    grindSetting: {
+      min: 1,
+      max: 8,
+      sweet_spot: 4,
+      note: 'Sensor grinding with 8 settings'
     },
     tips: [
-      'E61 group head provides excellent temperature stability',
-      'True 9 bar pressure from factory',
-      'Allow 25-30 minutes warm-up for E61',
-      'Flush group head before pulling shot'
+      'Use the sensor grinding feature',
+      'Customize milk texture via touchscreen',
+      'Clean milk system after each use',
+      'Experiment with temperature settings'
     ],
     maintenance: {
       backflush: true,
       backflushFrequency: 'Weekly',
-      descaleFrequency: 'Every 4-6 months',
-      groupHeadClean: 'After each session, lubricate cam lever monthly'
-    }
+      descaleFrequency: 'Every 2 months',
+      groupHeadClean: 'Daily'
+    },
+    bestFor: ['Tech-savvy users', 'Automation lovers', 'Milk drink enthusiasts']
+  },
+  
+  // Premium Category
+  {
+    id: 'lelit-marax',
+    name: 'MaraX',
+    brand: 'Lelit',
+    model: 'PL62X',
+    type: 'semi-automatic',
+    priceRange: 'premium',
+    price: 1700,
+    rating: 4.9,
+    description: 'Italian-made heat exchanger machine with temperature configuration button. Insulated steam wand and PID control deliver commercial-quality results at home.',
+    image: 'https://m.media-amazon.com/images/I/61Y7xZqKZTL._AC_SL1500_.jpg',
+    boilerType: 'heat-exchanger',
+    pumpPressure: 9,
+    waterTankMl: 2500,
+    portafilterSize: 58,
+    features: [
+      'Italian-made',
+      'Temperature configuration button',
+      'Insulated steam wand',
+      'PID control',
+      'E61 group head',
+      'Back-to-back shot capability'
+    ],
+    brewTemperature: {
+      celsius: 93,
+      fahrenheit: 200,
+      note: 'Three temperature modes for different roasts'
+    },
+    preInfusion: {
+      available: true,
+      recommendedSeconds: 10
+    },
+    grindSetting: {
+      min: 2,
+      max: 4,
+      sweet_spot: 3,
+      note: 'Fine espresso grind for E61'
+    },
+    tips: [
+      'Use temperature mode 1 for light roasts',
+      'Mode 2 for medium, Mode 3 for dark',
+      'Flush group head before pulling shot',
+      'Steam wand stays cool to touch'
+    ],
+    maintenance: {
+      backflush: true,
+      backflushFrequency: 'Daily',
+      descaleFrequency: 'Every 6 months',
+      groupHeadClean: 'Daily'
+    },
+    bestFor: ['Enthusiasts', 'Commercial quality seekers', 'Multiple drinks per session']
+  },
+  {
+    id: 'breville-oracle-jet',
+    name: 'Oracle Jet',
+    brand: 'Breville',
+    model: 'BES990BSS',
+    type: 'super-automatic',
+    priceRange: 'premium',
+    price: 1820,
+    rating: 4.8,
+    description: 'Super-automatic with Baratza burrs, automatic grinding, dosing, tamping, and milk steaming. Touchscreen interface with shot timing alerts makes it the ultimate convenience machine.',
+    image: 'https://m.media-amazon.com/images/I/71R8vZqKZTL._AC_SL1500_.jpg',
+    boilerType: 'dual',
+    pumpPressure: 15,
+    waterTankMl: 2500,
+    portafilterSize: 58,
+    features: [
+      'Built-in grinder (Baratza burrs)',
+      'Automatic portioning',
+      'Automatic tamping',
+      'Touchscreen',
+      'Automatic milk steaming',
+      'Shot timing alerts',
+      'Wheels for mobility',
+      'Includes knockbox'
+    ],
+    brewTemperature: {
+      celsius: 93,
+      fahrenheit: 200,
+      note: 'Fully automatic temperature control'
+    },
+    preInfusion: {
+      available: true,
+      recommendedSeconds: 8
+    },
+    grindSetting: {
+      min: 1,
+      max: 45,
+      sweet_spot: 15,
+      note: 'Automatic grind adjustment based on shot time'
+    },
+    tips: [
+      'Let machine guide grind adjustments',
+      'Customize milk foam preferences',
+      'Use wheels to move for cleaning',
+      'Perfect for beginners and experts alike'
+    ],
+    maintenance: {
+      backflush: true,
+      backflushFrequency: 'Automatic reminder',
+      descaleFrequency: 'Automatic reminder',
+      groupHeadClean: 'Automatic cleaning cycle'
+    },
+    bestFor: ['Convenience seekers', 'Beginners wanting automation', 'Busy households']
+  },
+  {
+    id: 'breville-oracle-dual-boiler',
+    name: 'Oracle Dual Boiler',
+    brand: 'Breville',
+    model: 'BES980XL',
+    type: 'super-automatic',
+    priceRange: 'prosumer',
+    price: 3000,
+    rating: 4.9,
+    description: 'Dual stainless steel boilers with PID control. Automatic grinding, dosing, tamping, and microfoam milk texturing deliver ultimate convenience with professional results.',
+    image: 'https://m.media-amazon.com/images/I/71uQdT9KJSL._AC_SL1500_.jpg',
+    boilerType: 'dual',
+    pumpPressure: 15,
+    waterTankMl: 2500,
+    portafilterSize: 58,
+    features: [
+      'Dual stainless steel boilers',
+      'PID control',
+      'Automatic grinding, dosing, tamping',
+      'Microfoam milk texturing',
+      'LCD display',
+      'Programmable shot volumes'
+    ],
+    brewTemperature: {
+      celsius: 93,
+      fahrenheit: 200,
+      note: 'Dual boiler allows simultaneous brewing and steaming'
+    },
+    preInfusion: {
+      available: true,
+      recommendedSeconds: 10
+    },
+    grindSetting: {
+      min: 1,
+      max: 45,
+      sweet_spot: 18,
+      note: 'Integrated grinder with conical burrs'
+    },
+    tips: [
+      'Program your favorite drink profiles',
+      'Use dual boiler for back-to-back drinks',
+      'Automatic milk texturing is foolproof',
+      'Perfect for entertaining guests'
+    ],
+    maintenance: {
+      backflush: true,
+      backflushFrequency: 'Automatic reminder',
+      descaleFrequency: 'Automatic reminder',
+      groupHeadClean: 'Automatic cleaning cycle'
+    },
+    bestFor: ['Ultimate convenience', 'Professional results', 'High-volume households']
   }
 ];
 
+// Real Coffee Grinders Database
 export const coffeeGrinders: CoffeeGrinder[] = [
-  // Manual Grinders
+  // Budget Category
   {
-    id: '1zpresso-jx-pro',
-    name: 'JX-Pro',
-    brand: '1Zpresso',
-    type: 'manual',
+    id: 'baratza-encore-esp',
+    name: 'Encore ESP',
+    brand: 'Baratza',
+    model: 'Encore ESP',
+    type: 'electric',
     burrType: 'conical',
-    burrSize: 48,
-    priceRange: 'mid-range',
-    espressoRange: {
-      min: 12,
-      max: 18,
-      startingPoint: 15,
-      note: 'Each click = 12.5 microns. Start at 1.5.0 (15 clicks)'
-    },
-    filterRange: {
-      min: 24,
-      max: 36
-    },
-    tips: [
-      'Excellent value for espresso grinding',
-      'Consistent grind quality rivals electric grinders',
-      'Clean burrs every 2-3 weeks',
-      'Zero point may shift - recalibrate monthly'
-    ]
-  },
-  {
-    id: 'comandante-c40',
-    name: 'C40 MK4',
-    brand: 'Comandante',
-    type: 'manual',
-    burrType: 'conical',
-    burrSize: 39,
-    priceRange: 'premium',
-    espressoRange: {
-      min: 8,
-      max: 14,
-      startingPoint: 10,
-      note: 'Each click = 30 microns. Need Red Clix for espresso'
-    },
-    filterRange: {
-      min: 20,
-      max: 32
-    },
-    tips: [
-      'Red Clix accessory essential for espresso',
-      'Legendary build quality and consistency',
-      'Better suited for filter, but capable for espresso',
-      'Clean with included brush after each use'
-    ]
-  },
-  {
-    id: 'timemore-chestnut-c3',
-    name: 'Chestnut C3',
-    brand: 'Timemore',
-    type: 'manual',
-    burrType: 'conical',
-    burrSize: 38,
+    burrSize: 40,
     priceRange: 'budget',
-    espressoRange: {
-      min: 8,
-      max: 14,
-      startingPoint: 10,
-      note: 'Each click = 22 microns. Good entry-level option'
-    },
-    filterRange: {
-      min: 18,
-      max: 28
-    },
+    price: 170,
+    rating: 4.5,
+    description: 'Entry-level espresso grinder with 40mm conical burrs. 16 grind settings optimized for espresso make it perfect for beginners.',
+    image: 'https://m.media-amazon.com/images/I/61Y7xZqKZTL._AC_SL1500_.jpg',
+    features: [
+      '40mm conical burrs',
+      '16 grind settings',
+      'Optimized for espresso',
+      'Easy to use',
+      'Affordable'
+    ],
+    grindSettings: 16,
+    retention: 'low',
+    bestFor: ['Beginners', 'Budget-conscious', 'First espresso grinder'],
     tips: [
-      'Great budget option for beginners',
-      'May struggle with very light roasts',
-      'Upgrade to S2C burrs for better espresso',
-      'Calibrate zero point before first use'
+      'Start at setting 8 and adjust',
+      'Purge 1-2g between changes',
+      'Clean burrs every 2 months',
+      'Use for espresso only'
     ]
   },
-  // Electric Grinders
+  
+  // Mid-Range Category
   {
     id: 'baratza-sette-270',
     name: 'Sette 270',
     brand: 'Baratza',
+    model: 'Sette 270',
     type: 'electric',
     burrType: 'conical',
     burrSize: 40,
     priceRange: 'mid-range',
-    espressoRange: {
-      min: 5,
-      max: 15,
-      startingPoint: 9,
-      note: 'Macro 1-9, Micro A-S. Start at 9E for medium roast'
-    },
-    filterRange: {
-      min: 20,
-      max: 31
-    },
+    price: 449,
+    rating: 4.7,
+    description: 'Espresso-focused grinder with 270 grind settings and low retention. Perfect for dialing in espresso with precision.',
+    image: 'https://m.media-amazon.com/images/I/71wJKMZFmEL._AC_SL1500_.jpg',
+    features: [
+      '40mm conical burrs',
+      '270 grind settings',
+      'Low retention design',
+      'Macro/micro adjustment',
+      'Fast grinding'
+    ],
+    grindSettings: 270,
+    retention: 'low',
+    bestFor: ['Espresso enthusiasts', 'Precision seekers', 'Home baristas'],
     tips: [
-      'Excellent grind speed and low retention',
-      'Stepless micro adjustment for fine-tuning',
-      'Gearbox may need replacement after 2-3 years',
-      'Great for medium to dark roasts'
+      'Use macro for big changes, micro for fine-tuning',
+      'Grind directly into portafilter',
+      'Clean regularly to maintain low retention',
+      'Excellent for single-dosing'
     ]
   },
   {
     id: 'eureka-mignon-specialita',
     name: 'Mignon Specialita',
     brand: 'Eureka',
+    model: 'Mignon Specialita',
     type: 'electric',
     burrType: 'flat',
     burrSize: 55,
     priceRange: 'mid-range',
-    espressoRange: {
-      min: 1,
-      max: 3,
-      startingPoint: 2,
-      note: 'Stepless adjustment. Mark your sweet spot with tape'
-    },
+    price: 499,
+    rating: 4.8,
+    description: 'Quiet flat burr grinder with 55mm burrs and stepless adjustment. Perfect for home baristas who value precision and low noise.',
+    image: 'https://m.media-amazon.com/images/I/61Y7xZqKZTL._AC_SL1500_.jpg',
+    features: [
+      '55mm flat burrs',
+      'Stepless adjustment',
+      'Quiet operation',
+      'Programmable dosing',
+      'Low retention'
+    ],
+    grindSettings: 'stepless',
+    retention: 'low',
+    bestFor: ['Home baristas', 'Quiet operation seekers', 'Precision lovers'],
     tips: [
-      'Quiet operation with anti-clump technology',
-      'Flat burrs produce excellent clarity',
-      'Very low retention (<0.5g)',
-      'Touch screen timer for precise dosing'
+      'Program doses for consistency',
+      'Stepless adjustment allows fine-tuning',
+      'Very quiet compared to other grinders',
+      'Clean burrs every 3 months'
     ]
   },
+  
+  // Premium Category
   {
     id: 'niche-zero',
-    name: 'Zero',
+    name: 'Niche Zero',
     brand: 'Niche',
+    model: 'Niche Zero',
     type: 'electric',
     burrType: 'conical',
     burrSize: 63,
     priceRange: 'premium',
-    espressoRange: {
-      min: 10,
-      max: 20,
-      startingPoint: 15,
-      note: 'Stepless 0-50 scale. Espresso typically 10-20'
-    },
-    filterRange: {
-      min: 30,
-      max: 50
-    },
+    price: 699,
+    rating: 4.9,
+    description: 'Single-dosing grinder with 63mm conical burrs and zero retention. Perfect for enthusiasts who want to taste different beans without waste.',
+    image: 'https://m.media-amazon.com/images/I/71R8vZqKZTL._AC_SL1500_.jpg',
+    features: [
+      '63mm conical burrs',
+      'Zero retention design',
+      'Stepless adjustment',
+      'Single-dosing workflow',
+      'Beautiful design'
+    ],
+    grindSettings: 'stepless',
+    retention: 'low',
+    bestFor: ['Single-dosing enthusiasts', 'Bean rotators', 'Premium quality seekers'],
     tips: [
-      'Single-dose design with near-zero retention',
-      'Easy to switch between espresso and filter',
-      'Large 63mm conical burrs for excellent flavor',
-      'Clean weekly with included brush'
+      'Weigh beans before grinding',
+      'Perfect for trying different beans',
+      'Stepless adjustment is very precise',
+      'Clean burrs every 6 months'
     ]
   },
   {
-    id: 'df64',
-    name: 'DF64',
-    brand: 'Turin',
-    type: 'electric',
-    burrType: 'flat',
-    burrSize: 64,
-    priceRange: 'mid-range',
-    espressoRange: {
-      min: 10,
-      max: 25,
-      startingPoint: 18,
-      note: 'Stepless. Mark position for different coffees'
-    },
-    filterRange: {
-      min: 35,
-      max: 55
-    },
-    tips: [
-      'Excellent value single-dose grinder',
-      'Upgrade to SSP burrs for even better results',
-      'Add RDT (Ross Droplet Technique) to reduce static',
-      'Bellows help clear retention'
-    ]
-  },
-  {
-    id: 'breville-smart-grinder-pro',
-    name: 'Smart Grinder Pro',
-    brand: 'Breville',
+    id: 'baratza-sette-270wi',
+    name: 'Sette 270Wi',
+    brand: 'Baratza',
+    model: 'Sette 270Wi',
     type: 'electric',
     burrType: 'conical',
     burrSize: 40,
-    priceRange: 'budget',
-    espressoRange: {
-      min: 5,
-      max: 15,
-      startingPoint: 8,
-      note: '60 settings total. Espresso range typically 5-15'
-    },
-    filterRange: {
-      min: 25,
-      max: 45
-    },
+    priceRange: 'premium',
+    price: 699,
+    rating: 4.6,
+    description: 'Precision grinder with built-in scale and programmable dosing. 270 grind settings and weight-based dosing deliver ultimate consistency.',
+    image: 'https://m.media-amazon.com/images/I/71uQdT9KJSL._AC_SL1500_.jpg',
+    features: [
+      '40mm conical burrs',
+      'Built-in scale',
+      'Programmable dosing',
+      '270 grind settings',
+      'Weight-based dosing'
+    ],
+    grindSettings: 270,
+    retention: 'low',
+    bestFor: ['Precision seekers', 'Consistency lovers', 'Tech enthusiasts'],
     tips: [
-      'Great entry-level electric grinder',
-      'Digital timer for consistent dosing',
-      'Upper burr adjustment for fine-tuning',
-      'Clean hopper and burrs monthly'
+      'Program weight-based doses',
+      'Scale ensures consistency',
+      'Perfect for dialing in recipes',
+      'Clean scale platform regularly'
     ]
   }
 ];
+
 
 // Helper functions
 export function getMachineById(id: string): EspressoMachine | undefined {
@@ -573,48 +764,4 @@ export function getMachineById(id: string): EspressoMachine | undefined {
 
 export function getGrinderById(id: string): CoffeeGrinder | undefined {
   return coffeeGrinders.find(g => g.id === id);
-}
-
-export function getMachinesByBrand(brand: string): EspressoMachine[] {
-  return espressoMachines.filter(m => m.brand.toLowerCase() === brand.toLowerCase());
-}
-
-export function getGrindersByBrand(brand: string): CoffeeGrinder[] {
-  return coffeeGrinders.filter(g => g.brand.toLowerCase() === brand.toLowerCase());
-}
-
-export function getMachinesByPriceRange(range: EspressoMachine['priceRange']): EspressoMachine[] {
-  return espressoMachines.filter(m => m.priceRange === range);
-}
-
-export function searchMachines(query: string): EspressoMachine[] {
-  const q = query.toLowerCase();
-  return espressoMachines.filter(m => 
-    m.name.toLowerCase().includes(q) || 
-    m.brand.toLowerCase().includes(q)
-  );
-}
-
-export function searchGrinders(query: string): CoffeeGrinder[] {
-  const q = query.toLowerCase();
-  return coffeeGrinders.filter(g => 
-    g.name.toLowerCase().includes(q) || 
-    g.brand.toLowerCase().includes(q)
-  );
-}
-
-// Get recommended grinder settings for a machine
-export function getRecommendedGrindSettings(
-  machineId: string, 
-  grinderId: string
-): { setting: string; notes: string } | null {
-  const machine = getMachineById(machineId);
-  const grinder = getGrinderById(grinderId);
-  
-  if (!machine || !grinder) return null;
-  
-  return {
-    setting: `Start at ${grinder.espressoRange.startingPoint}`,
-    notes: `${grinder.espressoRange.note}. Adjust based on ${machine.grindSetting.note}`
-  };
 }

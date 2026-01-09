@@ -64,7 +64,6 @@ vi.mock('@/data/machines', () => ({
       burrType: 'conical',
       burrSize: 48,
       priceRange: 'budget',
-      espressoRange: { min: 10, max: 20, startingPoint: 15, note: 'Test' },
       tips: ['Grinder tip'],
     },
   ],
@@ -158,7 +157,6 @@ describe('Machine Data', () => {
       expect(grinder.burrType).toBeDefined();
       expect(grinder.burrSize).toBeGreaterThan(0);
       expect(grinder.priceRange).toBeDefined();
-      expect(grinder.espressoRange).toBeDefined();
       expect(Array.isArray(grinder.tips)).toBe(true);
     });
   });

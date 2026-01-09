@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { ScreenContainer } from '@/components/screen-container';
@@ -28,124 +29,82 @@ export default function GrinderDetailScreen() {
 
   return (
     <>
-      <Stack.Screen 
-        options={{ 
+      <Stack.Screen
+        options={{
           title: grinder.name,
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.foreground,
-          headerShadowVisible: false,
-        }} 
+          headerShown: true,
+          headerBackTitle: "Back",
+        }}
       />
-      <ScreenContainer edges={["left", "right", "bottom"]}>
+      <ScreenContainer>
         <ScrollView 
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>
-              <IconSymbol name="dial.low.fill" size={48} color={colors.primary} />
-            </View>
-            <Text style={[styles.brand, { color: colors.muted }]}>{grinder.brand}</Text>
-            <Text style={[styles.name, { color: colors.foreground }]}>{grinder.name}</Text>
-            <View style={styles.badges}>
-              <View style={[styles.badge, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.badgeText, { color: colors.foreground }]}>
-                  {grinder.type}
-                </Text>
-              </View>
-              <View style={[styles.badge, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.badgeText, { color: colors.foreground }]}>
-                  {grinder.burrSize}mm {grinder.burrType}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Espresso Settings */}
+          {/* Specifications */}
           <PremiumCard style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-              Espresso Settings
+              Specifications
             </Text>
             
-            <View style={styles.settingsGrid}>
-              <View style={[styles.settingCard, { backgroundColor: colors.surfaceElevated }]}>
-                <Text style={[styles.settingLabel, { color: colors.muted }]}>Starting Point</Text>
-                <Text style={[styles.settingValue, { color: colors.primary }]}>
-                  {grinder.espressoRange.startingPoint}
-                </Text>
-              </View>
-              
-              <View style={[styles.settingCard, { backgroundColor: colors.surfaceElevated }]}>
-                <Text style={[styles.settingLabel, { color: colors.muted }]}>Range</Text>
-                <Text style={[styles.settingValue, { color: colors.foreground }]}>
-                  {grinder.espressoRange.min} - {grinder.espressoRange.max}
-                </Text>
-              </View>
-            </View>
-
-            {/* Visual Scale */}
-            <View style={styles.grindScale}>
-              <View style={styles.grindScaleLabels}>
-                <Text style={[styles.grindScaleLabel, { color: colors.muted }]}>Finer</Text>
-                <Text style={[styles.grindScaleLabel, { color: colors.muted }]}>Coarser</Text>
-              </View>
-              <View style={[styles.grindScaleBar, { backgroundColor: colors.surfaceElevated }]}>
-                <View 
-                  style={[
-                    styles.grindScaleRange,
-                    { 
-                      backgroundColor: `${colors.primary}30`,
-                      left: `${(grinder.espressoRange.min / 50) * 100}%`,
-                      width: `${((grinder.espressoRange.max - grinder.espressoRange.min) / 50) * 100}%`,
-                    }
-                  ]} 
-                />
-                <View 
-                  style={[
-                    styles.grindScaleMarker,
-                    { 
-                      backgroundColor: colors.primary,
-                      left: `${(grinder.espressoRange.startingPoint / 50) * 100}%`,
-                    }
-                  ]} 
-                />
-              </View>
-            </View>
-
-            <View style={[styles.noteBox, { backgroundColor: colors.surfaceElevated }]}>
-              <IconSymbol name="info.circle.fill" size={18} color={colors.primary} />
-              <Text style={[styles.noteText, { color: colors.muted }]}>
-                {grinder.espressoRange.note}
-              </Text>
-            </View>
+            <InfoRow label="Brand" value={grinder.brand} />
+            <InfoRow label="Model" value={grinder.model} />
+            <InfoRow label="Type" value={grinder.type.charAt(0).toUpperCase() + grinder.type.slice(1)} />
+            <InfoRow label="Burr Type" value={grinder.burrType.charAt(0).toUpperCase() + grinder.burrType.slice(1)} />
+            <InfoRow label="Burr Size" value={`${grinder.burrSize}mm`} />
+            <InfoRow label="Price Range" value={grinder.priceRange.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')} />
+            <InfoRow label="Price" value={`$${grinder.price}`} />
+            <InfoRow label="Rating" value={`${grinder.rating}/5.0`} />
+            <InfoRow label="Grind Settings" value={typeof grinder.grindSettings === 'number' ? String(grinder.grindSettings) : 'Stepless'} />
+            <InfoRow label="Retention" value={grinder.retention.charAt(0).toUpperCase() + grinder.retention.slice(1)} />
           </PremiumCard>
 
-          {/* Filter Settings */}
-          {grinder.filterRange && (
-            <PremiumCard style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-                Filter/Pour-over Settings
-              </Text>
-              
-              <View style={styles.settingsGrid}>
-                <View style={[styles.settingCard, { backgroundColor: colors.surfaceElevated }]}>
-                  <Text style={[styles.settingLabel, { color: colors.muted }]}>Range</Text>
-                  <Text style={[styles.settingValue, { color: colors.foreground }]}>
-                    {grinder.filterRange.min} - {grinder.filterRange.max}
-                  </Text>
-                </View>
+          {/* Description */}
+          <PremiumCard style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+              Description
+            </Text>
+            <Text style={[styles.description, { color: colors.muted }]}>
+              {grinder.description}
+            </Text>
+          </PremiumCard>
+
+          {/* Features */}
+          <PremiumCard style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+              Features
+            </Text>
+            {grinder.features.map((feature: string, index: number) => (
+              <View key={index} style={styles.featureRow}>
+                <IconSymbol name="checkmark.circle.fill" size={20} color={colors.success} />
+                <Text style={[styles.featureText, { color: colors.foreground }]}>
+                  {feature}
+                </Text>
               </View>
-            </PremiumCard>
-          )}
+            ))}
+          </PremiumCard>
+
+          {/* Best For */}
+          <PremiumCard style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+              Best For
+            </Text>
+            {grinder.bestFor.map((use: string, index: number) => (
+              <View key={index} style={styles.featureRow}>
+                <IconSymbol name="star.fill" size={18} color={colors.primary} />
+                <Text style={[styles.featureText, { color: colors.foreground }]}>
+                  {use}
+                </Text>
+              </View>
+            ))}
+          </PremiumCard>
 
           {/* Tips */}
           <PremiumCard style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
               Pro Tips
             </Text>
-            
-            {grinder.tips.map((tip, index) => (
+            {grinder.tips.map((tip: string, index: number) => (
               <View key={index} style={styles.tipRow}>
                 <View style={[styles.tipBullet, { backgroundColor: colors.primary }]} />
                 <Text style={[styles.tipText, { color: colors.foreground }]}>
@@ -154,19 +113,6 @@ export default function GrinderDetailScreen() {
               </View>
             ))}
           </PremiumCard>
-
-          {/* Specifications */}
-          <PremiumCard style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-              Specifications
-            </Text>
-            
-            <InfoRow label="Type" value={grinder.type} />
-            <InfoRow label="Burr Type" value={`${grinder.burrSize}mm ${grinder.burrType}`} />
-            <InfoRow label="Price Range" value={grinder.priceRange.replace('-', ' ')} />
-          </PremiumCard>
-
-          <View style={{ height: 40 }} />
         </ScrollView>
       </ScreenContainer>
     </>
@@ -175,48 +121,9 @@ export default function GrinderDetailScreen() {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    paddingHorizontal: 20,
-  },
-  header: {
-    alignItems: 'center',
-    paddingVertical: 24,
-  },
-  iconContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  brand: {
-    fontSize: 14,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 4,
-  },
-  name: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 12,
-  },
-  badges: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  badge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  badgeText: {
-    fontSize: 13,
-    fontWeight: '500',
-    textTransform: 'capitalize',
+    paddingBottom: 24,
   },
   section: {
-    padding: 20,
     marginBottom: 16,
   },
   sectionTitle: {
@@ -224,100 +131,51 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 16,
   },
-  settingsGrid: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  settingCard: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    gap: 4,
-  },
-  settingValue: {
-    fontSize: 28,
-    fontWeight: '700',
-  },
-  settingLabel: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  noteBox: {
-    flexDirection: 'row',
-    padding: 12,
-    borderRadius: 10,
-    gap: 10,
-    alignItems: 'flex-start',
-  },
-  noteText: {
-    flex: 1,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  grindScale: {
-    marginBottom: 16,
-  },
-  grindScaleLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  grindScaleLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  grindScaleBar: {
-    height: 8,
-    borderRadius: 4,
-    position: 'relative',
-  },
-  grindScaleRange: {
-    position: 'absolute',
-    top: 0,
-    height: '100%',
-    borderRadius: 4,
-  },
-  grindScaleMarker: {
-    position: 'absolute',
-    top: -4,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    marginLeft: -8,
-  },
-  tipRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-    gap: 12,
-  },
-  tipBullet: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginTop: 7,
-  },
-  tipText: {
-    flex: 1,
-    fontSize: 15,
-    lineHeight: 22,
-  },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
+    borderBottomColor: 'rgba(0,0,0,0.05)',
   },
   infoLabel: {
     fontSize: 15,
+    fontWeight: '500',
   },
   infoValue: {
     fontSize: 15,
     fontWeight: '600',
-    textTransform: 'capitalize',
+  },
+  description: {
+    fontSize: 15,
+    lineHeight: 24,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+  },
+  featureText: {
+    fontSize: 15,
+    flex: 1,
+  },
+  tipRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginBottom: 12,
+  },
+  tipBullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: 8,
+  },
+  tipText: {
+    fontSize: 15,
+    lineHeight: 24,
+    flex: 1,
   },
 });

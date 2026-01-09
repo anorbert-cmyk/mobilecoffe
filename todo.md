@@ -106,3 +106,13 @@
 - [ ] Add reading progress indicator for Learn articles
 - [ ] Add comparison view for machines
 - [ ] Add pull-to-refresh on cafe list
+
+
+## v9 Real Equipment Data & Image Enhancements
+- [x] Research and collect real espresso machines (budget, mid-range, high-end)
+- [x] Research and collect real coffee grinders
+- [x] Generate header images for all learning articles
+- [x] Add real machine images to recommendations
+- [x] Add detailed specs to machine cards (price, features, ratings)
+- [x] Implement image zoom/modal for coffee detail images
+- [ ] Update equipment recommender with real data

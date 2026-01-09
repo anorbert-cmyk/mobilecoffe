@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { ScrollView, Text, View, Pressable, StyleSheet } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { ScrollView, Text, View, Pressable, StyleSheet, Modal } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, Stack } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -22,6 +22,7 @@ export default function CoffeeDetailScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('recipe');
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
+  const [imageViewVisible, setImageViewVisible] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const coffee = getCoffeeById(id);
@@ -109,7 +110,12 @@ export default function CoffeeDetailScreen() {
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Hero Image */}
           <Animated.View entering={FadeIn.duration(400)}>
-            <View style={styles.heroContainer}>
+            <Pressable 
+              onPress={() => setImageViewVisible(true)}
+              style={styles.heroContainer}
+              accessibilityRole="button"
+              accessibilityLabel="Tap to view full image"
+            >
               <Image
                 source={coffee.image}
                 style={styles.heroImage}
@@ -118,8 +124,45 @@ export default function CoffeeDetailScreen() {
               />
               {/* Gradient overlay */}
               <View style={styles.heroGradient} />
-            </View>
+              {/* Zoom indicator */}
+              <View style={[styles.zoomIndicator, { backgroundColor: `${colors.background}CC` }]}>
+                <IconSymbol name="magnifyingglass" size={16} color={colors.foreground} />
+                <Text style={[styles.zoomText, { color: colors.foreground }]}>Tap to zoom</Text>
+              </View>
+            </Pressable>
           </Animated.View>
+
+          {/* Image Viewer Modal */}
+          <Modal
+            visible={imageViewVisible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => setImageViewVisible(false)}
+          >
+            <Pressable 
+              style={styles.modalOverlay}
+              onPress={() => setImageViewVisible(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close image viewer"
+            >
+              <View style={styles.modalContent}>
+                <Image
+                  source={coffee.image}
+                  style={styles.modalImage}
+                  contentFit="contain"
+                  transition={300}
+                />
+                <Pressable 
+                  style={[styles.closeButton, { backgroundColor: colors.surface }]}
+                  onPress={() => setImageViewVisible(false)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Close"
+                >
+                  <IconSymbol name="xmark" size={24} color={colors.foreground} />
+                </Pressable>
+              </View>
+            </Pressable>
+          </Modal>
 
           {/* Title Section */}
           <Animated.View 
@@ -409,6 +452,52 @@ const styles = StyleSheet.create({
     right: 0,
     height: 100,
     backgroundColor: 'transparent',
+  },
+  zoomIndicator: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  zoomText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalImage: {
+    width: '100%',
+    height: '100%',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   titleSection: {
     paddingHorizontal: 20,

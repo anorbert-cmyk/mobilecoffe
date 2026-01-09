@@ -187,7 +187,7 @@ export default function MachineDetailScreen() {
               Pro Tips
             </Text>
             
-            {machine.tips.map((tip, index) => (
+                {machine.tips.map((tip: string, index: number) => (
               <View key={index} style={styles.tipRow}>
                 <View style={[styles.tipBullet, { backgroundColor: colors.primary }]} />
                 <Text style={[styles.tipText, { color: colors.foreground }]}>

@@ -134,10 +134,10 @@ function PremiumRecommendationCard({
               <View style={styles.ratingContainer}>
                 <IconSymbol name="star.fill" size={14} color={colors.warning} />
                 <Text style={[styles.ratingText, { color: colors.foreground }]}>
-                  4.{Math.floor(Math.random() * 3) + 6}
+                  {'rating' in item ? item.rating.toFixed(1) : '4.5'}
                 </Text>
                 <Text style={[styles.reviewCount, { color: colors.muted }]}>
-                  ({Math.floor(Math.random() * 3000) + 500} reviews)
+                  {'price' in item ? `$${item.price}` : ''}
                 </Text>
               </View>
             </View>
