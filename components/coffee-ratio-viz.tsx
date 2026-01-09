@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import Svg, { Rect, Line, Circle } from 'react-native-svg';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { useColors } from '@/hooks/use-colors';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -93,7 +92,7 @@ export function CoffeeRatioViz({ ratio, title }: CoffeeRatioVizProps) {
   }
 
   return (
-    <Animated.View entering={FadeIn.duration(600)} style={[styles.container, { backgroundColor: colors.surface }]}>
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
       <Text style={[styles.title, { color: colors.foreground }]}>{title}</Text>
       
       <View style={styles.vizContainer}>
@@ -178,7 +177,7 @@ export function CoffeeRatioViz({ ratio, title }: CoffeeRatioVizProps) {
         <Text style={[styles.totalLabel, { color: colors.muted }]}>Total Volume</Text>
         <Text style={[styles.totalValue, { color: colors.primary }]}>{total}ml</Text>
       </View>
-    </Animated.View>
+    </View>
   );
 }
 

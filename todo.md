@@ -126,3 +126,6 @@
 ## v11 Bug Fixes
 - [x] Fix grinder layout breaking/falling apart
 - [x] Fix equipment images not loading (espresso machines)
+
+## v12 Bug Fix
+- [x] Fix coffee composition image not displaying
