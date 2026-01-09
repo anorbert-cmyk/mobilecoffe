@@ -122,3 +122,7 @@
 - [x] Update onboarding completion to navigate to recommendations if wantsToBuyEquipment === true
 - [x] Navigate to tab bar (Make Coffee) if wantsToBuyEquipment === false
 - [x] Test onboarding flow end-to-end
+
+## v11 Bug Fixes
+- [x] Fix grinder layout breaking/falling apart
+- [x] Fix equipment images not loading (espresso machines)

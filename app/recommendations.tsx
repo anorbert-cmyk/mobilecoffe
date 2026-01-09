@@ -112,10 +112,13 @@ function PremiumRecommendationCard({
         {/* Image Section */}
         <View style={styles.imageContainer}>
           <Image
-            source={'image' in item && item.image ? item.image : require('@/assets/images/espresso.png')}
+            source={'image' in item && item.image ? { uri: item.image } : require('@/assets/images/espresso.png')}
             style={styles.cardImage}
             contentFit="cover"
             transition={300}
+            placeholder={require('@/assets/images/espresso.png')}
+            placeholderContentFit="cover"
+            cachePolicy="memory-disk"
           />
           <LinearGradient
             colors={['transparent', 'rgba(0,0,0,0.3)']}
@@ -134,10 +137,10 @@ function PremiumRecommendationCard({
               <View style={styles.ratingContainer}>
                 <IconSymbol name="star.fill" size={14} color={colors.warning} />
                 <Text style={[styles.ratingText, { color: colors.foreground }]}>
-                  {'rating' in item ? item.rating.toFixed(1) : '4.5'}
+                  {item.rating?.toFixed(1) || '4.5'}
                 </Text>
                 <Text style={[styles.reviewCount, { color: colors.muted }]}>
-                  {'price' in item ? `$${item.price}` : ''}
+                  {item.price ? `$${item.price}` : ''}
                 </Text>
               </View>
             </View>
@@ -165,7 +168,7 @@ function PremiumRecommendationCard({
 
           {/* Description */}
           <Text style={[styles.cardDescription, { color: colors.muted }]} numberOfLines={2}>
-            {String('description' in item ? (item as any).description : `Professional ${type} for specialty coffee`)}
+            {item.description || `Professional ${type} for specialty coffee`}
           </Text>
 
           {/* Match Percentage Bar */}
@@ -206,19 +209,19 @@ function PremiumRecommendationCard({
                 {item.brand}
               </Text>
             </View>
-            {type === 'machine' && 'boilerType' in item && (
+            {type === 'machine' && (item as EspressoMachine).boilerType && (
               <View style={styles.specItem}>
                 <IconSymbol name="flame.fill" size={16} color={colors.muted} />
                 <Text style={[styles.specText, { color: colors.foreground }]}>
-                  {item.boilerType}
+                  {(item as EspressoMachine).boilerType}
                 </Text>
               </View>
             )}
-            {type === 'grinder' && 'burrType' in item && (
+            {type === 'grinder' && (item as CoffeeGrinder).burrType && (
               <View style={styles.specItem}>
                 <IconSymbol name="circle.grid.cross.fill" size={16} color={colors.muted} />
                 <Text style={[styles.specText, { color: colors.foreground }]}>
-                  {item.burrType} burrs
+                  {(item as CoffeeGrinder).burrType} burrs
                 </Text>
               </View>
             )}
