@@ -19,6 +19,10 @@ import type { EdgeInsets, Metrics, Rect } from "react-native-safe-area-context";
 import { trpc, createTRPCClient } from "@/lib/trpc";
 import { initManusRuntime, subscribeSafeAreaInsets } from "@/lib/_core/manus-runtime";
 import { UserProfileProvider } from "@/lib/user-profile";
+import { SubscriptionProvider } from "@/lib/subscription/subscription-provider";
+import { ComparisonProvider } from "@/lib/comparison/comparison-provider";
+import { FavoritesProvider } from "@/lib/favorites/favorites-provider";
+import { JournalProvider } from "@/lib/journal/journal-provider";
 import { useColors } from "@/hooks/use-colors";
 
 const DEFAULT_WEB_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -207,13 +211,21 @@ export default function RootLayout() {
 
   const content = (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <UserProfileProvider>
-        <trpc.Provider client={trpcClient} queryClient={queryClient}>
-          <QueryClientProvider client={queryClient}>
-            <AppStack />
-          </QueryClientProvider>
-        </trpc.Provider>
-      </UserProfileProvider>
+      <SubscriptionProvider>
+        <ComparisonProvider>
+          <FavoritesProvider>
+            <JournalProvider>
+              <UserProfileProvider>
+          <trpc.Provider client={trpcClient} queryClient={queryClient}>
+            <QueryClientProvider client={queryClient}>
+              <AppStack />
+            </QueryClientProvider>
+          </trpc.Provider>
+              </UserProfileProvider>
+            </JournalProvider>
+          </FavoritesProvider>
+        </ComparisonProvider>
+      </SubscriptionProvider>
     </GestureHandlerRootView>
   );
 

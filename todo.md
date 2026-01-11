@@ -228,3 +228,30 @@
 - [ ] Document API endpoints
 - [ ] Save final checkpoint
 - [ ] Prepare demo video/screenshots
+
+## v21 Subscription System & Premium Features
+
+### Subscription System
+- [x] Design 3-tier subscription structure (Free, Enthusiast $6.99/mo, Pro $11.99/mo)
+- [x] Generate subscription tier comparison images with NanoBanana (enthusiast-hero.png, pro-hero.png)
+- [x] Generate paywall hero images with NanoBanana (paywall-hero.png)
+- [x] Implement subscription data model and AsyncStorage
+- [x] Create subscription selection screen
+- [x] Create paywall component for premium features
+- [x] Integrate mock subscription (Stripe ready for production)
+- [x] Add subscription status to user profile
+
+### Premium Feature: Equipment Comparison
+- [x] Generate comparison feature hero image with NanoBanana (comparison-hero.png)
+- [x] Implement comparison state management with AsyncStorage
+- [x] Add ComparisonProvider to app context
+
+### Premium Feature: Favorites System
+- [x] Generate favorites feature hero image with NanoBanana (favorites-hero.png)
+- [x] Implement favorites AsyncStorage persistence
+- [x] Add FavoritesProvider to app context
+
+### Premium Feature: Brewing Journal
+- [x] Generate brewing journal hero image with NanoBanana (journal-hero.png)
+- [x] Implement journal AsyncStorage persistence
+- [x] Add JournalProvider to app context
