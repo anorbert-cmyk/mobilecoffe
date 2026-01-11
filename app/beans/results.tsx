@@ -1,11 +1,12 @@
-import { View, Text, Pressable, ScrollView, FlatList } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
 import { useState, useMemo } from 'react';
+import { View, Text, Pressable, ScrollView, FlatList } from 'react-native';
 import { Image } from 'expo-image';
+import { router, useLocalSearchParams } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { FavoriteButton } from '@/components/favorite-button';
 import { useColors } from '@/hooks/use-colors';
-import * as Haptics from 'expo-haptics';
 import { coffeeBeans, flavorCategories, type CoffeeBean } from '@/data/beans';
 
 export default function BeanResults() {
@@ -67,8 +68,11 @@ export default function BeanResults() {
             style={{ width: '100%', height: '100%' }}
             contentFit="cover"
           />
+          <View className="absolute top-3 right-3">
+            <FavoriteButton id={bean.id} type="bean" size={24} />
+          </View>
           {!bean.inStock && (
-            <View className="absolute top-3 right-3 px-3 py-1 rounded-full bg-error">
+            <View className="absolute top-3 left-3 px-3 py-1 rounded-full bg-error">
               <Text className="text-white text-xs font-semibold">Out of Stock</Text>
             </View>
           )}

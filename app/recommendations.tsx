@@ -16,6 +16,7 @@ import Animated, {
 import { ScreenContainer } from '@/components/screen-container';
 import { PremiumButton } from '@/components/ui/premium-button';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { FavoriteButton } from '@/components/favorite-button';
 import { useColors } from '@/hooks/use-colors';
 import { useUserProfile } from '@/lib/user-profile';
 import { getEquipmentRecommendations, EquipmentRecommendation } from '@/lib/equipment-recommender';
@@ -72,17 +73,10 @@ function PremiumRecommendationCard({
 }) {
   const colors = useColors();
   const scale = useSharedValue(1);
-  const [isSaved, setIsSaved] = useState(false);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
-
-  const handleSave = () => {
-    triggerHaptic();
-    setIsSaved(!isSaved);
-    onSave();
-  };
 
   return (
     <Animated.View entering={FadeInDown.delay(index * 100).duration(400)}>
@@ -146,24 +140,7 @@ function PremiumRecommendationCard({
             </View>
             
             {/* Save Button */}
-            <Pressable
-              onPress={handleSave}
-              style={({ pressed }) => [
-                styles.saveButton,
-                { 
-                  backgroundColor: isSaved ? `${colors.primary}15` : colors.surfaceElevated,
-                  opacity: pressed ? 0.7 : 1,
-                }
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={isSaved ? "Unsave" : "Save"}
-            >
-              <IconSymbol 
-                name={isSaved ? "heart.fill" : "heart"} 
-                size={20} 
-                color={isSaved ? colors.primary : colors.muted} 
-              />
-            </Pressable>
+            <FavoriteButton id={item.id} type={type === 'machine' ? 'machine' : 'grinder'} size={20} />
           </View>
 
           {/* Description */}

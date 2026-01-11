@@ -41,7 +41,7 @@ export default function JournalScreen() {
               style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
             >
               <Text style={[styles.cardTitle, { color: colors.foreground }]}>{entry.coffeeName}</Text>
-              <Text style={[styles.cardMethod, { color: colors.muted }]}>{entry.brewMethod}</Text>
+              <Text style={[styles.cardMethod, { color: colors.muted }]}>{entry.brewMethod.replace('-', ' ').toUpperCase()}</Text>
               <View style={styles.cardFooter}>
                 <Text style={[styles.cardDate, { color: colors.muted }]}>{new Date(entry.date).toLocaleDateString()}</Text>
                 <Text style={[styles.cardRating, { color: colors.primary }]}>★ {entry.rating}/5</Text>

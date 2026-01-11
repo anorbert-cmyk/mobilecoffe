@@ -25,6 +25,7 @@ import Animated, {
 
 import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { FavoriteButton } from '@/components/favorite-button';
 import { useColors } from '@/hooks/use-colors';
 import { coffeeRecipes, CoffeeRecipe } from '@/data/coffees';
 
@@ -107,6 +108,9 @@ function HeroCard({ coffee }: { coffee: CoffeeRecipe }) {
             <View style={[styles.heroLabel, { backgroundColor: colors.primary }]}>
               <Text style={styles.heroLabelText}>FEATURED</Text>
             </View>
+            <View style={{ position: 'absolute', top: 0, right: 0 }}>
+              <FavoriteButton id={coffee.id} type="coffee" size={28} />
+            </View>
           </View>
           <View style={styles.heroTextContent}>
             <Text style={styles.heroTitle}>{coffee.name}</Text>
@@ -159,6 +163,9 @@ function HorizontalCard({ coffee, index }: { coffee: CoffeeRecipe; index: number
           transition={300}
         />
         <View style={styles.horizontalCardContent}>
+          <View style={{ position: 'absolute', top: 8, right: 8, zIndex: 10 }}>
+            <FavoriteButton id={coffee.id} type="coffee" size={22} />
+          </View>
           <View style={[
             styles.difficultyDot,
             { backgroundColor: getDifficultyColor(coffee.difficulty, colors) }
@@ -214,6 +221,9 @@ function SmallCard({ coffee, index }: { coffee: CoffeeRecipe; index: number }) {
             contentFit="cover"
             transition={300}
           />
+          <View style={{ position: 'absolute', top: 4, right: 4, zIndex: 10 }}>
+            <FavoriteButton id={coffee.id} type="coffee" size={20} />
+          </View>
           <View style={[
             styles.smallCardBadge,
             { backgroundColor: getDifficultyColor(coffee.difficulty, colors) }
