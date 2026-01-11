@@ -390,3 +390,14 @@
 - [x] Implement favorite beans assignment UI
 - [x] Add maintenance schedule setup
 - [x] Test complete add equipment flow
+
+
+## v30 Lottie Animations & Interactive Splash
+
+- [x] Install lottie-react-native package
+- [x] Download free coffee-themed Lottie animations from LottieFiles
+- [x] Fix splash screen image visibility issue
+- [x] Add Lottie animation to splash screen
+- [x] Add Lottie animations to onboarding screens
+- [x] Add smooth transitions and loop animations
+- [x] Test all animations on iOS/Android/Web

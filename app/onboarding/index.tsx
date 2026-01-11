@@ -17,10 +17,12 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
+import LottieView from 'lottie-react-native';
 
 import { ScreenContainer } from '@/components/screen-container';
 import { PremiumButton } from '@/components/ui/premium-button';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+
 import { useColors } from '@/hooks/use-colors';
 import { 
   useUserProfile, 
@@ -342,6 +344,15 @@ function WelcomeStep({
           style={styles.heroImageFull}
           contentFit="cover"
         />
+        {/* Lottie Animation Overlay */}
+        <View style={styles.lottieContainer}>
+          <LottieView
+            source={require('@/assets/lottie/coffee-brewing.json')}
+            autoPlay
+            loop
+            style={styles.lottieAnimation}
+          />
+        </View>
         {/* Gradient Overlay */}
         <LinearGradient
           colors={['transparent', 'rgba(255,255,255,0.3)', colors.background]}
@@ -950,6 +961,18 @@ const styles = StyleSheet.create({
   heroImageFull: {
     width: '100%',
     height: '100%',
+  },
+  lottieContainer: {
+    position: 'absolute',
+    top: '30%',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lottieAnimation: {
+    width: 200,
+    height: 200,
   },
   heroGradient: {
     position: 'absolute',
