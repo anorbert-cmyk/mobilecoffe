@@ -159,3 +159,11 @@
 - [x] Fix str.startsWith error on grinder detail screen
 - [x] Fix str.startsWith error on machine detail screen (not needed - no images used)
 - [x] Verify all equipment images work across all screens
+
+## v19 Content Rewrite
+- [x] Rewrite Brewing Basics articles with professional barista tone (3 articles)
+- [x] Rewrite Roast Levels articles with professional barista tone (2 articles)
+- [x] Rewrite Coffee Origins articles with professional barista tone (2 articles)
+- [x] Rewrite Equipment Guide articles with professional barista tone (2 articles)
+- [x] Rewrite Home Setup articles with professional barista tone (2 articles)
+- [x] Update learning.ts with new content (11 articles total)

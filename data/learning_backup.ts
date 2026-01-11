@@ -446,58 +446,49 @@ An espresso-capable grinder is essential. Budget at least as much for the grinde
       {
         id: 'setting-up-station',
         title: 'Setting Up Your Station',
-        content: `# Setting Up Your Home Coffee Station
+        content: `# Setting Up Your Coffee Station
 
-Let's build a coffee corner that makes you excited to brew every morning.
+Create an efficient, enjoyable brewing space at home.
 
-## Choose Your Spot
+## Location Considerations
 
-Pick a location with:
-- **Counter space**: At least 2 feet wide for equipment
-- **Power outlet**: For grinder and kettle
-- **Natural light**: Makes the ritual more enjoyable
-- **Water access**: Close to sink for easy refills
+**Near water source**: You'll fill kettles frequently
+**Good lighting**: See your pour and extraction
+**Ventilation**: Grinders create dust
+**Stable surface**: Especially for espresso machines
 
-## Essential Layout
+## Organization Tips
 
-**The Workflow Triangle:**
-1. **Beans & Grinder** (left)
-2. **Scale & Brewer** (center)
-3. **Kettle & Water** (right)
+### The Work Triangle
+Arrange your station so you can move efficiently between:
+1. **Grinder** → 2. **Brewer** → 3. **Cups/Serving**
 
-This left-to-right flow matches how you'll actually brew, reducing unnecessary movement.
+### Storage Solutions
+- Keep beans in airtight containers away from light
+- Store filters and accessories within reach
+- Use drawer organizers for small tools
 
-## Storage Solutions
+## Cleaning Station
 
-**For Beans:**
-- Airtight containers away from light
-- Room temperature (not fridge!)
-- Label with roast date
+Keep these nearby:
+- Microfiber cloths
+- Grinder brush
+- Knock box (for espresso)
+- Cleaning tablets/powder
 
-**For Equipment:**
-- Grinder stays on counter (you'll use it daily)
-- Filters in a drawer or container
-- Brewing devices on open shelving for easy access
+## Aesthetic Touches
 
-## Keep It Clean
+- **Plants**: Add life to your corner
+- **Art**: Coffee-themed prints
+- **Lighting**: Warm under-cabinet lights
+- **Tray**: Contains mess, looks intentional
 
-A clean station = better coffee:
-- Wipe down daily after brewing
-- Deep clean grinder weekly
-- Descale kettle monthly
-- Replace filters as needed
+## Maintenance Schedule
 
-## Make It Yours
-
-Add personal touches:
-- Favorite mug collection on display
-- Small plant or succulent
-- Tasting notes journal
-- Brewing recipe cards
-
-**Pro tip**: Keep your most-used method front and center. Rotate seasonal brewers (cold brew in summer, moka pot in winter) to keep things interesting.
-
-Your coffee station should feel inviting, not intimidating. Start simple and add equipment as your skills grow.`,
+**Daily**: Wipe surfaces, rinse equipment
+**Weekly**: Deep clean brewer, empty knock box
+**Monthly**: Clean grinder, descale if needed
+**Quarterly**: Replace gaskets, check seals`,
         readTime: 5
       },
       {
