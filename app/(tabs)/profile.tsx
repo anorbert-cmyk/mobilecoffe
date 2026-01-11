@@ -200,6 +200,46 @@ export default function ProfileScreen() {
           </View>
         </Animated.View>
 
+        {/* Coffee Beans Marketplace */}
+        <Animated.View 
+          entering={FadeInDown.delay(175).duration(400)}
+          style={styles.section}
+        >
+          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+            Coffee Beans
+          </Text>
+          
+          <Pressable
+            onPress={() => {
+              triggerHaptic();
+              router.push('/beans/wizard-step1' as any);
+            }}
+            style={({ pressed }) => [
+              styles.secondaryActionCard,
+              { 
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                opacity: pressed ? 0.8 : 1,
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Find and buy specialty coffee beans"
+          >
+            <View style={[styles.secondaryActionIcon, { backgroundColor: colors.primary + '20' }]}>
+              <Text style={{ fontSize: 28 }}>☕</Text>
+            </View>
+            <View style={styles.secondaryActionText}>
+              <Text style={[styles.secondaryActionTitle, { color: colors.foreground }]}>
+                Buy Coffee Beans
+              </Text>
+              <Text style={[styles.secondaryActionDescription, { color: colors.muted }]}>
+                Find your perfect specialty beans
+              </Text>
+            </View>
+            <IconSymbol name="chevron.right" size={20} color={colors.muted} />
+          </Pressable>
+        </Animated.View>
+
         {/* Equipment Section */}
         <Animated.View 
           entering={FadeInDown.delay(200).duration(400)}

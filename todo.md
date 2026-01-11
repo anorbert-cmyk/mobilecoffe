@@ -167,3 +167,64 @@
 - [x] Rewrite Equipment Guide articles with professional barista tone (2 articles)
 - [x] Rewrite Home Setup articles with professional barista tone (2 articles)
 - [x] Update learning.ts with new content (11 articles total)
+
+## v20 Complete Monetization System Implementation
+
+### Phase 1: Architecture & Design
+- [ ] Design system architecture for monetization features
+- [ ] Create database schema for beans, courses, subscriptions, purchases
+- [ ] Design API endpoints for marketplace and subscriptions
+- [ ] Create technical specification document
+
+### Phase 2: UI/UX Design
+- [x] Design coffee bean marketplace screens (wizard, browse, detail, cart)
+- [x] Design course system screens (library, video player, progress)
+- [x] Design subscription paywall and tier selection
+- [x] Design premium feature screens (comparison, favorites, journal)
+- [x] Generate hero images for bean categories with NanoBanana (5 images)
+- [x] Generate course thumbnail images with NanoBanana (4 images)
+### Phase 3: Coffee Bean Marketplace
+- [x] Create bean database with roasters, origins, flavor profiles (16 beans, 5 roasters)
+- [x] Implement flavor profile wizard (3-step: brand vs flavor, selection, results)
+- [x] Implement bean browse and detail screens
+- [x] Add bean marketplace entry point to Profile tab
+- [x] Integrate affiliate purchase linkstegrate affiliate links for bean purchases
+
+### Phase 4: Course System
+- [ ] Define course curriculum (Brewing Mastery, Latte Art, Espresso Dialing, Equipment Maintenance)
+- [ ] Create course data structure with modules and lessons
+- [ ] Build course library screen
+- [ ] Build video player with progress tracking
+- [ ] Implement course completion certificates
+- [ ] Add course progress to user profile
+
+### Phase 5: Subscription System
+- [ ] Implement subscription tier logic (Free, Enthusiast, Pro, Lifetime)
+- [ ] Build paywall component with value proposition
+- [ ] Create subscription management screen in profile
+- [ ] Implement 30-day free trial logic
+- [ ] Add feature gating for premium content
+- [ ] Implement subscription status checks across app
+
+### Phase 6: Premium Features
+- [ ] Build equipment comparison tool (side-by-side up to 3 items)
+- [ ] Implement favorites system with AsyncStorage
+- [ ] Build "My Favorites" screen in profile
+- [ ] Create coffee journal with brew logging
+- [ ] Implement journal analytics and charts
+- [ ] Add premium badge to user profile
+
+### Phase 7: Testing & Polish
+- [ ] Test complete purchase flow end-to-end
+- [ ] Test subscription upgrade/downgrade flows
+- [ ] Test premium feature access control
+- [ ] Verify all affiliate links work correctly
+- [ ] Test course video playback and progress
+- [ ] Performance testing for all new features
+
+### Phase 8: Documentation & Delivery
+- [ ] Update README with monetization features
+- [ ] Create user guide for marketplace and courses
+- [ ] Document API endpoints
+- [ ] Save final checkpoint
+- [ ] Prepare demo video/screenshots
