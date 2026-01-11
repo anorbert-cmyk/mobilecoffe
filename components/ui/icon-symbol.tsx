@@ -61,12 +61,15 @@ const MAPPING = {
   "arrow.down.circle.fill": "download",
   "lightbulb.fill": "lightbulb",
   "list.bullet": "list",
+  "trash.fill": "delete",
   
   // Misc
   "map.fill": "map",
   "phone.fill": "phone",
   "globe": "language",
   "clock.fill": "schedule",
+  "calendar": "event",
+  "clock": "schedule",
   
   // Theme/Appearance
   "sun.max.fill": "light-mode",
@@ -89,10 +92,7 @@ const MAPPING = {
   
   // Equipment Management
   "wrench.and.screwdriver.fill": "build",
-  "calendar": "calendar-today",
-  "clock": "schedule",
   "plus.circle.fill": "add-circle",
-  "trash.fill": "delete",
   "arrow.up.right": "open-in-new",
   "checkmark.shield.fill": "verified-user",
 } as IconMapping;

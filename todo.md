@@ -379,3 +379,14 @@
 - [x] Add maintenance schedule configuration
 - [x] Add coffee stock threshold setting (days/weeks)
 - [x] Add test notification button for debugging
+
+
+## v29 Add Equipment Flow
+
+- [x] Create Add Equipment screen with type selection (Machine vs Grinder)
+- [x] Add catalog selection (browse existing machines/grinders)
+- [x] Add custom equipment entry form
+- [x] Create equipment detail/edit screen
+- [x] Implement favorite beans assignment UI
+- [x] Add maintenance schedule setup
+- [x] Test complete add equipment flow
