@@ -80,6 +80,12 @@ const MAPPING = {
   "dollarsign.circle.fill": "attach-money",
   "sparkles": "auto-awesome",
   "arrow.counterclockwise": "refresh",
+  
+  // Courses
+  "play.circle.fill": "play-circle-filled",
+  "lock.fill": "lock",
+  "bell.fill": "notifications",
+  "bell.badge.fill": "notifications-active",
 } as IconMapping;
 
 /**

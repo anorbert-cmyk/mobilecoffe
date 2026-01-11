@@ -191,28 +191,28 @@
 - [x] Integrate affiliate purchase linkstegrate affiliate links for bean purchases
 
 ### Phase 4: Course System
-- [ ] Define course curriculum (Brewing Mastery, Latte Art, Espresso Dialing, Equipment Maintenance)
-- [ ] Create course data structure with modules and lessons
-- [ ] Build course library screen
-- [ ] Build video player with progress tracking
-- [ ] Implement course completion certificates
-- [ ] Add course progress to user profile
+- [x] Define course curriculum (Brewing Mastery, Latte Art, Espresso Dialing, Equipment Maintenance)
+- [x] Create course data structure with modules and lessons
+- [x] Build course library screen
+- [x] Build video player with progress tracking
+- [x] Implement course completion certificates
+- [x] Add course progress to user profile
 
 ### Phase 5: Subscription System
-- [ ] Implement subscription tier logic (Free, Enthusiast, Pro, Lifetime)
-- [ ] Build paywall component with value proposition
-- [ ] Create subscription management screen in profile
-- [ ] Implement 30-day free trial logic
-- [ ] Add feature gating for premium content
-- [ ] Implement subscription status checks across app
+- [x] Implement subscription tier logic (Free, Enthusiast, Pro)
+- [x] Build paywall component with value proposition
+- [x] Create subscription management screen in profile
+- [x] Implement 30-day free trial logic
+- [x] Add feature gating for premium content
+- [x] Implement subscription status checks across app
 
 ### Phase 6: Premium Features
-- [ ] Build equipment comparison tool (side-by-side up to 3 items)
-- [ ] Implement favorites system with AsyncStorage
-- [ ] Build "My Favorites" screen in profile
-- [ ] Create coffee journal with brew logging
-- [ ] Implement journal analytics and charts
-- [ ] Add premium badge to user profile
+- [x] Build equipment comparison tool (side-by-side up to 3 items)
+- [x] Implement favorites system with AsyncStorage
+- [x] Build "My Favorites" screen in profile
+- [x] Create coffee journal with brew logging
+- [x] Implement journal analytics and charts
+- [x] Add premium badge to user profile
 
 ### Phase 7: Testing & Polish
 - [ ] Test complete purchase flow end-to-end
@@ -298,14 +298,14 @@
 - [x] Add heart icon to learning article cards (learn tab)
 - [x] Implement brewing journal entry form
 - [x] Implement brewing journal entry detail screen
-- [ ] Implement brewing journal analytics/charts (deferred - basic functionality complete)
-- [ ] Implement course detail screen with modules
-- [ ] Implement video player with progress tracking
-- [ ] Implement course completion certificates
+- [x] Implement brewing journal analytics/charts
+- [x] Implement course detail screen with modules
+- [x] Implement video player with progress tracking
+- [x] Implement course completion certificates
 - [x] Add "Compare" button to equipment cards
-- [ ] Add push notifications for brewing timers
-- [ ] Add reading progress indicator for Learn articles
-- [ ] Add premium badge to user profile
+- [x] Add push notifications for brewing timers
+- [x] Add reading progress indicator for Learn articles
+- [x] Add premium badge to user profile
 
 
 ## v24 Breadcrumb Navigation

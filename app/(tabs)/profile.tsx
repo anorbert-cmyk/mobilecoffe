@@ -14,6 +14,7 @@ import {
   getPurposeLabel 
 } from '@/lib/user-profile';
 import { useThemeContext, ThemePreference } from '@/lib/theme-provider';
+import { useSubscription } from '@/lib/subscription/subscription-provider';
 
 type ThemeOption = {
   value: ThemePreference;
@@ -32,6 +33,9 @@ export default function ProfileScreen() {
   const colors = useColors();
   const { profile, resetProfile } = useUserProfile();
   const { themePreference, setThemePreference } = useThemeContext();
+  const { tier, trial, isSubscribed, getTrialStatus } = useSubscription();
+  
+  const trialStatus = getTrialStatus();
 
   const triggerHaptic = () => {
     if (Platform.OS !== 'web') {
@@ -124,6 +128,28 @@ export default function ProfileScreen() {
           <Text style={[styles.headerSubtitle, { color: colors.muted }]}>
             Manage your preferences and equipment
           </Text>
+          
+          {/* Premium Badge */}
+          {isSubscribed && (
+            <View style={[styles.premiumBadge, { 
+              backgroundColor: trialStatus.isTrialActive ? `${colors.warning}20` : `${colors.primary}20`,
+              borderColor: trialStatus.isTrialActive ? colors.warning : colors.primary
+            }]}>
+              <IconSymbol 
+                name="sparkles" 
+                size={16} 
+                color={trialStatus.isTrialActive ? colors.warning : colors.primary} 
+              />
+              <Text style={[styles.premiumBadgeText, { 
+                color: trialStatus.isTrialActive ? colors.warning : colors.primary 
+              }]}>
+                {trialStatus.isTrialActive 
+                  ? `Trial • ${trialStatus.trialDaysRemaining} days left`
+                  : tier === 'pro' ? 'Pro Member' : 'Enthusiast Member'
+                }
+              </Text>
+            </View>
+          )}
         </Animated.View>
 
         {/* Experience Card */}
@@ -734,5 +760,19 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 13,
+  },
+  premiumBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginTop: 12,
+  },
+  premiumBadgeText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
