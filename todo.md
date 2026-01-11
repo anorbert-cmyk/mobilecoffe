@@ -401,3 +401,16 @@
 - [x] Add Lottie animations to onboarding screens
 - [x] Add smooth transitions and loop animations
 - [x] Test all animations on iOS/Android/Web
+
+
+## v31 Header Image Fixes
+
+- [x] Audit all screens with header images
+- [x] Fix onboarding screen header images
+- [x] Fix equipment detail screen header images
+- [x] Fix course detail screen header images
+- [x] Fix machine/grinder detail screen header images
+- [x] Fix learn article detail screen header images
+- [x] Fix bean detail screen header images
+- [x] Ensure consistent image sizing and aspect ratios
+- [x] Test all header images on iOS/Android/Web

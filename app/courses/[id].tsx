@@ -354,7 +354,7 @@ export default function CourseDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flexGrow: 1 },
-  heroImage: { width: '100%', height: 200 },
+  heroImage: { width: '100%', height: 200, resizeMode: 'cover' },
   headerContent: { padding: 20 },
   levelBadge: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, marginBottom: 12 },
   levelText: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },

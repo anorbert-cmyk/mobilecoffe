@@ -75,7 +75,7 @@ export default function GrinderDetailScreen() {
                 triggerHaptic();
                 setImageViewVisible(true);
               }}
-              style={styles.heroContainer}
+              style={styles.heroImageContainer}
               accessibilityRole="button"
               accessibilityLabel="Tap to view full image"
             >
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 24,
   },
-  heroContainer: {
+  heroImageContainer: {
     width: '100%',
     height: 300,
     position: 'relative',
@@ -300,6 +300,7 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: '100%',
+    resizeMode: 'cover',
   },
   heroGradient: {
     position: 'absolute',
