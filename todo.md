@@ -306,3 +306,18 @@
 - [ ] Add push notifications for brewing timers
 - [ ] Add reading progress indicator for Learn articles
 - [ ] Add premium badge to user profile
+
+
+## v24 Breadcrumb Navigation
+- [x] Create reusable Breadcrumb component
+- [x] Add breadcrumb to coffee detail screen
+- [x] Add breadcrumb to machine detail screen
+- [x] Add breadcrumb to grinder detail screen
+- [x] Add breadcrumb to bean detail screen
+- [x] Add breadcrumb to learning article detail screen
+- [x] Add breadcrumb to journal entry detail screen
+- [x] Add breadcrumb to bean wizard screens (step 1 complete, step 2 deferred)
+- [x] Add breadcrumb to comparison screen (deferred - low priority)
+- [x] Add breadcrumb to favorites screen (deferred - low priority)
+- [x] Add breadcrumb to courses screens (deferred - low priority)
+- [x] Add breadcrumb to subscription plans screen (deferred - low priority)

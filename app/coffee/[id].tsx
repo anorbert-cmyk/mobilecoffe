@@ -7,6 +7,7 @@ import { Platform } from "react-native";
 import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 
 import { ScreenContainer } from "@/components/screen-container";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { PremiumCard } from "@/components/ui/premium-card";
 import { PremiumButton } from "@/components/ui/premium-button";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -108,6 +109,11 @@ export default function CoffeeDetailScreen() {
       />
       <ScreenContainer edges={["left", "right"]}>
         <ScrollView showsVerticalScrollIndicator={false}>
+          <Breadcrumb items={[
+            { label: 'Home', href: '/' },
+            { label: 'Coffees', href: '/' },
+            { label: coffee.name }
+          ]} />
           {/* Hero Image */}
           <Animated.View entering={FadeIn.duration(400)}>
             <Pressable 

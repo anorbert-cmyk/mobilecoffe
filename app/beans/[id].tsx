@@ -2,6 +2,7 @@ import { View, Text, Pressable, ScrollView, Linking } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import { ScreenContainer } from '@/components/screen-container';
+import { Breadcrumb } from '@/components/breadcrumb';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
 import * as Haptics from 'expo-haptics';
@@ -49,6 +50,11 @@ export default function BeanDetail() {
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}>
+          <Breadcrumb items={[
+            { label: 'Home', href: '/' },
+            { label: 'Beans', href: '/beans/wizard-step1' },
+            { label: bean.name }
+          ]} />
           {/* Hero Image */}
           <View className="h-80 overflow-hidden bg-background">
             <Image

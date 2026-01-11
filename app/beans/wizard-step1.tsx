@@ -1,6 +1,7 @@
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { ScreenContainer } from '@/components/screen-container';
+import { Breadcrumb } from '@/components/breadcrumb';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
 import * as Haptics from 'expo-haptics';
@@ -16,6 +17,10 @@ export default function BeanWizardStep1() {
   return (
     <ScreenContainer>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+        <Breadcrumb items={[
+          { label: 'Home', href: '/' },
+          { label: 'Find Beans' }
+        ]} />
         <View className="flex-1 p-6">
           {/* Header */}
           <View className="mb-8">

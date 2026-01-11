@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { Platform } from 'react-native';
 
 import { ScreenContainer } from '@/components/screen-container';
+import { Breadcrumb } from '@/components/breadcrumb';
 import { PremiumCard } from '@/components/ui/premium-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
@@ -62,6 +63,11 @@ export default function GrinderDetailScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
+          <Breadcrumb items={[
+            { label: 'Home', href: '/' },
+            { label: 'Equipment', href: '/recommendations' },
+            { label: grinder.name }
+          ]} />
           {/* Hero Image */}
           <Animated.View entering={FadeIn.duration(400)}>
             <Pressable 

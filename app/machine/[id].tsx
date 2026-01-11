@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { ScreenContainer } from '@/components/screen-container';
+import { Breadcrumb } from '@/components/breadcrumb';
 import { PremiumCard } from '@/components/ui/premium-card';
 import { PremiumButton } from '@/components/ui/premium-button';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -45,6 +46,11 @@ export default function MachineDetailScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
+          <Breadcrumb items={[
+            { label: 'Home', href: '/' },
+            { label: 'Equipment', href: '/recommendations' },
+            { label: machine.name }
+          ]} />
           {/* Header */}
           <View style={styles.header}>
             <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}15` }]}>

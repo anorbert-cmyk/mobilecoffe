@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { Platform } from 'react-native';
 
 import { ScreenContainer } from "@/components/screen-container";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { getCategoryById, Article } from "@/data/learning";
 import { useColors } from "@/hooks/use-colors";
@@ -60,6 +61,11 @@ export default function LearnCategoryScreen() {
           contentContainerStyle={styles.articleContainer}
           showsVerticalScrollIndicator={false}
         >
+          <Breadcrumb items={[
+            { label: 'Home', href: '/' },
+            { label: 'Learn', href: '/learn' },
+            { label: selectedArticle.title }
+          ]} />
           {/* Hero Section */}
           <View style={[styles.heroSection, { backgroundColor: colors.surface }]}>
             <Image

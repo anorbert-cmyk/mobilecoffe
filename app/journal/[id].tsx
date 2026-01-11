@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ScreenContainer } from '@/components/screen-container';
+import { Breadcrumb } from '@/components/breadcrumb';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
 import { useJournal } from '@/lib/journal/journal-provider';
@@ -27,6 +28,11 @@ export default function JournalEntryDetail() {
   return (
     <ScreenContainer>
       <ScrollView contentContainerStyle={{ padding: 20 }}>
+        <Breadcrumb items={[
+          { label: 'Home', href: '/' },
+          { label: 'Journal', href: '/journal' },
+          { label: entry.coffeeName }
+        ]} />
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <Pressable onPress={() => router.back()}>
             <IconSymbol name="chevron.left" size={24} color={colors.foreground} />
