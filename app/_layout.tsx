@@ -24,7 +24,9 @@ import { ComparisonProvider } from "@/lib/comparison/comparison-provider";
 import { FavoritesProvider } from "@/lib/favorites/favorites-provider";
 import { JournalProvider } from "@/lib/journal/journal-provider";
 import { CourseProgressProvider } from "@/lib/course-progress/course-progress-provider";
-import { ReadingProgressProvider } from "@/lib/reading-progress/reading-progress-provider";
+import { ReadingProgressProvider } from '@/lib/reading-progress/reading-progress-provider';
+import { MyEquipmentProvider } from '@/lib/equipment/my-equipment-provider';
+import { NotificationPreferencesProvider } from '@/lib/notifications/notification-preferences-provider';
 import { useColors } from "@/hooks/use-colors";
 
 const DEFAULT_WEB_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -219,13 +221,17 @@ export default function RootLayout() {
             <JournalProvider>
               <CourseProgressProvider>
                 <ReadingProgressProvider>
-                  <UserProfileProvider>
+                  <MyEquipmentProvider>
+                    <NotificationPreferencesProvider>
+                      <UserProfileProvider>
           <trpc.Provider client={trpcClient} queryClient={queryClient}>
             <QueryClientProvider client={queryClient}>
               <AppStack />
             </QueryClientProvider>
           </trpc.Provider>
-                  </UserProfileProvider>
+                      </UserProfileProvider>
+                    </NotificationPreferencesProvider>
+                  </MyEquipmentProvider>
                 </ReadingProgressProvider>
               </CourseProgressProvider>
             </JournalProvider>

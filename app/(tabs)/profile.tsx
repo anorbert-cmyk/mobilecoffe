@@ -15,6 +15,7 @@ import {
 } from '@/lib/user-profile';
 import { useThemeContext, ThemePreference } from '@/lib/theme-provider';
 import { useSubscription } from '@/lib/subscription/subscription-provider';
+import { useMyEquipment } from '@/lib/equipment/my-equipment-provider';
 
 type ThemeOption = {
   value: ThemePreference;
@@ -34,6 +35,7 @@ export default function ProfileScreen() {
   const { profile, resetProfile } = useUserProfile();
   const { themePreference, setThemePreference } = useThemeContext();
   const { tier, trial, isSubscribed, getTrialStatus } = useSubscription();
+  const { equipment, getMaintenanceDueItems } = useMyEquipment();
   
   const trialStatus = getTrialStatus();
 
@@ -86,6 +88,16 @@ export default function ProfileScreen() {
   const handleBeanMarketplace = () => {
     triggerHaptic();
     router.push('/beans/wizard-step1' as any);
+  };
+
+  const handleMyEquipment = () => {
+    triggerHaptic();
+    router.push('/my-equipment' as any);
+  };
+
+  const handleNotificationSettings = () => {
+    triggerHaptic();
+    router.push('/settings/notifications' as any);
   };
 
   const handleResetOnboarding = () => {
@@ -150,6 +162,52 @@ export default function ProfileScreen() {
               </Text>
             </View>
           )}
+        </Animated.View>
+
+        {/* My Equipment Section - Top Priority */}
+        <Animated.View 
+          entering={FadeInDown.delay(50).duration(400)}
+          style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
+          <View style={styles.cardHeader}>
+            <View style={[styles.cardIconWrapper, { backgroundColor: colors.primary + '20' }]}>
+              <IconSymbol name="wrench.and.screwdriver.fill" size={20} color={colors.primary} />
+            </View>
+            <Text style={[styles.cardTitle, { color: colors.foreground }]}>
+              My Equipment
+            </Text>
+          </View>
+          
+          <View style={styles.cardContent}>
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: colors.muted }]}>Registered Items</Text>
+              <Text style={[styles.infoValue, { color: colors.foreground }]}>
+                {equipment.length} {equipment.length === 1 ? 'item' : 'items'}
+              </Text>
+            </View>
+            
+            {getMaintenanceDueItems().length > 0 && (
+              <View style={[styles.maintenanceAlert, { backgroundColor: colors.warning + '15' }]}>
+                <IconSymbol name="exclamationmark.triangle.fill" size={16} color={colors.warning} />
+                <Text style={[styles.maintenanceAlertText, { color: colors.warning }]}>
+                  {getMaintenanceDueItems().length} {getMaintenanceDueItems().length === 1 ? 'item needs' : 'items need'} maintenance
+                </Text>
+              </View>
+            )}
+          </View>
+          
+          <Pressable
+            onPress={handleMyEquipment}
+            style={({ pressed }) => [
+              styles.cardButton,
+              { backgroundColor: colors.primary, opacity: pressed ? 0.9 : 1 }
+            ]}
+          >
+            <Text style={styles.cardButtonText}>
+              {equipment.length === 0 ? 'Add Equipment' : 'Manage Equipment'}
+            </Text>
+            <IconSymbol name="chevron.right" size={16} color="#FFF" />
+          </Pressable>
         </Animated.View>
 
         {/* Experience Card */}
@@ -488,6 +546,31 @@ export default function ProfileScreen() {
           
           <View style={[styles.settingsCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Pressable
+              onPress={handleNotificationSettings}
+              style={({ pressed }) => [
+                styles.settingsRow,
+                { opacity: pressed ? 0.7 : 1 },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Notification settings"
+            >
+              <View style={[styles.settingsIcon, { backgroundColor: colors.primary + '20' }]}>
+                <IconSymbol name="bell.fill" size={20} color={colors.primary} />
+              </View>
+              <View style={styles.settingsContent}>
+                <Text style={[styles.settingsTitle, { color: colors.foreground }]}>
+                  Notifications
+                </Text>
+                <Text style={[styles.settingsDescription, { color: colors.muted }]}>
+                  Manage alerts and reminders
+                </Text>
+              </View>
+              <IconSymbol name="chevron.right" size={18} color={colors.muted} />
+            </Pressable>
+
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+            <Pressable
               onPress={handleResetOnboarding}
               style={({ pressed }) => [
                 styles.settingsRow,
@@ -806,5 +889,34 @@ const styles = StyleSheet.create({
   premiumBadgeText: {
     fontSize: 13,
     fontWeight: '600',
+  },
+  maintenanceAlert: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 10,
+    borderRadius: 8,
+  },
+  maintenanceAlertText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  cardButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginTop: 12,
+  },
+  cardButtonText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  divider: {
+    height: 1,
+    marginHorizontal: 16,
   },
 });

@@ -86,6 +86,15 @@ const MAPPING = {
   "lock.fill": "lock",
   "bell.fill": "notifications",
   "bell.badge.fill": "notifications-active",
+  
+  // Equipment Management
+  "wrench.and.screwdriver.fill": "build",
+  "calendar": "calendar-today",
+  "clock": "schedule",
+  "plus.circle.fill": "add-circle",
+  "trash.fill": "delete",
+  "arrow.up.right": "open-in-new",
+  "checkmark.shield.fill": "verified-user",
 } as IconMapping;
 
 /**

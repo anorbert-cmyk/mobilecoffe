@@ -345,3 +345,37 @@
 - [x] Test subscription downgrade flow
 - [x] Verify paywall blocks premium features correctly
 - [x] Add purchase confirmation screens
+
+
+## v28 User Equipment & Smart Notifications
+
+### My Equipment Management (Profile)
+- [x] Create "My Equipment" provider for user's owned equipment
+- [x] Add "My Equipment" section to profile (top position, psychologically optimal)
+- [x] Implement add equipment flow (select from catalog or custom)
+- [x] Add favorite beans assignment to each equipment
+- [x] Create equipment detail screen with maintenance history
+- [x] Add quick access to Bean Matcher from equipment
+
+### Enhanced Cafe Finder
+- [x] Add bean filter options (origin, roast level, flavor notes)
+- [x] Integrate user's favorite beans with cafe search
+- [x] Show cafes/roasters that carry user's favorite beans
+- [x] Add "Find my beans" quick filter button
+- [x] Display bean availability badges on cafe cards
+
+### Smart Notifications
+- [x] Create notification preferences provider
+- [x] Implement coffee stock tracking system
+- [x] Add "Coffee Stock Alert" notification (configurable threshold)
+- [x] Implement equipment maintenance due notifications
+- [x] Create maintenance schedule calculator (grinder: 3mo, machine: 6mo)
+- [x] Add notification scheduling service
+
+### Settings Panel
+- [x] Create settings screen with notification preferences
+- [x] Add toggle for Coffee Stock Alerts
+- [x] Add toggle for Maintenance Reminders
+- [x] Add maintenance schedule configuration
+- [x] Add coffee stock threshold setting (days/weeks)
+- [x] Add test notification button for debugging

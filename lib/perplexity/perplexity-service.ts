@@ -233,6 +233,54 @@ Return a JSON array:
       return [];
     }
   }
+
+  async searchCafes(latitude: number, longitude: number, query: string): Promise<any[]> {
+    const systemPrompt = `You are a local coffee expert. Find real specialty coffee shops near the given location. Always respond in valid JSON format.`;
+
+    const userPrompt = `Find specialty coffee shops near coordinates ${latitude}, ${longitude} matching: "${query}"
+
+Return a JSON array of 5-10 cafes with:
+[
+  {
+    "id": "unique-id",
+    "name": "cafe name",
+    "rating": number (out of 5),
+    "reviewCount": number,
+    "priceLevel": number (1-4),
+    "address": "full address",
+    "neighborhood": "area name",
+    "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80",
+    "isOpen": true,
+    "openingHours": "hours",
+    "features": ["WiFi", "Card Payment"],
+    "description": "brief description",
+    "latitude": number,
+    "longitude": number,
+    "phone": "+phone",
+    "website": "url",
+    "specialties": ["specialty 1", "specialty 2"]
+  }
+]`;
+
+    const response = await this.query([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ]);
+
+    if (!response) return [];
+
+    try {
+      const content = response.choices[0]?.message?.content || '';
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) return [];
+
+      const data = JSON.parse(jsonMatch[0]);
+      return data;
+    } catch (error) {
+      console.error('Failed to parse cafe search results:', error);
+      return [];
+    }
+  }
 }
 
 export const perplexityService = new PerplexityService();
