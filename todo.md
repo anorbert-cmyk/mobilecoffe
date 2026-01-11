@@ -295,14 +295,14 @@
 - [x] Add heart icon to coffee cards (home screen: hero, horizontal, small cards)
 - [x] Add heart icon to equipment cards (recommendations screen)
 - [x] Add heart icon to bean cards (results screen)
-- [ ] Add heart icon to learning article cards (learn tab)
+- [x] Add heart icon to learning article cards (learn tab)
 - [x] Implement brewing journal entry form
 - [x] Implement brewing journal entry detail screen
 - [ ] Implement brewing journal analytics/charts (deferred - basic functionality complete)
 - [ ] Implement course detail screen with modules
 - [ ] Implement video player with progress tracking
 - [ ] Implement course completion certificates
-- [ ] Add "Compare" button to equipment cards
+- [x] Add "Compare" button to equipment cards
 - [ ] Add push notifications for brewing timers
 - [ ] Add reading progress indicator for Learn articles
 - [ ] Add premium badge to user profile

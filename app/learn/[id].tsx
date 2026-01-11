@@ -10,6 +10,7 @@ import { Platform } from 'react-native';
 import { ScreenContainer } from "@/components/screen-container";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { FavoriteButton } from "@/components/favorite-button";
 import { getCategoryById, Article } from "@/data/learning";
 import { useColors } from "@/hooks/use-colors";
 
@@ -300,9 +301,12 @@ export default function LearnCategoryScreen() {
                 accessibilityLabel={`Read ${article.title}`}
               >
                 <View style={styles.articleCardContent}>
-                  <Text style={[styles.articleCardTitle, { color: colors.foreground }]}>
-                    {article.title}
-                  </Text>
+                  <View style={styles.articleCardHeader}>
+                    <Text style={[styles.articleCardTitle, { color: colors.foreground }]}>
+                      {article.title}
+                    </Text>
+                    <FavoriteButton id={article.id} type="article" size={20} />
+                  </View>
                   <View style={styles.articleCardMeta}>
                     <IconSymbol name="clock.fill" size={14} color={colors.muted} />
                     <Text style={[styles.articleCardMetaText, { color: colors.muted }]}>
@@ -530,11 +534,18 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 12,
   },
+  articleCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   articleCardTitle: {
+    flex: 1,
     fontSize: 17,
     fontWeight: '700',
     lineHeight: 24,
-    marginBottom: 8,
+    marginRight: 8,
   },
   articleCardMeta: {
     flexDirection: 'row',

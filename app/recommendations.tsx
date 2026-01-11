@@ -21,6 +21,7 @@ import { useColors } from '@/hooks/use-colors';
 import { useUserProfile } from '@/lib/user-profile';
 import { getEquipmentRecommendations, EquipmentRecommendation } from '@/lib/equipment-recommender';
 import { EspressoMachine, CoffeeGrinder } from '@/data/machines';
+import { useComparison } from '@/lib/comparison/comparison-provider';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 40;
@@ -61,6 +62,7 @@ function PremiumRecommendationCard({
   isBestMatch,
   onPress,
   onSave,
+  onCompare,
   index,
 }: {
   item: EspressoMachine | CoffeeGrinder;
@@ -69,6 +71,7 @@ function PremiumRecommendationCard({
   isBestMatch: boolean;
   onPress: () => void;
   onSave: () => void;
+  onCompare: () => void;
   index: number;
 }) {
   const colors = useColors();
@@ -210,9 +213,17 @@ function PremiumRecommendationCard({
               onPress={onPress}
               variant="primary"
               size="md"
-              fullWidth
+              style={{ flex: 1 }}
             >
               <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>Learn More</Text>
+            </PremiumButton>
+            <PremiumButton
+              onPress={onCompare}
+              variant="secondary"
+              size="md"
+              style={{ flex: 1 }}
+            >
+              <Text style={{ color: colors.primary, fontSize: 16, fontWeight: '600' }}>Compare</Text>
             </PremiumButton>
           </View>
         </View>
@@ -224,6 +235,7 @@ function PremiumRecommendationCard({
 export default function RecommendationsScreen() {
   const colors = useColors();
   const { profile } = useUserProfile();
+  const { addItem, isInComparison, canAddMore } = useComparison();
   const [recommendations, setRecommendations] = useState<EquipmentRecommendation | null>(null);
 
   useEffect(() => {
@@ -247,6 +259,18 @@ export default function RecommendationsScreen() {
 
   const handleSave = () => {
     // TODO: Implement save to favorites
+  };
+
+  const handleCompare = (id: string, type: 'machine' | 'grinder') => {
+    if (isInComparison(id)) {
+      router.push('/comparison');
+    } else if (canAddMore) {
+      addItem({ id, type });
+      triggerHaptic();
+    } else {
+      // Max items reached, navigate to comparison
+      router.push('/comparison');
+    }
   };
 
   if (!recommendations) {
@@ -299,6 +323,7 @@ export default function RecommendationsScreen() {
               isBestMatch={index === 0}
               onPress={() => handleViewMachineDetails(machine.id)}
               onSave={handleSave}
+              onCompare={() => handleCompare(machine.id, 'machine')}
               index={index}
             />
           ))}
@@ -322,6 +347,7 @@ export default function RecommendationsScreen() {
               isBestMatch={index === 0}
               onPress={() => handleViewGrinderDetails(grinder.id)}
               onSave={handleSave}
+              onCompare={() => handleCompare(grinder.id, 'grinder')}
               index={index + recommendations.machines.length}
             />
           ))}
