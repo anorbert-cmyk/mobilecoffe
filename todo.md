@@ -321,3 +321,27 @@
 - [x] Add breadcrumb to favorites screen (deferred - low priority)
 - [x] Add breadcrumb to courses screens (deferred - low priority)
 - [x] Add breadcrumb to subscription plans screen (deferred - low priority)
+
+
+## v27 Equipment-to-Bean Matcher & Real Data
+
+### Equipment-to-Bean Matcher
+- [x] Create equipment selection wizard (Step 1: Select your machine)
+- [x] Add grinder selection step (Step 2: Select your grinder)
+- [x] Implement bean matching algorithm based on equipment type
+- [x] Create bean recommendations results screen
+- [x] Add entry point from Profile tab
+
+### Real Equipment Data (Perplexity API)
+- [x] Create Perplexity API service for equipment data
+- [x] Fetch real espresso machine specs, prices, reviews
+- [x] Fetch real grinder specs, prices, reviews
+- [x] Update equipment database with real data
+- [x] Add "Last updated" timestamp to equipment cards
+
+### Monetization Flow Completion
+- [x] Test bean purchase affiliate links end-to-end
+- [x] Test subscription upgrade flow (Free → Enthusiast → Pro)
+- [x] Test subscription downgrade flow
+- [x] Verify paywall blocks premium features correctly
+- [x] Add purchase confirmation screens

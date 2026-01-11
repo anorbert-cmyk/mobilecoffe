@@ -265,6 +265,38 @@ export default function ProfileScreen() {
             Coffee Beans
           </Text>
           
+          {/* Bean Matcher - Find beans for your equipment */}
+          <Pressable
+            onPress={() => {
+              triggerHaptic();
+              router.push('/bean-matcher/step1-machine' as any);
+            }}
+            style={({ pressed }) => [
+              styles.primaryActionCard,
+              { 
+                backgroundColor: colors.primary,
+                transform: [{ scale: pressed ? 0.98 : 1 }],
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Find beans matched to your equipment"
+          >
+            <View style={styles.primaryActionContent}>
+              <View style={styles.primaryActionIcon}>
+                <Text style={{ fontSize: 28 }}>🎯</Text>
+              </View>
+              <View style={styles.primaryActionText}>
+                <Text style={styles.primaryActionTitle}>Find Your Perfect Beans</Text>
+                <Text style={styles.primaryActionDescription}>
+                  Get recommendations based on your machine & grinder
+                </Text>
+              </View>
+            </View>
+            <IconSymbol name="chevron.right" size={24} color="rgba(255,255,255,0.8)" />
+          </Pressable>
+          
+          <View style={{ height: 12 }} />
+          
           <Pressable
             onPress={() => {
               triggerHaptic();
