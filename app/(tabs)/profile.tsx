@@ -54,6 +54,36 @@ export default function ProfileScreen() {
     router.push('/recommendations');
   };
 
+  const handleFavorites = () => {
+    triggerHaptic();
+    router.push('/favorites' as any);
+  };
+
+  const handleJournal = () => {
+    triggerHaptic();
+    router.push('/journal' as any);
+  };
+
+  const handleCourses = () => {
+    triggerHaptic();
+    router.push('/courses' as any);
+  };
+
+  const handleComparison = () => {
+    triggerHaptic();
+    router.push('/comparison' as any);
+  };
+
+  const handleSubscription = () => {
+    triggerHaptic();
+    router.push('/subscription/plans' as any);
+  };
+
+  const handleBeanMarketplace = () => {
+    triggerHaptic();
+    router.push('/beans/wizard-step1' as any);
+  };
+
   const handleResetOnboarding = () => {
     triggerHaptic();
     Alert.alert(
@@ -322,6 +352,71 @@ export default function ProfileScreen() {
               <IconSymbol name="chevron.right" size={20} color={colors.muted} />
             </Pressable>
           )}
+        </Animated.View>
+
+        {/* Premium Features Section */}
+        <Animated.View 
+          entering={FadeInDown.delay(250).duration(400)}
+          style={styles.section}
+        >
+          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+            Premium Features
+          </Text>
+          
+          <Pressable onPress={handleSubscription} style={({ pressed }) => [styles.secondaryActionCard, { backgroundColor: colors.surface, borderColor: colors.border, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+            <View style={[styles.secondaryActionIcon, { backgroundColor: colors.primary + '20' }]}>
+              <IconSymbol name="star.fill" size={24} color={colors.primary} />
+            </View>
+            <View style={styles.secondaryActionText}>
+              <Text style={[styles.secondaryActionTitle, { color: colors.foreground }]}>Subscription Plans</Text>
+              <Text style={[styles.secondaryActionDescription, { color: colors.muted }]}>Unlock all premium features</Text>
+            </View>
+            <IconSymbol name="chevron.right" size={20} color={colors.muted} />
+          </Pressable>
+
+          <Pressable onPress={handleFavorites} style={({ pressed }) => [styles.secondaryActionCard, { backgroundColor: colors.surface, borderColor: colors.border, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+            <View style={[styles.secondaryActionIcon, { backgroundColor: '#FF006620' }]}>
+              <IconSymbol name="heart.fill" size={24} color="#FF0066" />
+            </View>
+            <View style={styles.secondaryActionText}>
+              <Text style={[styles.secondaryActionTitle, { color: colors.foreground }]}>My Favorites</Text>
+              <Text style={[styles.secondaryActionDescription, { color: colors.muted }]}>View saved coffees and equipment</Text>
+            </View>
+            <IconSymbol name="chevron.right" size={20} color={colors.muted} />
+          </Pressable>
+
+          <Pressable onPress={handleJournal} style={({ pressed }) => [styles.secondaryActionCard, { backgroundColor: colors.surface, borderColor: colors.border, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+            <View style={[styles.secondaryActionIcon, { backgroundColor: '#4CAF5020' }]}>
+              <IconSymbol name="book.fill" size={24} color="#4CAF50" />
+            </View>
+            <View style={styles.secondaryActionText}>
+              <Text style={[styles.secondaryActionTitle, { color: colors.foreground }]}>Brewing Journal</Text>
+              <Text style={[styles.secondaryActionDescription, { color: colors.muted }]}>Track your brewing sessions</Text>
+            </View>
+            <IconSymbol name="chevron.right" size={20} color={colors.muted} />
+          </Pressable>
+
+          <Pressable onPress={handleCourses} style={({ pressed }) => [styles.secondaryActionCard, { backgroundColor: colors.surface, borderColor: colors.border, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+            <View style={[styles.secondaryActionIcon, { backgroundColor: '#2196F320' }]}>
+              <IconSymbol name="play.circle.fill" size={24} color="#2196F3" />
+            </View>
+            <View style={styles.secondaryActionText}>
+              <Text style={[styles.secondaryActionTitle, { color: colors.foreground }]}>Video Courses</Text>
+              <Text style={[styles.secondaryActionDescription, { color: colors.muted }]}>Master your coffee craft</Text>
+            </View>
+            <IconSymbol name="chevron.right" size={20} color={colors.muted} />
+          </Pressable>
+
+          <Pressable onPress={handleComparison} style={({ pressed }) => [styles.secondaryActionCard, { backgroundColor: colors.surface, borderColor: colors.border, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+            <View style={[styles.secondaryActionIcon, { backgroundColor: '#FF980020' }]}>
+              <IconSymbol name="slider.horizontal.3" size={24} color="#FF9800" />
+            </View>
+            <View style={styles.secondaryActionText}>
+              <Text style={[styles.secondaryActionTitle, { color: colors.foreground }]}>Compare Equipment</Text>
+              <Text style={[styles.secondaryActionDescription, { color: colors.muted }]}>Side-by-side comparison</Text>
+            </View>
+            <IconSymbol name="chevron.right" size={20} color={colors.muted} />
+          </Pressable>
         </Animated.View>
 
         {/* Settings Section */}

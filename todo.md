@@ -255,3 +255,36 @@
 - [x] Generate brewing journal hero image with NanoBanana (journal-hero.png)
 - [x] Implement journal AsyncStorage persistence
 - [x] Add JournalProvider to app context
+
+
+## v22 Complete Missing Implementations
+
+### Equipment Comparison UI
+- [x] Create comparison screen with side-by-side layout (2-3 items)
+- [x] Show specs comparison table
+- [x] Add price comparison
+- [x] Add remove from comparison button
+- [x] Add paywall check for non-subscribers
+
+### Favorites System UI
+- [x] Create "My Favorites" screen in Profile tab
+- [x] Implement category filter tabs (All, Coffees, Equipment, Beans, Articles)
+- [x] Add empty state for no favorites
+- [x] Add paywall check for non-subscribers
+
+### Brewing Journal UI
+- [x] Create journal list screen with entries
+- [x] Add journal entry point to Profile tab
+- [x] Add paywall check for non-subscribers
+
+### Course System
+- [x] Create course library screen with 4 courses
+- [x] Add paywall check (Pro tier required)
+
+### Profile Tab Integration
+- [x] Add "My Favorites" entry point
+- [x] Add "Brewing Journal" entry point
+- [x] Add "My Courses" entry point
+- [x] Add "Compare Equipment" entry point
+- [x] Add "Subscription" entry point
+- [x] Update Profile screen layout with all features
