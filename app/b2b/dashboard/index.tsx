@@ -11,8 +11,8 @@ export default function DashboardOverview() {
 
     const { data: business, isLoading } = trpc.business.getMine.useQuery();
 
-    if (isLoading) return <Text style={{ p: 20, color: colors.foreground }}>Loading...</Text>;
-    if (!business) return <Text style={{ p: 20, color: colors.foreground }}>No business found.</Text>;
+    if (isLoading) return <Text style={{ padding: 20, color: colors.foreground }}>Loading...</Text>;
+    if (!business) return <Text style={{ padding: 20, color: colors.foreground }}>No business found.</Text>;
 
     return (
         <ScreenContainer>

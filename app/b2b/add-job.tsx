@@ -103,7 +103,7 @@ export default function AddJobScreen() {
                         variant="primary"
                         onPress={handleSubmit}
                         fullWidth
-                        isLoading={createJob.isPending}
+                        loading={createJob.isPending}
                     >
                         Post Job (5 Credits)
                     </PremiumButton>

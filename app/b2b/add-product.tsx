@@ -5,7 +5,7 @@ import { ScreenContainer } from '@/components/screen-container';
 import { PremiumButton } from '@/components/ui/premium-button';
 import { useColors } from '@/hooks/use-colors';
 import { trpc } from '@/lib/trpc';
-import { Picker } from '@react-native-picker/picker'; // Might need to install this or use basic input
+// Type selection simplified - no picker needed
 
 export default function AddProductScreen() {
     const router = useRouter();
@@ -69,7 +69,7 @@ export default function AddProductScreen() {
                         variant="primary"
                         onPress={handleSubmit}
                         fullWidth
-                        isLoading={createProduct.isPending}
+                        loading={createProduct.isPending}
                     >
                         Create Product
                     </PremiumButton>

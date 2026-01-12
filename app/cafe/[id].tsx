@@ -18,22 +18,22 @@ export default function CafeDetailScreen() {
         { enabled: !!businessId }
     );
 
-    if (isLoading) return <ScreenContainer><Text style={{ p: 20 }}>Loading...</Text></ScreenContainer>;
-    if (!business) return <ScreenContainer><Text style={{ p: 20 }}>Cafe not found.</Text></ScreenContainer>;
+    if (isLoading) return <ScreenContainer><Text style={{ padding: 20 }}>Loading...</Text></ScreenContainer>;
+    if (!business) return <ScreenContainer><Text style={{ padding: 20 }}>Cafe not found.</Text></ScreenContainer>;
 
     return (
         <ScreenContainer>
             <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
                 {/* Header Image */}
                 <View style={styles.headerImageContainer}>
-                    {business.headerImageUrls?.[0] ? (
-                        <Image source={{ uri: business.headerImageUrls[0] }} style={styles.headerImage} />
+                    {(business.headerImageUrls as string[] | null)?.[0] ? (
+                        <Image source={{ uri: (business.headerImageUrls as string[])[0] }} style={styles.headerImage} />
                     ) : (
                         <View style={[styles.headerImage, { backgroundColor: colors.primary }]} />
                     )}
                     <View style={styles.headerOverlay}>
                         <Text style={[styles.cafeName, { color: 'white' }]}>{business.name}</Text>
-                        <Text style={{ color: 'white', opacity: 0.9 }}>{business.address?.city}</Text>
+                        <Text style={{ color: 'white', opacity: 0.9 }}>{(business.address as { city?: string } | null)?.city}</Text>
                     </View>
                 </View>
 
@@ -66,10 +66,10 @@ export default function CafeDetailScreen() {
                     <View style={styles.section}>
                         <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Menu</Text>
                         {/* Render categories */}
-                        {business.menuCategories?.map(category => (
+                        {(business.menuCategories as Array<{ id: number, name: string, items?: Array<{ id: number, name: string, price: number }> }>)?.map((category) => (
                             <View key={category.id} style={{ marginBottom: 16 }}>
                                 <Text style={[styles.categoryTitle, { color: colors.primary }]}>{category.name}</Text>
-                                {category.items?.map(item => (
+                                {category.items?.map((item) => (
                                     <View key={item.id} style={styles.menuItem}>
                                         <Text style={{ color: colors.foreground, flex: 1 }}>{item.name}</Text>
                                         <Text style={{ color: colors.primary, fontWeight: 'bold' }}>{item.price} Ft</Text>

@@ -29,7 +29,7 @@ export default function JobsScreen() {
             </View>
 
             {isLoading ? (
-                <Text style={{ p: 20, color: colors.foreground }}>Loading...</Text>
+                <Text style={{ padding: 20, color: colors.foreground }}>Loading...</Text>
             ) : (
                 <FlatList
                     data={myJobs}
