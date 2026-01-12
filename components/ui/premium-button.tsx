@@ -1,7 +1,7 @@
 import { Text, Pressable, StyleSheet, ActivityIndicator, ViewStyle, Platform } from 'react-native';
-import Animated, { 
-  useAnimatedStyle, 
-  useSharedValue, 
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
@@ -20,6 +20,7 @@ export interface PremiumButtonProps {
   className?: string;
   style?: ViewStyle;
   accessibilityLabel?: string;
+  leftIcon?: React.ReactNode;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -28,8 +29,8 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
  * Premium button component with iOS 26 capsule design
  * Features haptic feedback, smooth animations, and WCAG AA compliance
  */
-export function PremiumButton({ 
-  children, 
+export function PremiumButton({
+  children,
   onPress,
   variant = 'primary',
   size = 'md',
@@ -39,6 +40,7 @@ export function PremiumButton({
   className,
   style,
   accessibilityLabel,
+  leftIcon,
 }: PremiumButtonProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -110,20 +112,32 @@ export function PremiumButton({
       accessibilityState={{ disabled: disabled || loading }}
     >
       {loading ? (
-        <ActivityIndicator 
-          size="small" 
-          color={variant === 'primary' ? '#FAF8F5' : '#5D4037'} 
+        <ActivityIndicator
+          size="small"
+          color={variant === 'primary' ? '#FAF8F5' : '#5D4037'}
         />
       ) : (
-        <Text style={[styles.text, textSizeStyles[size], getTextStyle()]}>
-          {children}
-        </Text>
+        <View style={styles.contentContainer}>
+          {leftIcon && <View style={styles.iconContainer}>{leftIcon}</View>}
+          <Text style={[styles.text, textSizeStyles[size], getTextStyle()]}>
+            {children}
+          </Text>
+        </View>
       )}
     </AnimatedPressable>
   );
 }
 
 const styles = StyleSheet.create({
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  iconContainer: {
+    // Optional spacing adjustments
+  },
   button: {
     borderRadius: 999, // Capsule shape
     flexDirection: 'row',

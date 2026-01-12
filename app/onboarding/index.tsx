@@ -5,10 +5,10 @@ import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { 
-  FadeIn, 
-  FadeOut, 
-  SlideInRight, 
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SlideInRight,
   SlideOutLeft,
   SlideInLeft,
   useAnimatedStyle,
@@ -24,17 +24,17 @@ import { PremiumButton } from '@/components/ui/premium-button';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
 import { useColors } from '@/hooks/use-colors';
-import { 
-  useUserProfile, 
-  ExperienceLevel, 
-  BudgetRange, 
-  CoffeePurpose 
+import {
+  useUserProfile,
+  ExperienceLevel,
+  BudgetRange,
+  CoffeePurpose
 } from '@/lib/user-profile';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Onboarding step types
-type OnboardingStep = 
+type OnboardingStep =
   | 'welcome'
   | 'experience'
   | 'equipment-interest'
@@ -60,7 +60,7 @@ const STEPS: StepConfig[] = [
 export default function OnboardingScreen() {
   const colors = useColors();
   const { updateProfile, completeOnboarding } = useUserProfile();
-  
+
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('welcome');
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | null>(null);
   const [wantsToBuy, setWantsToBuy] = useState<boolean | null>(null);
@@ -95,10 +95,10 @@ export default function OnboardingScreen() {
   const goBack = useCallback(() => {
     triggerHaptic();
     setDirection('back');
-    
+
     const stepOrder: OnboardingStep[] = ['welcome', 'experience', 'equipment-interest', 'budget', 'purpose', 'complete'];
     const currentIndex = stepOrder.indexOf(currentStep);
-    
+
     if (currentStep === 'purpose') {
       if (experienceLevel === 'beginner' && wantsToBuy) {
         setCurrentStep('budget');
@@ -122,7 +122,7 @@ export default function OnboardingScreen() {
     triggerHaptic();
     setExperienceLevel(level);
     await updateProfile({ experienceLevel: level });
-    
+
     setDirection('forward');
     if (level === 'beginner') {
       setCurrentStep('equipment-interest');
@@ -135,7 +135,7 @@ export default function OnboardingScreen() {
     triggerHaptic();
     setWantsToBuy(wants);
     await updateProfile({ wantsToBuyEquipment: wants });
-    
+
     setDirection('forward');
     if (wants) {
       setCurrentStep('budget');
@@ -172,7 +172,7 @@ export default function OnboardingScreen() {
   const handleComplete = async () => {
     triggerHaptic();
     await completeOnboarding();
-    
+
     // If user wants to buy equipment, navigate to recommendations
     if (wantsToBuy && budget) {
       router.replace('/recommendations');
@@ -193,7 +193,7 @@ export default function OnboardingScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Premium Header with Back Button */}
       {currentStep !== 'welcome' && (
-        <Animated.View 
+        <Animated.View
           entering={FadeIn.duration(300)}
           style={styles.header}
         >
@@ -202,7 +202,7 @@ export default function OnboardingScreen() {
               onPress={goBack}
               style={({ pressed }) => [
                 styles.backButton,
-                { 
+                {
                   backgroundColor: colors.surface,
                   opacity: pressed ? 0.7 : 1,
                 },
@@ -213,19 +213,19 @@ export default function OnboardingScreen() {
               <IconSymbol name="chevron.left" size={20} color={colors.foreground} />
             </Pressable>
           )}
-          
+
           {/* Progress Indicator */}
           {currentStep !== 'complete' && (
             <View style={styles.progressWrapper}>
               <View style={[styles.progressTrack, { backgroundColor: colors.surface }]}>
-                <Animated.View 
+                <Animated.View
                   style={[
-                    styles.progressFill, 
-                    { 
+                    styles.progressFill,
+                    {
                       backgroundColor: colors.primary,
                       width: `${progress * 100}%`,
                     }
-                  ]} 
+                  ]}
                 />
               </View>
               <Text style={[styles.progressText, { color: colors.muted }]}>
@@ -238,21 +238,21 @@ export default function OnboardingScreen() {
 
       {/* Welcome Step - Premium Design */}
       {currentStep === 'welcome' && (
-        <WelcomeStep 
-          colors={colors} 
-          onContinue={() => goToNextStep('experience')} 
+        <WelcomeStep
+          colors={colors}
+          onContinue={() => goToNextStep('experience')}
         />
       )}
 
       {/* Experience Level Step */}
       {currentStep === 'experience' && (
-        <Animated.View 
+        <Animated.View
           key="experience"
           entering={enteringAnimation}
           style={styles.stepContainer}
         >
-          <ExperienceStep 
-            colors={colors} 
+          <ExperienceStep
+            colors={colors}
             onSelect={handleExperienceSelect}
           />
         </Animated.View>
@@ -260,13 +260,13 @@ export default function OnboardingScreen() {
 
       {/* Equipment Interest Step */}
       {currentStep === 'equipment-interest' && (
-        <Animated.View 
+        <Animated.View
           key="equipment"
           entering={enteringAnimation}
           style={styles.stepContainer}
         >
-          <EquipmentInterestStep 
-            colors={colors} 
+          <EquipmentInterestStep
+            colors={colors}
             onSelect={handleEquipmentInterest}
           />
         </Animated.View>
@@ -274,13 +274,13 @@ export default function OnboardingScreen() {
 
       {/* Budget Step */}
       {currentStep === 'budget' && (
-        <Animated.View 
+        <Animated.View
           key="budget"
           entering={enteringAnimation}
           style={styles.stepContainer}
         >
-          <BudgetStep 
-            colors={colors} 
+          <BudgetStep
+            colors={colors}
             selected={budget}
             onSelect={handleBudgetSelect}
           />
@@ -289,13 +289,13 @@ export default function OnboardingScreen() {
 
       {/* Purpose Step */}
       {currentStep === 'purpose' && (
-        <Animated.View 
+        <Animated.View
           key="purpose"
           entering={enteringAnimation}
           style={styles.stepContainer}
         >
-          <PurposeStep 
-            colors={colors} 
+          <PurposeStep
+            colors={colors}
             selected={purposes}
             onToggle={handlePurposeToggle}
             onContinue={handlePurposeContinue}
@@ -305,12 +305,12 @@ export default function OnboardingScreen() {
 
       {/* Complete Step */}
       {currentStep === 'complete' && (
-        <Animated.View 
+        <Animated.View
           key="complete"
           entering={FadeIn.duration(500)}
           style={styles.stepContainer}
         >
-          <CompleteStep 
+          <CompleteStep
             colors={colors}
             experienceLevel={experienceLevel}
             wantsToBuy={wantsToBuy}
@@ -325,15 +325,15 @@ export default function OnboardingScreen() {
 }
 
 // Premium Welcome Step Component
-function WelcomeStep({ 
-  colors, 
-  onContinue 
-}: { 
+function WelcomeStep({
+  colors,
+  onContinue
+}: {
   colors: ReturnType<typeof useColors>;
   onContinue: () => void;
 }) {
   return (
-    <Animated.View 
+    <Animated.View
       entering={FadeIn.duration(800)}
       style={styles.welcomeContainer}
     >
@@ -360,33 +360,33 @@ function WelcomeStep({
           style={styles.heroGradient}
         />
       </View>
-      
+
       {/* Content */}
       <View style={styles.welcomeContent}>
         {/* App Logo Badge */}
-        <Animated.View 
+        <Animated.View
           entering={FadeIn.delay(300).duration(500)}
           style={[styles.logoBadge, { backgroundColor: colors.primary }]}
         >
           <IconSymbol name="cup.and.saucer.fill" size={24} color="#FFFFFF" />
         </Animated.View>
 
-        <Animated.Text 
+        <Animated.Text
           entering={FadeIn.delay(400).duration(500)}
           style={[styles.welcomeTitle, { color: colors.foreground }]}
           accessibilityRole="header"
         >
           Coffee Craft
         </Animated.Text>
-        
-        <Animated.Text 
+
+        <Animated.Text
           entering={FadeIn.delay(500).duration(500)}
           style={[styles.welcomeTagline, { color: colors.primary }]}
         >
           Master the Art of Specialty Coffee
         </Animated.Text>
-        
-        <Animated.Text 
+
+        <Animated.Text
           entering={FadeIn.delay(600).duration(500)}
           style={[styles.welcomeDescription, { color: colors.muted }]}
         >
@@ -394,7 +394,7 @@ function WelcomeStep({
         </Animated.Text>
 
         {/* Feature Pills */}
-        <Animated.View 
+        <Animated.View
           entering={FadeIn.delay(700).duration(500)}
           style={styles.featurePills}
         >
@@ -411,8 +411,8 @@ function WelcomeStep({
             <Text style={[styles.featurePillText, { color: colors.foreground }]}>Find Cafés</Text>
           </View>
         </Animated.View>
-        
-        <Animated.View 
+
+        <Animated.View
           entering={FadeIn.delay(800).duration(500)}
           style={styles.welcomeButtonContainer}
         >
@@ -425,10 +425,20 @@ function WelcomeStep({
           >
             Start Your Journey
           </PremiumButton>
-          
+
           <Text style={[styles.welcomeFooter, { color: colors.muted }]}>
             Takes only 30 seconds to personalize
           </Text>
+
+          <Pressable
+            onPress={() => router.push('/b2b')}
+            style={{ marginTop: 20, padding: 10 }}
+            accessibilityRole="button"
+          >
+            <Text style={{ color: colors.primary, fontWeight: '600', textAlign: 'center' }}>
+              Are you a Cafe or Roaster? Login here
+            </Text>
+          </Pressable>
         </Animated.View>
       </View>
     </Animated.View>
@@ -436,10 +446,10 @@ function WelcomeStep({
 }
 
 // Experience Level Step Component
-function ExperienceStep({ 
-  colors, 
-  onSelect 
-}: { 
+function ExperienceStep({
+  colors,
+  onSelect
+}: {
   colors: ReturnType<typeof useColors>;
   onSelect: (level: ExperienceLevel) => void;
 }) {
@@ -468,13 +478,13 @@ function ExperienceStep({
   ];
 
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.scrollContainer}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.stepHeader}>
-        <Text 
+        <Text
           style={[styles.stepTitle, { color: colors.foreground }]}
           accessibilityRole="header"
         >
@@ -495,7 +505,7 @@ function ExperienceStep({
               onPress={() => onSelect(option.level)}
               style={({ pressed }) => [
                 styles.experienceCard,
-                { 
+                {
                   backgroundColor: colors.surface,
                   borderColor: colors.border,
                   transform: [{ scale: pressed ? 0.98 : 1 }],
@@ -525,15 +535,15 @@ function ExperienceStep({
 }
 
 // Equipment Interest Step Component
-function EquipmentInterestStep({ 
-  colors, 
-  onSelect 
-}: { 
+function EquipmentInterestStep({
+  colors,
+  onSelect
+}: {
   colors: ReturnType<typeof useColors>;
   onSelect: (wants: boolean) => void;
 }) {
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.scrollContainer}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
@@ -542,7 +552,7 @@ function EquipmentInterestStep({
         <View style={[styles.stepIconWrapper, { backgroundColor: colors.primary + '20' }]}>
           <IconSymbol name="gearshape.2.fill" size={32} color={colors.primary} />
         </View>
-        <Text 
+        <Text
           style={[styles.stepTitle, { color: colors.foreground }]}
           accessibilityRole="header"
         >
@@ -558,7 +568,7 @@ function EquipmentInterestStep({
           onPress={() => onSelect(true)}
           style={({ pressed }) => [
             styles.binaryCard,
-            { 
+            {
               backgroundColor: colors.surface,
               borderColor: colors.border,
               transform: [{ scale: pressed ? 0.98 : 1 }],
@@ -582,7 +592,7 @@ function EquipmentInterestStep({
           onPress={() => onSelect(false)}
           style={({ pressed }) => [
             styles.binaryCard,
-            { 
+            {
               backgroundColor: colors.surface,
               borderColor: colors.border,
               transform: [{ scale: pressed ? 0.98 : 1 }],
@@ -607,11 +617,11 @@ function EquipmentInterestStep({
 }
 
 // Budget Step Component
-function BudgetStep({ 
-  colors, 
+function BudgetStep({
+  colors,
   selected,
-  onSelect 
-}: { 
+  onSelect
+}: {
   colors: ReturnType<typeof useColors>;
   selected: BudgetRange | null;
   onSelect: (budget: BudgetRange) => void;
@@ -644,7 +654,7 @@ function BudgetStep({
   ];
 
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.scrollContainer}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
@@ -653,7 +663,7 @@ function BudgetStep({
         <View style={[styles.stepIconWrapper, { backgroundColor: '#4CAF5020' }]}>
           <IconSymbol name="dollarsign.circle.fill" size={32} color="#4CAF50" />
         </View>
-        <Text 
+        <Text
           style={[styles.stepTitle, { color: colors.foreground }]}
           accessibilityRole="header"
         >
@@ -674,7 +684,7 @@ function BudgetStep({
               onPress={() => onSelect(option.budget)}
               style={({ pressed }) => [
                 styles.budgetCard,
-                { 
+                {
                   backgroundColor: selected === option.budget ? colors.primary + '15' : colors.surface,
                   borderColor: selected === option.budget ? colors.primary : colors.border,
                   borderWidth: selected === option.budget ? 2 : 1,
@@ -707,12 +717,12 @@ function BudgetStep({
 }
 
 // Purpose Step Component
-function PurposeStep({ 
-  colors, 
+function PurposeStep({
+  colors,
   selected,
   onToggle,
   onContinue
-}: { 
+}: {
   colors: ReturnType<typeof useColors>;
   selected: CoffeePurpose[];
   onToggle: (purpose: CoffeePurpose) => void;
@@ -728,7 +738,7 @@ function PurposeStep({
 
   return (
     <View style={styles.purposeContainer}>
-      <ScrollView 
+      <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -737,7 +747,7 @@ function PurposeStep({
           <View style={[styles.stepIconWrapper, { backgroundColor: '#FF980020' }]}>
             <IconSymbol name="cup.and.saucer.fill" size={32} color="#FF9800" />
           </View>
-          <Text 
+          <Text
             style={[styles.stepTitle, { color: colors.foreground }]}
             accessibilityRole="header"
           >
@@ -760,7 +770,7 @@ function PurposeStep({
                   onPress={() => onToggle(option.purpose)}
                   style={({ pressed }) => [
                     styles.purposeChip,
-                    { 
+                    {
                       backgroundColor: isSelected ? colors.primary : colors.surface,
                       borderColor: isSelected ? colors.primary : colors.border,
                       transform: [{ scale: pressed ? 0.96 : 1 }],
@@ -770,13 +780,13 @@ function PurposeStep({
                   accessibilityState={{ checked: isSelected }}
                   accessibilityLabel={option.title}
                 >
-                  <IconSymbol 
-                    name={option.icon as any} 
-                    size={20} 
-                    color={isSelected ? '#FFFFFF' : colors.foreground} 
+                  <IconSymbol
+                    name={option.icon as any}
+                    size={20}
+                    color={isSelected ? '#FFFFFF' : colors.foreground}
                   />
                   <Text style={[
-                    styles.purposeChipText, 
+                    styles.purposeChipText,
                     { color: isSelected ? '#FFFFFF' : colors.foreground }
                   ]}>
                     {option.title}
@@ -808,14 +818,14 @@ function PurposeStep({
 }
 
 // Complete Step Component
-function CompleteStep({ 
+function CompleteStep({
   colors,
   experienceLevel,
   wantsToBuy,
   budget,
   purposes,
   onComplete
-}: { 
+}: {
   colors: ReturnType<typeof useColors>;
   experienceLevel: ExperienceLevel | null;
   wantsToBuy: boolean | null;
@@ -824,27 +834,27 @@ function CompleteStep({
   onComplete: () => void;
 }) {
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.scrollContainer}
       contentContainerStyle={[styles.scrollContent, styles.completeContent]}
       showsVerticalScrollIndicator={false}
     >
-      <Animated.View 
+      <Animated.View
         entering={FadeIn.delay(200).duration(500)}
         style={[styles.completeIconWrapper, { backgroundColor: '#4CAF5020' }]}
       >
         <IconSymbol name="checkmark.circle.fill" size={64} color="#4CAF50" />
       </Animated.View>
 
-      <Animated.Text 
+      <Animated.Text
         entering={FadeIn.delay(400).duration(500)}
         style={[styles.completeTitle, { color: colors.foreground }]}
         accessibilityRole="header"
       >
         You're All Set!
       </Animated.Text>
-      
-      <Animated.Text 
+
+      <Animated.Text
         entering={FadeIn.delay(500).duration(500)}
         style={[styles.completeSubtitle, { color: colors.muted }]}
       >
@@ -852,12 +862,12 @@ function CompleteStep({
       </Animated.Text>
 
       {/* Summary Card */}
-      <Animated.View 
+      <Animated.View
         entering={FadeIn.delay(600).duration(500)}
         style={[styles.summaryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
       >
         <Text style={[styles.summaryTitle, { color: colors.foreground }]}>Your Profile</Text>
-        
+
         <View style={styles.summaryRow}>
           <Text style={[styles.summaryLabel, { color: colors.muted }]}>Experience</Text>
           <Text style={[styles.summaryValue, { color: colors.foreground }]}>
@@ -884,7 +894,7 @@ function CompleteStep({
         )}
       </Animated.View>
 
-      <Animated.View 
+      <Animated.View
         entering={FadeIn.delay(800).duration(500)}
         style={styles.completeButtonContainer}
       >
@@ -948,7 +958,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 100,
   },
-  
+
   // Welcome Step Styles
   welcomeContainer: {
     flex: 1,
