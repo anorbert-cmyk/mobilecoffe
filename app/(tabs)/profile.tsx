@@ -7,11 +7,11 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
-import { 
-  useUserProfile, 
-  getExperienceLabel, 
+import {
+  useUserProfile,
+  getExperienceLabel,
   getBudgetLabel,
-  getPurposeLabel 
+  getPurposeLabel
 } from '@/lib/user-profile';
 import { useThemeContext, ThemePreference } from '@/lib/theme-provider';
 import { useSubscription } from '@/lib/subscription/subscription-provider';
@@ -36,7 +36,7 @@ export default function ProfileScreen() {
   const { themePreference, setThemePreference } = useThemeContext();
   const { tier, trial, isSubscribed, getTrialStatus } = useSubscription();
   const { equipment, getMaintenanceDueItems } = useMyEquipment();
-  
+
   const trialStatus = getTrialStatus();
 
   const triggerHaptic = () => {
@@ -107,8 +107,8 @@ export default function ProfileScreen() {
       'This will clear all your preferences and restart the onboarding. Are you sure?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Reset', 
+        {
+          text: 'Reset',
           style: 'destructive',
           onPress: async () => {
             await resetProfile();
@@ -121,13 +121,13 @@ export default function ProfileScreen() {
 
   return (
     <ScreenContainer>
-      <ScrollView 
+      <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <Animated.View 
+        <Animated.View
           entering={FadeIn.duration(400)}
           style={styles.header}
         >
@@ -140,22 +140,22 @@ export default function ProfileScreen() {
           <Text style={[styles.headerSubtitle, { color: colors.muted }]}>
             Manage your preferences and equipment
           </Text>
-          
+
           {/* Premium Badge */}
           {isSubscribed && (
-            <View style={[styles.premiumBadge, { 
+            <View style={[styles.premiumBadge, {
               backgroundColor: trialStatus.isTrialActive ? `${colors.warning}20` : `${colors.primary}20`,
               borderColor: trialStatus.isTrialActive ? colors.warning : colors.primary
             }]}>
-              <IconSymbol 
-                name="sparkles" 
-                size={16} 
-                color={trialStatus.isTrialActive ? colors.warning : colors.primary} 
+              <IconSymbol
+                name="sparkles"
+                size={16}
+                color={trialStatus.isTrialActive ? colors.warning : colors.primary}
               />
-              <Text style={[styles.premiumBadgeText, { 
-                color: trialStatus.isTrialActive ? colors.warning : colors.primary 
+              <Text style={[styles.premiumBadgeText, {
+                color: trialStatus.isTrialActive ? colors.warning : colors.primary
               }]}>
-                {trialStatus.isTrialActive 
+                {trialStatus.isTrialActive
                   ? `Trial • ${trialStatus.trialDaysRemaining} days left`
                   : tier === 'pro' ? 'Pro Member' : 'Enthusiast Member'
                 }
@@ -165,7 +165,7 @@ export default function ProfileScreen() {
         </Animated.View>
 
         {/* My Equipment Section - Top Priority */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(50).duration(400)}
           style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
         >
@@ -177,7 +177,7 @@ export default function ProfileScreen() {
               My Equipment
             </Text>
           </View>
-          
+
           <View style={styles.cardContent}>
             <View style={styles.infoRow}>
               <Text style={[styles.infoLabel, { color: colors.muted }]}>Registered Items</Text>
@@ -185,7 +185,7 @@ export default function ProfileScreen() {
                 {equipment.length} {equipment.length === 1 ? 'item' : 'items'}
               </Text>
             </View>
-            
+
             {getMaintenanceDueItems().length > 0 && (
               <View style={[styles.maintenanceAlert, { backgroundColor: colors.warning + '15' }]}>
                 <IconSymbol name="exclamationmark.triangle.fill" size={16} color={colors.warning} />
@@ -195,7 +195,7 @@ export default function ProfileScreen() {
               </View>
             )}
           </View>
-          
+
           <Pressable
             onPress={handleMyEquipment}
             style={({ pressed }) => [
@@ -211,7 +211,7 @@ export default function ProfileScreen() {
         </Animated.View>
 
         {/* Experience Card */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(100).duration(400)}
           style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
         >
@@ -223,7 +223,7 @@ export default function ProfileScreen() {
               Coffee Journey
             </Text>
           </View>
-          
+
           <View style={styles.cardContent}>
             <View style={styles.infoRow}>
               <Text style={[styles.infoLabel, { color: colors.muted }]}>Experience Level</Text>
@@ -231,7 +231,7 @@ export default function ProfileScreen() {
                 {profile.experienceLevel ? getExperienceLabel(profile.experienceLevel) : 'Not set'}
               </Text>
             </View>
-            
+
             {profile.coffeePurpose && profile.coffeePurpose.length > 0 && (
               <View style={styles.infoRow}>
                 <Text style={[styles.infoLabel, { color: colors.muted }]}>Interests</Text>
@@ -244,14 +244,14 @@ export default function ProfileScreen() {
         </Animated.View>
 
         {/* Appearance Section - Dark Mode Toggle */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(150).duration(400)}
           style={styles.section}
         >
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
             Appearance
           </Text>
-          
+
           <View style={[styles.themeCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.themeHeader}>
               <View style={[styles.themeIconWrapper, { backgroundColor: colors.primary + '20' }]}>
@@ -266,7 +266,7 @@ export default function ProfileScreen() {
                 </Text>
               </View>
             </View>
-            
+
             <View style={styles.themeOptions}>
               {THEME_OPTIONS.map((option) => {
                 const isSelected = themePreference === option.value;
@@ -277,11 +277,11 @@ export default function ProfileScreen() {
                     style={({ pressed }) => [
                       styles.themeOption,
                       {
-                        backgroundColor: isSelected 
-                          ? colors.primary 
+                        backgroundColor: isSelected
+                          ? colors.primary
                           : colors.background,
-                        borderColor: isSelected 
-                          ? colors.primary 
+                        borderColor: isSelected
+                          ? colors.primary
                           : colors.border,
                         transform: [{ scale: pressed ? 0.96 : 1 }],
                       },
@@ -290,10 +290,10 @@ export default function ProfileScreen() {
                     accessibilityState={{ selected: isSelected }}
                     accessibilityLabel={`${option.label} theme: ${option.description}`}
                   >
-                    <IconSymbol 
-                      name={option.icon as any} 
-                      size={24} 
-                      color={isSelected ? '#FFFFFF' : colors.muted} 
+                    <IconSymbol
+                      name={option.icon as any}
+                      size={24}
+                      color={isSelected ? '#FFFFFF' : colors.muted}
                     />
                     <Text style={[
                       styles.themeOptionLabel,
@@ -315,14 +315,14 @@ export default function ProfileScreen() {
         </Animated.View>
 
         {/* Coffee Beans Marketplace */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(175).duration(400)}
           style={styles.section}
         >
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
             Coffee Beans
           </Text>
-          
+
           {/* Bean Matcher - Find beans for your equipment */}
           <Pressable
             onPress={() => {
@@ -331,7 +331,7 @@ export default function ProfileScreen() {
             }}
             style={({ pressed }) => [
               styles.primaryActionCard,
-              { 
+              {
                 backgroundColor: colors.primary,
                 transform: [{ scale: pressed ? 0.98 : 1 }],
               },
@@ -352,9 +352,9 @@ export default function ProfileScreen() {
             </View>
             <IconSymbol name="chevron.right" size={24} color="rgba(255,255,255,0.8)" />
           </Pressable>
-          
+
           <View style={{ height: 12 }} />
-          
+
           <Pressable
             onPress={() => {
               triggerHaptic();
@@ -362,7 +362,7 @@ export default function ProfileScreen() {
             }}
             style={({ pressed }) => [
               styles.secondaryActionCard,
-              { 
+              {
                 backgroundColor: colors.surface,
                 borderColor: colors.border,
                 opacity: pressed ? 0.8 : 1,
@@ -387,20 +387,20 @@ export default function ProfileScreen() {
         </Animated.View>
 
         {/* Equipment Section */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(200).duration(400)}
           style={styles.section}
         >
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
             Equipment
           </Text>
-          
+
           {/* Buy/Upgrade Equipment - Primary CTA */}
           <Pressable
             onPress={handleEquipmentWizard}
             style={({ pressed }) => [
               styles.primaryActionCard,
-              { 
+              {
                 backgroundColor: colors.primary,
                 transform: [{ scale: pressed ? 0.98 : 1 }],
               },
@@ -445,7 +445,7 @@ export default function ProfileScreen() {
               onPress={handleViewRecommendations}
               style={({ pressed }) => [
                 styles.secondaryActionCard,
-                { 
+                {
                   backgroundColor: colors.surface,
                   borderColor: colors.border,
                   opacity: pressed ? 0.8 : 1,
@@ -471,14 +471,14 @@ export default function ProfileScreen() {
         </Animated.View>
 
         {/* Premium Features Section */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(250).duration(400)}
           style={styles.section}
         >
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
             Premium Features
           </Text>
-          
+
           <Pressable onPress={handleSubscription} style={({ pressed }) => [styles.secondaryActionCard, { backgroundColor: colors.surface, borderColor: colors.border, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
             <View style={[styles.secondaryActionIcon, { backgroundColor: colors.primary + '20' }]}>
               <IconSymbol name="star.fill" size={24} color={colors.primary} />
@@ -535,15 +535,56 @@ export default function ProfileScreen() {
           </Pressable>
         </Animated.View>
 
+        {/* Business Section - B2B Portal */}
+        <Animated.View
+          entering={FadeInDown.delay(275).duration(400)}
+          style={styles.section}
+        >
+          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+            Business
+          </Text>
+
+          <Pressable
+            onPress={() => {
+              triggerHaptic();
+              router.push('/b2b' as any);
+            }}
+            style={({ pressed }) => [
+              styles.primaryActionCard,
+              {
+                backgroundColor: '#7C3AED',
+                transform: [{ scale: pressed ? 0.98 : 1 }],
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Business Portal - Manage your cafe or roastery"
+          >
+            <View style={styles.primaryActionContent}>
+              <View style={styles.primaryActionIcon}>
+                <IconSymbol name="building.2.fill" size={32} color="#FFFFFF" />
+              </View>
+              <View style={styles.primaryActionText}>
+                <Text style={styles.primaryActionTitle}>
+                  Business Portal
+                </Text>
+                <Text style={styles.primaryActionDescription}>
+                  Register your cafe, post jobs, sell products
+                </Text>
+              </View>
+              <IconSymbol name="chevron.right" size={20} color="rgba(255,255,255,0.8)" />
+            </View>
+          </Pressable>
+        </Animated.View>
+
         {/* Settings Section */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(300).duration(400)}
           style={styles.section}
         >
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
             Settings
           </Text>
-          
+
           <View style={[styles.settingsCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Pressable
               onPress={handleNotificationSettings}
@@ -596,7 +637,7 @@ export default function ProfileScreen() {
         </Animated.View>
 
         {/* App Info */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(400).duration(400)}
           style={styles.footer}
         >

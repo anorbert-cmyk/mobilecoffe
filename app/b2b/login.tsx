@@ -1,16 +1,22 @@
-import { useEffect } from 'react';
-import { View, Text, StyleSheet, Linking } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/screen-container';
 import { PremiumButton } from '@/components/ui/premium-button';
 import { useColors } from '@/hooks/use-colors';
 import { trpc } from '@/lib/trpc';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { getApiBaseUrl } from '@/constants/oauth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const SESSION_TOKEN_KEY = 'app_session_token';
 
 export default function B2BLogin() {
     const router = useRouter();
     const colors = useColors();
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
 
+    const utils = trpc.useUtils();
     const { data: user, isLoading, refetch } = trpc.auth.me.useQuery();
     const { data: business, isLoading: loadingBusiness } = trpc.business.getMine.useQuery(undefined, {
         enabled: !!user,
@@ -27,25 +33,41 @@ export default function B2BLogin() {
         }
     }, [user, business, loadingBusiness]);
 
-    const handleLogin = () => {
-        // Determine the login URL. In dev, usually points to the backend /api/auth/login or similar?
-        // Or we use the Manus Login UI provided by the platform.
-        // For now, I'll assume we redirect to the root which usually triggers auth if protected, 
-        // or specifically to an oauth endpoint if I can find it.
-        // Since I can't find the start endpoint in code, I'll just link to the root 
-        // and rely on the platform to handle the session.
-        // Spec says: "Apple Sign-In", "Google Sign-In", "Email + Jelszó".
-        // I will mock the action for now as "Sign In".
+    const handleDemoLogin = async () => {
+        setIsLoggingIn(true);
+        try {
+            const apiBase = getApiBaseUrl();
+            const response = await fetch(`${apiBase}/api/demo-login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
 
-        // In a real Manus app, we usually window.location.href = '/api/oauth/start' or similar.
-        // Let's assume there is a global login function or we redirect to the backend login.
-        const backendUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
-        Linking.openURL(`${backendUrl}/api/login`); // Hypothetical endpoint
+            const data = await response.json();
+
+            if (data.success && data.token) {
+                // Store the session token
+                await AsyncStorage.setItem(SESSION_TOKEN_KEY, data.token);
+
+                // Invalidate and refetch auth queries
+                await utils.auth.me.invalidate();
+                await refetch();
+
+                Alert.alert('Success', `Logged in as ${data.user.name}`);
+            } else {
+                Alert.alert('Login Failed', data.error || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Demo login error:', error);
+            Alert.alert('Login Failed', String(error));
+        } finally {
+            setIsLoggingIn(false);
+        }
     };
 
     return (
         <ScreenContainer>
             <View style={styles.container}>
+                <IconSymbol name="building.2.fill" size={64} color={colors.primary} />
                 <Text style={[styles.title, { color: colors.foreground }]}>Business Login</Text>
 
                 {isLoading ? (
@@ -56,13 +78,21 @@ export default function B2BLogin() {
                             Sign in to manage your cafe or roastery.
                         </Text>
 
+                        <View style={styles.infoBox}>
+                            <Text style={{ color: colors.muted, textAlign: 'center', fontSize: 12 }}>
+                                Demo Mode: Use the button below to log in as a test user.{'\n'}
+                                Google/Apple login coming soon!
+                            </Text>
+                        </View>
+
                         <PremiumButton
                             variant="primary"
-                            onPress={handleLogin}
+                            onPress={handleDemoLogin}
                             fullWidth
+                            loading={isLoggingIn}
                             leftIcon={<IconSymbol name="person.fill" size={20} color="white" />}
                         >
-                            Sign In / Register
+                            Demo Login
                         </PremiumButton>
 
                         <View style={{ marginTop: 20 }}>
@@ -91,5 +121,13 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 8,
+        marginTop: 16,
+    },
+    infoBox: {
+        backgroundColor: 'rgba(124, 58, 237, 0.1)',
+        padding: 16,
+        borderRadius: 12,
+        marginBottom: 24,
+        width: '100%',
     },
 });

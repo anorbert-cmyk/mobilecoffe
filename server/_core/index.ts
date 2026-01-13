@@ -60,6 +60,38 @@ async function startServer() {
     res.json({ ok: true, timestamp: Date.now() });
   });
 
+  // Demo login for testing (bypasses OAuth)
+  app.post("/api/demo-login", async (_req, res) => {
+    try {
+      const { upsertUser, getUserByOpenId } = await import("../db");
+      const { sdk } = await import("./sdk");
+
+      const demoOpenId = "demo-user-001";
+      const demoName = "Demo Business User";
+
+      // Create or update demo user
+      await upsertUser({
+        openId: demoOpenId,
+        name: demoName,
+        email: "demo@coffeecraft.app",
+        loginMethod: "demo",
+        lastSignedIn: new Date(),
+      });
+
+      // Create session token
+      const sessionToken = await sdk.createSessionToken(demoOpenId, { name: demoName });
+
+      res.json({
+        success: true,
+        token: sessionToken,
+        user: { openId: demoOpenId, name: demoName }
+      });
+    } catch (error) {
+      console.error("[Demo Login] Error:", error);
+      res.status(500).json({ success: false, error: String(error) });
+    }
+  });
+
   app.use(
     "/api/trpc",
     createExpressMiddleware({
