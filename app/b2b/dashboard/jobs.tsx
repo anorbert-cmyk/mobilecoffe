@@ -37,11 +37,44 @@ export default function JobsScreen() {
                     contentContainerStyle={{ padding: 16 }}
                     renderItem={({ item }) => (
                         <View style={[styles.card, { backgroundColor: colors.surface }]}>
-                            <Text style={[styles.cardTitle, { color: colors.foreground }]}>{item.title}</Text>
-                            <Text style={{ color: colors.muted }}>{item.contractType} • {item.workingHours}</Text>
-                            <Text style={{ color: colors.muted, marginTop: 4 }}>
-                                {item.netSalaryMin?.toLocaleString()} - {item.netSalaryMax?.toLocaleString()} HUF
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                                <Text style={[styles.cardTitle, { color: colors.foreground, flex: 1 }]}>{item.title}</Text>
+                                <View style={[styles.badge, { backgroundColor: colors.primary + '20' }]}>
+                                    <Text style={[styles.badgeText, { color: colors.primary }]}>
+                                        {item.contractType?.toUpperCase()}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <Text style={{ color: colors.muted, marginBottom: 12, lineHeight: 20 }} numberOfLines={2}>
+                                {item.description}
                             </Text>
+
+                            <View style={styles.metaRow}>
+                                <View style={styles.metaItem}>
+                                    <Text style={{ fontSize: 14, color: colors.foreground }}>
+                                        💰 {item.netSalaryMin?.toLocaleString()} - {item.netSalaryMax?.toLocaleString()} Ft
+                                    </Text>
+                                </View>
+                                <View style={styles.metaItem}>
+                                    <Text style={{ fontSize: 14, color: colors.muted }}>
+                                        🕒 {item.workingHours}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View style={[styles.statusBadge, {
+                                backgroundColor: item.status === 'active' ? '#10B98120' : '#EF444420',
+                                alignSelf: 'flex-start',
+                                marginTop: 12
+                            }]}>
+                                <Text style={{
+                                    color: item.status === 'active' ? '#10B981' : '#EF4444',
+                                    fontSize: 12, fontWeight: 'bold'
+                                }}>
+                                    ● {item.status?.toUpperCase()}
+                                </Text>
+                            </View>
                         </View>
                     )}
                     ListEmptyComponent={
@@ -62,8 +95,30 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     cardTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginBottom: 4,
+        fontSize: 18,
+        fontWeight: 'bold',
     },
+    badge: {
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+    },
+    badgeText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+    metaRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 12,
+    },
+    metaItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    statusBadge: {
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+    }
 });

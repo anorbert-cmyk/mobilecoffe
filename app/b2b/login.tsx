@@ -50,9 +50,10 @@ export default function B2BLogin() {
 
                 // Invalidate and refetch auth queries
                 await utils.auth.me.invalidate();
-                await refetch();
+                await utils.business.getMine.invalidate();
 
-                Alert.alert('Success', `Logged in as ${data.user.name}`);
+                // Force navigation immediately
+                router.replace('/b2b/dashboard');
             } else {
                 Alert.alert('Login Failed', data.error || 'Unknown error');
             }
