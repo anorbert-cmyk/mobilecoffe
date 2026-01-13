@@ -66,12 +66,20 @@ export default function DashboardOverview() {
         <ScreenContainer>
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.header}>
-                    <Text style={[styles.welcome, { color: colors.foreground }]}>
-                        {business.name}
-                    </Text>
-                    <Text style={[styles.role, { color: colors.muted }]}>
-                        {business.type.toUpperCase()} • {(business.address as any)?.city || 'Location not set'}
-                    </Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <View>
+                            <Text style={[styles.welcome, { color: colors.foreground }]}>
+                                {business.name}
+                            </Text>
+                            <Text style={[styles.role, { color: colors.muted }]}>
+                                {business.type.toUpperCase()} • {(business.address as any)?.city || 'Location not set'}
+                            </Text>
+                        </View>
+                        <View style={{ backgroundColor: colors.surface, padding: 8, borderRadius: 12, borderWidth: 1, borderColor: colors.border }}>
+                            <Text style={{ fontSize: 10, color: colors.muted, textAlign: 'center' }}>BALANCE</Text>
+                            <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.primary }}>125 CR</Text>
+                        </View>
+                    </View>
                 </View>
 
                 {/* Stats Grid */}

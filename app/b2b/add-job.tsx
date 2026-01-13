@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, Alert, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/screen-container';
 import { PremiumButton } from '@/components/ui/premium-button';
 import { useColors } from '@/hooks/use-colors';
 import { trpc } from '@/lib/trpc';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 
 export default function AddJobScreen() {
     const router = useRouter();
@@ -98,6 +99,59 @@ export default function AddJobScreen() {
                 </View>
 
 
+                {/* Boost Options */}
+                <View style={{ marginTop: 32, marginBottom: 24 }}>
+                    <Text style={[styles.title, { fontSize: 20, marginBottom: 16, color: colors.foreground }]}>
+                        Boost Your Reach 🚀
+                    </Text>
+
+                    {[
+                        { id: 'highlight', label: 'Highlight Post', cost: 2, desc: 'Your job stands out with a yellow background.' },
+                        { id: 'pin', label: 'Pin to Top', cost: 5, desc: 'Keep your job at the top of the list for 7 days.' },
+                        { id: 'smartMatch', label: 'Smart Match Email', cost: 10, desc: 'Email 50+ qualified candidates instantly.' },
+                    ].map((option) => {
+                        const isSelected = (formData as any)[option.id];
+                        return (
+                            <Pressable
+                                key={option.id}
+                                onPress={() => setFormData(prev => ({ ...prev, [option.id]: !isSelected }))}
+                                style={[
+                                    styles.boostCard,
+                                    {
+                                        backgroundColor: colors.surface,
+                                        borderColor: isSelected ? colors.primary : 'transparent',
+                                        borderWidth: 2
+                                    }
+                                ]}
+                            >
+                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.foreground }}>
+                                            {option.label}
+                                        </Text>
+                                        <Text style={{ fontSize: 12, color: colors.muted, marginTop: 4 }}>
+                                            {option.desc}
+                                        </Text>
+                                    </View>
+                                    <View style={{ alignItems: 'flex-end' }}>
+                                        <Text style={{ fontWeight: 'bold', color: colors.primary }}>
+                                            +{option.cost} Credits
+                                        </Text>
+                                        <View style={{
+                                            width: 24, height: 24, borderRadius: 12, borderWidth: 2,
+                                            borderColor: isSelected ? colors.primary : colors.border,
+                                            marginTop: 8, alignItems: 'center', justifyContent: 'center',
+                                            backgroundColor: isSelected ? colors.primary : 'transparent'
+                                        }}>
+                                            {isSelected && <IconSymbol name="checkmark" size={14} color="white" />}
+                                        </View>
+                                    </View>
+                                </View>
+                            </Pressable>
+                        );
+                    })}
+                </View>
+
                 <View style={{ marginTop: 24 }}>
                     <PremiumButton
                         variant="primary"
@@ -105,8 +159,11 @@ export default function AddJobScreen() {
                         fullWidth
                         loading={createJob.isPending}
                     >
-                        Post Job (5 Credits)
+                        Post Job (Total: {5 + ((formData as any).highlight ? 2 : 0) + ((formData as any).pin ? 5 : 0) + ((formData as any).smartMatch ? 10 : 0)} Credits)
                     </PremiumButton>
+                    <Text style={{ textAlign: 'center', color: colors.muted, marginTop: 12, fontSize: 12 }}>
+                        Includes 5 credits base fee.
+                    </Text>
                 </View>
             </ScrollView>
         </ScreenContainer>
@@ -114,9 +171,10 @@ export default function AddJobScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { padding: 24 },
+    container: { padding: 24, paddingBottom: 40 },
     title: { fontSize: 24, fontWeight: 'bold', marginBottom: 24 },
     formGroup: { marginBottom: 16 },
     label: { marginBottom: 8, fontWeight: '500' },
     input: { borderWidth: 1, borderRadius: 8, padding: 12 },
+    boostCard: { padding: 16, borderRadius: 12, marginBottom: 12 },
 });
