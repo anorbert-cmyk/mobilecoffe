@@ -129,6 +129,92 @@ async function startServer() {
             createdAt: new Date(),
           });
         }
+        // 4. Seed Job Listings if empty
+        if (business) {
+          const jobs = await db.query.jobListings.findMany({
+            where: eq((await import("../../drizzle/schema")).jobListings.businessId, business.id)
+          });
+
+          if (jobs.length === 0) {
+            console.log("Seeding demo jobs...");
+            const { jobListings } = await import("../../drizzle/schema");
+            await db.insert(jobListings).values([
+              {
+                businessId: business.id,
+                title: "Head Barista",
+                description: "We are looking for an experienced Head Barista to lead our team. You will be responsible for QC, dialing in recipes, and training staff. Minimum 3 years specialty coffee experience required.",
+                netSalaryMin: 450000,
+                netSalaryMax: 550000,
+                contractType: "full-time",
+                workingHours: "40h/week",
+                contactEmail: "jobs@demoroasters.com",
+                status: "active",
+                createdAt: new Date(),
+              },
+              {
+                businessId: business.id,
+                title: "Roastery Assistant",
+                description: "Join our roasting team! Tasks include green coffee handling, packaging, and assisting with roast profiles. No prior roasting experience needed, but passion for coffee is a must.",
+                netSalaryMin: 350000,
+                netSalaryMax: 400000,
+                contractType: "part-time",
+                workingHours: "20h/week",
+                contactEmail: "roast@demoroasters.com",
+                status: "active",
+                createdAt: new Date(),
+              }
+            ]);
+          }
+        }
+
+        // 5. Seed Products if empty
+        if (business) {
+          const prods = await db.query.products.findMany({
+            where: eq((await import("../../drizzle/schema")).products.businessId, business.id)
+          });
+
+          if (prods.length === 0) {
+            console.log("Seeding demo products...");
+            const { products } = await import("../../drizzle/schema");
+            await db.insert(products).values([
+              {
+                businessId: business.id,
+                type: "coffee",
+                name: "Ethiopia Yirgacheffe",
+                description: "Floral and citrus notes with a tea-like body. Washed process.",
+                price: 4500,
+                roastLevel: "light",
+                processMethod: "washed",
+                flavorNotes: ["Jasmine", "Bergamot", "Lemon"],
+                weight: 250,
+                createdAt: new Date(),
+                isAvailable: true
+              },
+              {
+                businessId: business.id,
+                type: "coffee",
+                name: "Colombia Pink Bourbon",
+                description: "Complex acidity with red fruit sweetness. Anaerobic fermentation.",
+                price: 5200,
+                roastLevel: "medium",
+                processMethod: "anaerobic",
+                flavorNotes: ["Strawberry", "Vanilla", "Cacao"],
+                weight: 250,
+                createdAt: new Date(),
+                isAvailable: true
+              },
+              {
+                businessId: business.id,
+                type: "equipment",
+                name: "V60 Starter Kit",
+                description: "Everything you need to start brewing pour-over coffee.",
+                price: 12000,
+                createdAt: new Date(),
+                isAvailable: true
+              }
+            ]);
+          }
+        }
       }
 
       // Create session token
