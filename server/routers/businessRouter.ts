@@ -71,13 +71,13 @@ export const businessRouter = router({
             data: z.object({
                 name: z.string().optional(),
                 description: z.string().optional(),
-                address: z.any().optional(), // typed as json in db
-                openingHours: z.any().optional(),
-                services: z.any().optional(),
+                address: z.object({ city: z.string(), country: z.string() }).passthrough().optional(),
+                openingHours: z.record(z.string(), z.string()).optional(),
+                services: z.array(z.string()).optional(),
                 headerImageUrls: z.array(z.string()).optional(),
                 logoUrl: z.string().optional(),
                 website: z.string().optional(),
-                socialMedia: z.any().optional(),
+                socialMedia: z.record(z.string(), z.string()).optional(),
             })
         }))
         .mutation(async ({ ctx, input }) => {

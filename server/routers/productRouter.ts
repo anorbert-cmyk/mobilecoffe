@@ -18,7 +18,7 @@ export const productRouter = router({
             // Coffee props
             roastLevel: z.enum(["light", "medium", "medium-dark", "dark"]).optional(),
             processMethod: z.enum(["washed", "natural", "honey", "anaerobic"]).optional(),
-            origin: z.any().optional(),
+            origin: z.string().optional(),
             flavorNotes: z.array(z.string()).optional(),
             weight: z.number().optional(),
             roasterId: z.number().optional(),
