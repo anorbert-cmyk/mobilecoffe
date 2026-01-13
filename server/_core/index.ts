@@ -57,7 +57,7 @@ async function startServer() {
   registerOAuthRoutes(app);
 
   app.get("/api/health", (_req, res) => {
-    res.json({ ok: true, timestamp: Date.now() });
+    res.json({ ok: true, timestamp: Date.now(), version: "fix-jwt-fallback-v2" });
   });
 
   // Demo login for testing (bypasses OAuth)
