@@ -1,9 +1,10 @@
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useColors } from '@/hooks/use-colors';
 import { trpc } from '@/lib/trpc';
 import { PremiumButton } from '@/components/ui/premium-button';
 import { useRouter } from 'expo-router';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 
 export default function DashboardOverview() {
     const colors = useColors();
@@ -11,51 +12,116 @@ export default function DashboardOverview() {
 
     const { data: business, isLoading } = trpc.business.getMine.useQuery();
 
-    if (isLoading) return <Text style={{ padding: 20, color: colors.foreground }}>Loading...</Text>;
-    if (!business) return <Text style={{ padding: 20, color: colors.foreground }}>No business found.</Text>;
+    if (isLoading) return (
+        <ScreenContainer>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: colors.foreground }}>Loading...</Text>
+            </View>
+        </ScreenContainer>
+    );
+
+    if (!business) return (
+        <ScreenContainer>
+            <View style={{ padding: 20, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ fontSize: 18, marginBottom: 16, color: colors.foreground }}>No business profile found.</Text>
+                <PremiumButton onPress={() => router.push('/b2b/register')}>
+                    Create Business Profile
+                </PremiumButton>
+            </View>
+        </ScreenContainer>
+    );
+
+    const menuItems = [
+        {
+            title: 'Manage Jobs',
+            subtitle: 'Post and track job listings',
+            icon: 'briefcase.fill',
+            color: '#3B82F6',
+            route: '/b2b/dashboard/jobs',
+        },
+        {
+            title: 'Manage Products',
+            subtitle: 'Update menu and shop items',
+            icon: 'cup.and.saucer.fill',
+            color: '#F59E0B',
+            route: '/b2b/dashboard/products',
+        },
+        {
+            title: 'Business Profile',
+            subtitle: 'Edit details and appearance',
+            icon: 'building.2.fill',
+            color: '#10B981',
+            route: '/b2b/register', // Re-use register form for editing for now, or new edit page
+        },
+        {
+            title: 'Subscription',
+            subtitle: `${business.subscriptions?.[0]?.plan?.toUpperCase() || 'FREE'} Plan`,
+            icon: 'creditcard.fill',
+            color: '#8B5CF6',
+            route: '/subscription/plans', // Or specific B2B subscription page
+        }
+    ];
 
     return (
         <ScreenContainer>
             <ScrollView contentContainerStyle={styles.container}>
-                <Text style={[styles.welcome, { color: colors.foreground }]}>
-                    Welcome, {business.name}
-                </Text>
+                <View style={styles.header}>
+                    <Text style={[styles.welcome, { color: colors.foreground }]}>
+                        {business.name}
+                    </Text>
+                    <Text style={[styles.role, { color: colors.muted }]}>
+                        {business.type.toUpperCase()} • {(business.address as any)?.city || 'Location not set'}
+                    </Text>
+                </View>
 
                 {/* Stats Grid */}
                 <View style={styles.statsGrid}>
                     <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
-                        <Text style={[styles.statValue, { color: colors.primary }]}>{business.subscriptions?.[0]?.plan?.toUpperCase() || 'FREE'}</Text>
+                        <Text style={[styles.statValue, { color: colors.primary }]}>
+                            {business.subscriptions?.[0]?.plan?.toUpperCase() || 'FREE'}
+                        </Text>
                         <Text style={[styles.statLabel, { color: colors.muted }]}>Current Plan</Text>
                     </View>
                     <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
-                        <Text style={[styles.statValue, { color: colors.foreground }]}>0</Text>
-                        <Text style={[styles.statLabel, { color: colors.muted }]}>Profile Views</Text>
+                        <Text style={[styles.statValue, { color: colors.foreground }]}>Active</Text>
+                        <Text style={[styles.statLabel, { color: colors.muted }]}>Status</Text>
                     </View>
                 </View>
 
-                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Quick Actions</Text>
-                <View style={styles.actions}>
-                    <PremiumButton
-                        variant="outline"
-                        onPress={() => router.push('/b2b/add-product')}
-                    >
-                        Add Product
-                    </PremiumButton>
-                    <View style={{ height: 10 }} />
-                    <PremiumButton
-                        variant="outline"
-                        onPress={() => router.push('/b2b/add-job')}
-                    >
-                        Post a Job
-                    </PremiumButton>
-                    <View style={{ height: 10 }} />
-                    <PremiumButton
-                        variant="secondary"
-                        onPress={() => router.push('/cafe/' + business.id)}
-                    >
-                        View Public Profile
-                    </PremiumButton>
+                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Management</Text>
+
+                <View style={styles.menuGrid}>
+                    {menuItems.map((item, index) => (
+                        <Pressable
+                            key={index}
+                            style={({ pressed }) => [
+                                styles.menuCard,
+                                {
+                                    backgroundColor: colors.surface,
+                                    transform: [{ scale: pressed ? 0.98 : 1 }],
+                                    opacity: pressed ? 0.8 : 1
+                                }
+                            ]}
+                            onPress={() => router.push(item.route as any)}
+                        >
+                            <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
+                                <IconSymbol name={item.icon as any} size={24} color={item.color} />
+                            </View>
+                            <Text style={[styles.menuTitle, { color: colors.foreground }]}>{item.title}</Text>
+                            <Text style={[styles.menuSubtitle, { color: colors.muted }]}>{item.subtitle}</Text>
+                        </Pressable>
+                    ))}
                 </View>
+
+                <View style={{ height: 24 }} />
+
+                <PremiumButton
+                    variant="outline"
+                    onPress={() => router.push('/cafe/' + business.id)}
+                    leftIcon={<IconSymbol name="eye.fill" size={20} color={colors.primary} />}
+                >
+                    View Public Page
+                </PremiumButton>
 
             </ScrollView>
         </ScreenContainer>
@@ -65,11 +131,18 @@ export default function DashboardOverview() {
 const styles = StyleSheet.create({
     container: {
         padding: 20,
+        paddingBottom: 40,
+    },
+    header: {
+        marginBottom: 24,
     },
     welcome: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 4,
+    },
+    role: {
+        fontSize: 16,
     },
     statsGrid: {
         flexDirection: 'row',
@@ -79,23 +152,51 @@ const styles = StyleSheet.create({
     statCard: {
         flex: 1,
         padding: 16,
-        borderRadius: 12,
+        borderRadius: 16,
         alignItems: 'center',
+        justifyContent: 'center',
     },
     statValue: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 4,
     },
     statLabel: {
         fontSize: 12,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     sectionTitle: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: '600',
+        marginBottom: 16,
+    },
+    menuGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 12,
+    },
+    menuCard: {
+        width: '48%', // roughly half width with gap
+        padding: 16,
+        borderRadius: 16,
+        marginBottom: 4,
+    },
+    iconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
         marginBottom: 12,
     },
-    actions: {
-        width: '100%',
+    menuTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginBottom: 4,
+    },
+    menuSubtitle: {
+        fontSize: 13,
+        lineHeight: 18,
     },
 });

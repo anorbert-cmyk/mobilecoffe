@@ -63,13 +63,18 @@ async function startServer() {
   // Demo login for testing (bypasses OAuth)
   app.post("/api/demo-login", async (_req, res) => {
     try {
-      const { upsertUser, getUserByOpenId } = await import("../db");
+      const { upsertUser, getDb } = await import("../db");
+      const { eq } = await import("drizzle-orm");
+      const { businesses, businessSubscriptions } = await import("../../drizzle/schema");
       const { sdk } = await import("./sdk");
 
       const demoOpenId = "demo-user-001";
       const demoName = "Demo Business User";
 
-      // Create or update demo user
+      const db = await getDb();
+      if (!db) throw new Error("Database not initialized");
+
+      // 1. Create or update demo user
       await upsertUser({
         openId: demoOpenId,
         name: demoName,
@@ -77,6 +82,54 @@ async function startServer() {
         loginMethod: "demo",
         lastSignedIn: new Date(),
       });
+
+      // Get the user ID
+      const user = await db.query.users.findFirst({
+        where: eq((await import("../../drizzle/schema")).users.openId, demoOpenId)
+      });
+
+      if (!user) throw new Error("Failed to create demo user");
+
+      // 2. Check if business exists, if not create one
+      let business = await db.query.businesses.findFirst({
+        where: eq(businesses.ownerId, user.id)
+      });
+
+      if (!business) {
+        console.log("Creating demo business...");
+        await db.insert(businesses).values({
+          ownerId: user.id,
+          name: "Demo Coffee Roasters",
+          type: "roaster",
+          email: "contact@demoroasters.com",
+          description: "Premium innovative specialty coffee roaster from Budapest.",
+          isVerified: true,
+          address: { city: "Budapest", country: "Hungary" },
+          openingHours: { week: "9-5" },
+          createdAt: new Date(),
+        });
+
+        business = await db.query.businesses.findFirst({
+          where: eq(businesses.ownerId, user.id)
+        });
+      }
+
+      // 3. Check subscription, if not create 'premium'
+      if (business) {
+        const sub = await db.query.businessSubscriptions.findFirst({
+          where: eq(businessSubscriptions.businessId, business.id)
+        });
+
+        if (!sub) {
+          console.log("Creating demo subscription...");
+          await db.insert(businessSubscriptions).values({
+            businessId: business.id,
+            plan: "premium",
+            status: "active",
+            createdAt: new Date(),
+          });
+        }
+      }
 
       // Create session token
       const sessionToken = await sdk.createSessionToken(demoOpenId, { name: demoName });
