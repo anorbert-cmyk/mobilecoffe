@@ -13,19 +13,17 @@ export default function DashboardOverview() {
 
     const { data: apiBusiness, isLoading, refetch } = trpc.business.getMine.useQuery();
 
+    // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+    const upgradeToPremium = trpc.business.upgradeToPremium.useMutation({
+        onSuccess: () => {
+            alert("Upgraded to Premium (Mock)!");
+        }
+    });
+
     // Fix: If apiBusiness exists but lacks relations (old server), use it but check for missing fields or merge with demo if needed.
-    // Ideally for the dashboard main view, we just need basic info, but if we want to show stats, we need arrays.
-    // For now, let's allow apiBusiness to drive the main view, but if it's completely missing, use demo.
     const business = apiBusiness || demoBusiness;
     const isDemo = !apiBusiness;
-
-    if (isLoading) return (
-        <ScreenContainer>
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ color: colors.foreground }}>Loading...</Text>
-            </View>
-        </ScreenContainer>
-    );
+    const isPremium = business.subscriptions?.[0]?.plan === 'premium';
 
     const menuItems = [
         {
@@ -58,14 +56,13 @@ export default function DashboardOverview() {
         },
     ];
 
-    const upgradeToPremium = trpc.business.upgradeToPremium.useMutation({
-        onSuccess: () => {
-            // force refetch or just alert
-            alert("Upgraded to Premium (Mock)!");
-        }
-    });
-
-    const isPremium = business.subscriptions?.[0]?.plan === 'premium';
+    if (isLoading) return (
+        <ScreenContainer>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: colors.foreground }}>Loading...</Text>
+            </View>
+        </ScreenContainer>
+    );
 
     return (
         <ScreenContainer>
