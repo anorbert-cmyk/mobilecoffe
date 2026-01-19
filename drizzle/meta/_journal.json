@@ -15,6 +15,13 @@
       "when": 1768258623475,
       "tag": "0001_strange_quentin_quire",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1768836083650,
+      "tag": "0002_loose_agent_brand",
+      "breakpoints": true
     }
   ]
 }

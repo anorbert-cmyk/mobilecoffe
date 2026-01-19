@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
-import { businesses } from "../../drizzle/schema";
+import { businesses, businessSubscriptions } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -97,6 +97,49 @@ export const businessRouter = router({
                 ...input.data,
                 updatedAt: new Date(),
             }).where(eq(businesses.id, input.id));
+
+            return { success: true };
+        }),
+
+
+    upgradeToPremium: protectedProcedure
+        .input(z.object({ businessId: z.number() }))
+        .mutation(async ({ ctx, input }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+            const business = await db.query.businesses.findFirst({
+                where: eq(businesses.id, input.businessId),
+                with: { subscriptions: true }
+            });
+
+            if (!business || business.ownerId !== ctx.user.id) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            // In a real app, we would create a Stripe Checkout session here.
+            // For this mock/demo, we just upgrade them instantly.
+
+            // Deactivate old subscriptions
+            await db.update(businesses).set({
+                // Potentially verify logic here if needed
+            });
+            // Actually better to update the subscription table
+
+            // Check if active subscription exists
+            const activeSub = business.subscriptions.find(s => s.status === 'active');
+            if (activeSub) {
+                await db.update(businessSubscriptions)
+                    .set({ plan: 'premium', updatedAt: new Date() })
+                    .where(eq(businessSubscriptions.id, activeSub.id));
+            } else {
+                await db.insert(businessSubscriptions).values({
+                    businessId: business.id,
+                    plan: 'premium',
+                    status: 'active',
+                    createdAt: new Date(),
+                });
+            }
 
             return { success: true };
         }),

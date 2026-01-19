@@ -47,20 +47,29 @@ export default function DashboardOverview() {
             route: '/b2b/dashboard/products',
         },
         {
+            title: 'Manage Events',
+            subtitle: 'Host cuppings and workshops',
+            icon: 'calendar',
+            color: '#EC4899',
+            route: '/b2b/dashboard/events',
+        },
+        {
             title: 'Business Profile',
             subtitle: 'Edit details and appearance',
             icon: 'building.2.fill',
             color: '#10B981',
-            route: '/b2b/register', // Re-use register form for editing for now, or new edit page
+            route: '/b2b/register',
         },
-        {
-            title: 'Subscription',
-            subtitle: `${business.subscriptions?.[0]?.plan?.toUpperCase() || 'FREE'} Plan`,
-            icon: 'creditcard.fill',
-            color: '#8B5CF6',
-            route: '/subscription/plans', // Or specific B2B subscription page
-        }
     ];
+
+    const upgradeToPremium = trpc.business.upgradeToPremium.useMutation({
+        onSuccess: () => {
+            // force refetch or just alert
+            alert("Upgraded to Premium (Mock)!");
+        }
+    });
+
+    const isPremium = business.subscriptions?.[0]?.plan === 'premium';
 
     return (
         <ScreenContainer>
@@ -89,6 +98,13 @@ export default function DashboardOverview() {
                             {business.subscriptions?.[0]?.plan?.toUpperCase() || 'FREE'}
                         </Text>
                         <Text style={[styles.statLabel, { color: colors.muted }]}>Current Plan</Text>
+                        {!isPremium && (
+                            <Pressable disabled={upgradeToPremium.isPending} onPress={() => upgradeToPremium.mutate({ businessId: business.id })}>
+                                <Text style={{ color: colors.primary, fontSize: 12, marginTop: 4, fontWeight: 'bold' }}>
+                                    {upgradeToPremium.isPending ? 'Upgrading...' : 'UPGRADE NOW'}
+                                </Text>
+                            </Pressable>
+                        )}
                     </View>
                     <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
                         <Text style={[styles.statValue, { color: colors.foreground }]}>Active</Text>

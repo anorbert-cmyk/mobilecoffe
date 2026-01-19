@@ -77,8 +77,8 @@ export const products = mysqlTable("products", {
   origin: json("origin"), // { country, region, farm }
   flavorNotes: json("flavorNotes"), // Array of strings
   weight: int("weight"), // grams
-  roasterId: int("roasterId").references(() => roasters.id), 
-  
+  roasterId: int("roasterId").references(() => roasters.id),
+
   isAvailable: boolean("isAvailable").default(true),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -147,6 +147,7 @@ export const businessRelations = relations(businesses, ({ one, many }) => ({
   jobs: many(jobListings),
   menuCategories: many(menuCategories),
   subscriptions: many(businessSubscriptions), // Should technically be one active, but history is good
+  events: many(events),
 }));
 
 export const productRelations = relations(products, ({ one }) => ({
@@ -165,6 +166,26 @@ export const menuItemRelations = relations(menuItems, ({ one }) => ({
 
 export const jobRelations = relations(jobListings, ({ one }) => ({
   business: one(businesses, { fields: [jobListings.businessId], references: [businesses.id] }),
+}));
+
+export const events = mysqlTable("events", {
+  id: int("id").autoincrement().primaryKey(),
+  businessId: int("businessId").references(() => businesses.id).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  date: timestamp("date").notNull(),
+  location: varchar("location", { length: 255 }).notNull(),
+  price: int("price").default(0), // 0 = free
+  currency: varchar("currency", { length: 3 }).default("HUF"),
+  imageUrl: varchar("imageUrl", { length: 512 }),
+  maxAttendees: int("maxAttendees"),
+  isPublished: boolean("isPublished").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const eventRelations = relations(events, ({ one }) => ({
+  business: one(businesses, { fields: [events.businessId], references: [businesses.id] }),
 }));
 
 export type User = typeof users.$inferSelect;
