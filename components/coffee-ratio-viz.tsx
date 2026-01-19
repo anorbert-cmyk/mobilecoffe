@@ -41,7 +41,7 @@ export function CoffeeRatioViz({ ratio, title }: CoffeeRatioVizProps) {
 
   // Layer positions (from bottom to top)
   let currentY = glassY + glassHeight;
-  const layers: Array<{ color: string; height: number; y: number; label: string; value: number }> = [];
+  const layers: { color: string; height: number; y: number; label: string; value: number }[] = [];
 
   if (ratio.espresso) {
     const height = (espressoPercent / 100) * glassHeight;

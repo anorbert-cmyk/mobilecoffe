@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet , Platform } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
 
 import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -38,14 +37,14 @@ export default function BeanMatcherStep2() {
   const handleContinue = () => {
     if (hasGrinder === null) return;
     triggerHaptic();
-    
+
     const searchParams = new URLSearchParams({
       method: params.method || 'espresso-machine',
       machineId: params.machineId || '',
       grinderId: selectedGrinderId || '',
       hasGrinder: hasGrinder ? 'true' : 'false',
     });
-    
+
     router.push(`/bean-matcher/step3-preferences?${searchParams.toString()}` as any);
   };
 
@@ -159,7 +158,7 @@ export default function BeanMatcherStep2() {
                   )}
                 </Pressable>
               ))}
-              
+
               <Pressable
                 onPress={() => handleGrinderSelect('other')}
                 style={({ pressed }) => [
@@ -200,7 +199,7 @@ export default function BeanMatcherStep2() {
                 Pro Tip
               </Text>
               <Text style={[styles.tipText, { color: colors.muted }]}>
-                We'll recommend beans that work well pre-ground, but consider investing in a grinder for the best flavor!
+                We&apos;ll recommend beans that work well pre-ground, but consider investing in a grinder for the best flavor!
               </Text>
             </View>
           </Animated.View>
@@ -210,7 +209,7 @@ export default function BeanMatcherStep2() {
       </ScrollView>
 
       {canContinue && (
-        <Animated.View 
+        <Animated.View
           entering={FadeIn.duration(300)}
           style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}
         >

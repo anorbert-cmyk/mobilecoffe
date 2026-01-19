@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable, TextInput, Alert, ActivityIndicator , Platform } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import { BlurView } from 'expo-blur';
-import { Platform } from 'react-native';
 
 import { ScreenContainer } from '@/components/screen-container';
 import { PremiumButton } from '@/components/ui/premium-button';
@@ -53,7 +52,7 @@ export default function CartScreen() {
                     </View>
                     <Text style={[styles.successTitle, { color: colors.foreground }]}>Order Confirmed!</Text>
                     <Text style={[styles.successDesc, { color: colors.muted }]}>
-                        Thank you for your order. We've sent a confirmation email to you.
+                        Thank you for your order. We&apos;ve sent a confirmation email to you.
                     </Text>
                     <PremiumButton onPress={() => router.replace(`/cafe/${cafeId}`)} style={{ marginTop: 32, width: 200 }}>
                         Back to Cafe

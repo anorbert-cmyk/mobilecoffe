@@ -193,7 +193,7 @@ export default function BeanDetail() {
             </View>
           </Pressable>
           <Text className="text-xs text-muted text-center mt-3">
-            You'll be redirected to {bean.roaster}'s website
+            You&apos;ll be redirected to {bean.roaster}&apos;s website
           </Text>
         </View>
       </View>

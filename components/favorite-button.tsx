@@ -1,6 +1,5 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet , Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
 import { IconSymbol } from './ui/icon-symbol';
 import { useFavorites } from '@/lib/favorites/favorites-provider';
 import { useColors } from '@/hooks/use-colors';

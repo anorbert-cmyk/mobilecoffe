@@ -1,9 +1,8 @@
 import { useState, useCallback } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, ScrollView , Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   FadeIn,
@@ -491,7 +490,7 @@ function ExperienceStep({
           Where are you on your coffee journey?
         </Text>
         <Text style={[styles.stepSubtitle, { color: colors.muted }]}>
-          We'll personalize your experience based on your level
+          We&apos;ll personalize your experience based on your level
         </Text>
       </View>
 
@@ -667,7 +666,7 @@ function BudgetStep({
           style={[styles.stepTitle, { color: colors.foreground }]}
           accessibilityRole="header"
         >
-          What's your budget?
+          What&apos;s your budget?
         </Text>
         <Text style={[styles.stepSubtitle, { color: colors.muted }]}>
           This helps us recommend the right equipment for you
@@ -851,7 +850,7 @@ function CompleteStep({
         style={[styles.completeTitle, { color: colors.foreground }]}
         accessibilityRole="header"
       >
-        You're All Set!
+        You&apos;re All Set!
       </Animated.Text>
 
       <Animated.Text

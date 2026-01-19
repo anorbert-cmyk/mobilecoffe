@@ -1,11 +1,10 @@
 import { useState, useCallback } from 'react';
-import { View, Text, Pressable, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, Pressable, StyleSheet, ScrollView, Dimensions , Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
-import Animated, { 
-  FadeIn, 
+import Animated, {
+  FadeIn,
   FadeInDown,
   SlideInRight,
   SlideInLeft,
@@ -15,10 +14,10 @@ import { ScreenContainer } from '@/components/screen-container';
 import { PremiumButton } from '@/components/ui/premium-button';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
-import { 
-  useUserProfile, 
-  BudgetRange, 
-  CoffeePurpose 
+import {
+  useUserProfile,
+  BudgetRange,
+  CoffeePurpose
 } from '@/lib/user-profile';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -28,7 +27,7 @@ type WizardStep = 'intro' | 'budget' | 'purpose' | 'complete';
 export default function EquipmentWizardScreen() {
   const colors = useColors();
   const { profile, updateProfile } = useUserProfile();
-  
+
   const [currentStep, setCurrentStep] = useState<WizardStep>('intro');
   const [budget, setBudget] = useState<BudgetRange | null>(profile.budgetRange);
   const [purposes, setPurposes] = useState<CoffeePurpose[]>(profile.coffeePurpose || []);
@@ -43,7 +42,7 @@ export default function EquipmentWizardScreen() {
   const goBack = useCallback(() => {
     triggerHaptic();
     setDirection('back');
-    
+
     if (currentStep === 'budget') {
       setCurrentStep('intro');
     } else if (currentStep === 'purpose') {
@@ -100,7 +99,7 @@ export default function EquipmentWizardScreen() {
   return (
     <ScreenContainer edges={['top', 'bottom', 'left', 'right']}>
       {/* Header with Back Button */}
-      <Animated.View 
+      <Animated.View
         entering={FadeIn.duration(300)}
         style={styles.header}
       >
@@ -108,7 +107,7 @@ export default function EquipmentWizardScreen() {
           onPress={goBack}
           style={({ pressed }) => [
             styles.backButton,
-            { 
+            {
               backgroundColor: colors.surface,
               opacity: pressed ? 0.7 : 1,
             },
@@ -118,17 +117,17 @@ export default function EquipmentWizardScreen() {
         >
           <IconSymbol name="chevron.left" size={20} color={colors.foreground} />
         </Pressable>
-        
+
         <View style={styles.progressWrapper}>
           <View style={[styles.progressTrack, { backgroundColor: colors.surface }]}>
-            <Animated.View 
+            <Animated.View
               style={[
-                styles.progressFill, 
-                { 
+                styles.progressFill,
+                {
                   backgroundColor: colors.primary,
                   width: `${progress * 100}%`,
                 }
-              ]} 
+              ]}
             />
           </View>
         </View>
@@ -137,7 +136,7 @@ export default function EquipmentWizardScreen() {
           onPress={handleClose}
           style={({ pressed }) => [
             styles.closeButton,
-            { 
+            {
               backgroundColor: colors.surface,
               opacity: pressed ? 0.7 : 1,
             },
@@ -151,12 +150,12 @@ export default function EquipmentWizardScreen() {
 
       {/* Intro Step */}
       {currentStep === 'intro' && (
-        <Animated.View 
+        <Animated.View
           key="intro"
           entering={FadeIn.duration(400)}
           style={styles.stepContainer}
         >
-          <ScrollView 
+          <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
@@ -164,13 +163,13 @@ export default function EquipmentWizardScreen() {
               <View style={[styles.introIconWrapper, { backgroundColor: colors.primary + '20' }]}>
                 <IconSymbol name="gearshape.2.fill" size={48} color={colors.primary} />
               </View>
-              
+
               <Text style={[styles.introTitle, { color: colors.foreground }]}>
                 Find Your Perfect Setup
               </Text>
-              
+
               <Text style={[styles.introDescription, { color: colors.muted }]}>
-                Answer a few quick questions and we'll recommend the best espresso machine and grinder for your needs and budget.
+                Answer a few quick questions and we&apos;ll recommend the best espresso machine and grinder for your needs and budget.
               </Text>
 
               <View style={styles.introFeatures}>
@@ -203,7 +202,7 @@ export default function EquipmentWizardScreen() {
               onPress={() => goNext('budget')}
               fullWidth
             >
-              Let's Get Started
+              Let&apos;s Get Started
             </PremiumButton>
           </View>
         </Animated.View>
@@ -211,18 +210,18 @@ export default function EquipmentWizardScreen() {
 
       {/* Budget Step */}
       {currentStep === 'budget' && (
-        <Animated.View 
+        <Animated.View
           key="budget"
           entering={enteringAnimation}
           style={styles.stepContainer}
         >
-          <ScrollView 
+          <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.stepHeader}>
               <Text style={[styles.stepTitle, { color: colors.foreground }]}>
-                What's your budget?
+                What&apos;s your budget?
               </Text>
               <Text style={[styles.stepSubtitle, { color: colors.muted }]}>
                 This includes both machine and grinder
@@ -244,7 +243,7 @@ export default function EquipmentWizardScreen() {
                     onPress={() => handleBudgetSelect(option.budget)}
                     style={({ pressed }) => [
                       styles.budgetCard,
-                      { 
+                      {
                         backgroundColor: budget === option.budget ? colors.primary + '15' : colors.surface,
                         borderColor: budget === option.budget ? colors.primary : colors.border,
                         borderWidth: budget === option.budget ? 2 : 1,
@@ -277,12 +276,12 @@ export default function EquipmentWizardScreen() {
 
       {/* Purpose Step */}
       {currentStep === 'purpose' && (
-        <Animated.View 
+        <Animated.View
           key="purpose"
           entering={enteringAnimation}
           style={styles.stepContainer}
         >
-          <ScrollView 
+          <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
@@ -313,7 +312,7 @@ export default function EquipmentWizardScreen() {
                       onPress={() => handlePurposeToggle(option.purpose)}
                       style={({ pressed }) => [
                         styles.purposeChip,
-                        { 
+                        {
                           backgroundColor: isSelected ? colors.primary : colors.surface,
                           borderColor: isSelected ? colors.primary : colors.border,
                           transform: [{ scale: pressed ? 0.96 : 1 }],
@@ -322,13 +321,13 @@ export default function EquipmentWizardScreen() {
                       accessibilityRole="checkbox"
                       accessibilityState={{ checked: isSelected }}
                     >
-                      <IconSymbol 
-                        name={option.icon as any} 
-                        size={20} 
-                        color={isSelected ? '#FFFFFF' : colors.foreground} 
+                      <IconSymbol
+                        name={option.icon as any}
+                        size={20}
+                        color={isSelected ? '#FFFFFF' : colors.foreground}
                       />
                       <Text style={[
-                        styles.purposeText, 
+                        styles.purposeText,
                         { color: isSelected ? '#FFFFFF' : colors.foreground }
                       ]}>
                         {option.title}
@@ -359,12 +358,12 @@ export default function EquipmentWizardScreen() {
 
       {/* Complete Step */}
       {currentStep === 'complete' && (
-        <Animated.View 
+        <Animated.View
           key="complete"
           entering={FadeIn.duration(500)}
           style={styles.stepContainer}
         >
-          <ScrollView 
+          <ScrollView
             contentContainerStyle={[styles.scrollContent, styles.completeContent]}
             showsVerticalScrollIndicator={false}
           >
@@ -375,9 +374,9 @@ export default function EquipmentWizardScreen() {
             <Text style={[styles.completeTitle, { color: colors.foreground }]}>
               Perfect!
             </Text>
-            
+
             <Text style={[styles.completeSubtitle, { color: colors.muted }]}>
-              We've found the best equipment for you
+              We&apos;ve found the best equipment for you
             </Text>
 
             <View style={[styles.summaryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -454,7 +453,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 120,
   },
-  
+
   // Intro styles
   introContent: {
     alignItems: 'center',

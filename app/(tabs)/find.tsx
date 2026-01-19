@@ -280,15 +280,7 @@ export default function FindCoffeeScreen() {
               </Text>
             </View>
 
-            {/* Distance badge */}
-            {userLocation && (
-              <View style={[styles.distanceBadge, { backgroundColor: colors.primary }]}>
-                <IconSymbol name="location.fill" size={12} color="#FFF" />
-                <Text style={styles.distanceBadgeText}>
-                  {formatDistance(item.distance)}
-                </Text>
-              </View>
-            )}
+
           </View>
 
           {/* Content */}
@@ -306,20 +298,21 @@ export default function FindCoffeeScreen() {
               </Text>
             </View>
 
-            <View style={styles.cafeMetaRow}>
-              <IconSymbol name="mappin.and.ellipse" size={14} color={colors.muted} />
-              <Text style={[styles.cafeAddress, { color: colors.muted }]} numberOfLines={1}>
-                {item.neighborhood || item.address}
-              </Text>
+            {/* Amenities Icons - Prominent */}
+            <View style={styles.amenitiesRow}>
+              {item.amenities?.wifi && <IconSymbol name="wifi" size={16} color={colors.primary} style={{ marginRight: 10 }} />}
+              {item.amenities?.dogFriendly && <IconSymbol name="pawprint.fill" size={16} color={colors.primary} style={{ marginRight: 10 }} />}
+              {item.amenities?.cardPayment && <IconSymbol name="creditcard.fill" size={16} color={colors.primary} style={{ marginRight: 10 }} />}
+              {item.amenities?.terrace && <IconSymbol name="sun.max.fill" size={16} color={colors.primary} style={{ marginRight: 10 }} />}
+              {item.amenities?.laptopFriendly && <IconSymbol name="laptopcomputer" size={16} color={colors.primary} style={{ marginRight: 10 }} />}
             </View>
 
-            {/* Amenities Icons */}
-            <View style={styles.amenitiesRow}>
-              {item.amenities?.wifi && <IconSymbol name="wifi" size={14} color={colors.muted} style={{ marginRight: 8 }} />}
-              {item.amenities?.dogFriendly && <IconSymbol name="pawprint.fill" size={14} color={colors.muted} style={{ marginRight: 8 }} />}
-              {item.amenities?.cardPayment && <IconSymbol name="creditcard.fill" size={14} color={colors.muted} style={{ marginRight: 8 }} />}
-              {item.amenities?.terrace && <IconSymbol name="sun.max.fill" size={14} color={colors.muted} style={{ marginRight: 8 }} />}
-              {item.amenities?.laptopFriendly && <IconSymbol name="laptopcomputer" size={14} color={colors.muted} style={{ marginRight: 8 }} />}
+            {/* Bottom: Location & Distance */}
+            <View style={styles.locationRow}>
+              <IconSymbol name="mappin.fill" size={14} color={colors.muted} />
+              <Text style={[styles.locationText, { color: colors.muted }]} numberOfLines={1}>
+                {item.distance ? `${formatDistance(item.distance)} • ` : ''}{item.neighborhood || item.address}
+              </Text>
             </View>
           </View>
         </PremiumCard>
@@ -616,8 +609,18 @@ const styles = StyleSheet.create({
   emptyDescription: { fontSize: 15, textAlign: 'center' },
   amenitiesRow: {
     flexDirection: 'row',
-    marginTop: 12,
+    marginTop: 8,
     alignItems: 'center',
-    opacity: 0.8,
+    marginBottom: 8,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+  },
+  locationText: {
+    fontSize: 13,
+    fontWeight: '500',
   },
 });

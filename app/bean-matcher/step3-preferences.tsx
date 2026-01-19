@@ -1,20 +1,19 @@
 import { useState, useMemo } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Linking } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Linking , Platform } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
 
 import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
 import { coffeeBeans } from '@/data/beans';
 import { espressoMachines, coffeeGrinders } from '@/data/machines';
-import { 
-  matchBeansToEquipment, 
-  EquipmentProfile, 
-  BeanMatch 
+import {
+  matchBeansToEquipment,
+  EquipmentProfile,
+  BeanMatch
 } from '@/lib/bean-matcher/bean-matcher';
 
 type FlavorPreference = 'chocolate-nutty' | 'fruity-bright' | 'balanced' | 'bold-strong';
@@ -35,13 +34,13 @@ const FLAVOR_OPTIONS: FlavorOption[] = [
 
 export default function BeanMatcherStep3() {
   const colors = useColors();
-  const params = useLocalSearchParams<{ 
-    method: string; 
+  const params = useLocalSearchParams<{
+    method: string;
     machineId: string;
     grinderId: string;
     hasGrinder: string;
   }>();
-  
+
   const [selectedFlavor, setSelectedFlavor] = useState<FlavorPreference | null>(null);
   const [showResults, setShowResults] = useState(false);
 
@@ -52,12 +51,12 @@ export default function BeanMatcherStep3() {
   };
 
   // Get machine and grinder from data
-  const machine = useMemo(() => 
+  const machine = useMemo(() =>
     espressoMachines.find(m => m.id === params.machineId),
     [params.machineId]
   );
-  
-  const grinder = useMemo(() => 
+
+  const grinder = useMemo(() =>
     coffeeGrinders.find(g => g.id === params.grinderId),
     [params.grinderId]
   );
@@ -84,9 +83,9 @@ export default function BeanMatcherStep3() {
   // Get bean recommendations
   const recommendations: BeanMatch[] = useMemo(() => {
     if (!showResults) return [];
-    
+
     let filteredBeans = [...coffeeBeans];
-    
+
     // Filter by flavor preference
     if (selectedFlavor) {
       const flavorKeywords: Record<FlavorPreference, string[]> = {
@@ -95,7 +94,7 @@ export default function BeanMatcherStep3() {
         'balanced': ['balanced', 'smooth', 'clean', 'mild'],
         'bold-strong': ['bold', 'intense', 'dark', 'smoky', 'tobacco', 'earthy'],
       };
-      
+
       const keywords = flavorKeywords[selectedFlavor];
       filteredBeans = coffeeBeans.filter(bean =>
         bean.flavorNotes.some(note =>
@@ -104,13 +103,13 @@ export default function BeanMatcherStep3() {
         (selectedFlavor === 'bold-strong' && (bean.roastLevel === 'dark' || bean.roastLevel === 'medium-dark')) ||
         (selectedFlavor === 'balanced' && bean.roastLevel === 'medium')
       );
-      
+
       // If no matches, use all beans
       if (filteredBeans.length === 0) {
         filteredBeans = coffeeBeans;
       }
     }
-    
+
     return matchBeansToEquipment(filteredBeans, equipmentProfile, machine, grinder).slice(0, 5);
   }, [showResults, selectedFlavor, equipmentProfile, machine, grinder]);
 
@@ -145,7 +144,7 @@ export default function BeanMatcherStep3() {
 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           {/* Equipment Summary */}
-          <Animated.View 
+          <Animated.View
             entering={FadeIn.duration(400)}
             style={[styles.summaryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
           >
@@ -176,7 +175,7 @@ export default function BeanMatcherStep3() {
           </Text>
 
           {recommendations.map((match, index) => (
-            <Animated.View 
+            <Animated.View
               key={match.bean.id}
               entering={FadeInDown.delay(index * 100).duration(400)}
             >
@@ -215,7 +214,7 @@ export default function BeanMatcherStep3() {
 
                 {match.matchReasons.length > 0 && (
                   <View style={styles.reasonsSection}>
-                    <Text style={[styles.reasonsTitle, { color: colors.foreground }]}>Why it's a match:</Text>
+                    <Text style={[styles.reasonsTitle, { color: colors.foreground }]}>Why it&apos;s a match:</Text>
                     {match.matchReasons.slice(0, 2).map((reason, i) => (
                       <View key={i} style={styles.reasonRow}>
                         <IconSymbol name="checkmark.circle.fill" size={16} color={colors.success} />
@@ -279,8 +278,8 @@ export default function BeanMatcherStep3() {
 
         <View style={styles.flavorGrid}>
           {FLAVOR_OPTIONS.map((flavor, index) => (
-            <Animated.View 
-              key={flavor.id} 
+            <Animated.View
+              key={flavor.id}
               entering={FadeInDown.delay(index * 50).duration(300)}
             >
               <Pressable
@@ -327,7 +326,7 @@ export default function BeanMatcherStep3() {
         <View style={{ height: 120 }} />
       </ScrollView>
 
-      <Animated.View 
+      <Animated.View
         entering={FadeIn.duration(300)}
         style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}
       >

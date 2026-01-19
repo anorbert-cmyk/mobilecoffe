@@ -1,10 +1,9 @@
-import { View, Text, Pressable, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, ActivityIndicator , Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
 
 import { ScreenContainer } from '@/components/screen-container';
 import { useColors } from '@/hooks/use-colors';
@@ -31,25 +30,6 @@ export default function ComparisonScreen() {
   const [isLoadingLive, setIsLoadingLive] = useState(false);
   const [aiRecommendation, setAiRecommendation] = useState<string | null>(null);
 
-  const triggerHaptic = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-  };
-
-  // Check access
-  if (!hasAccess('equipment-comparison')) {
-    return (
-      <Paywall
-        visible={true}
-        onClose={() => router.back()}
-        feature="equipment-comparison"
-        featureName="Equipment Comparison"
-        requiredTier="enthusiast"
-      />
-    );
-  }
-
   // Initialize enhanced items from static data
   useEffect(() => {
     const enhanced = items.map(item => {
@@ -70,7 +50,7 @@ export default function ComparisonScreen() {
   // Fetch live data from Perplexity
   const fetchLiveData = useCallback(async () => {
     if (enhancedItems.length === 0) return;
-    
+
     setIsLoadingLive(true);
     triggerHaptic();
 
@@ -78,12 +58,12 @@ export default function ComparisonScreen() {
       // Fetch comparison data for all items
       const itemNames = enhancedItems.map(item => item.staticData?.name).filter(Boolean);
       const itemType = enhancedItems[0]?.type === 'machine' ? 'espresso-machine' : 'grinder';
-      
+
       const comparisonResult = await perplexityService.compareEquipment(itemNames, itemType);
-      
+
       if (comparisonResult) {
         setAiRecommendation(comparisonResult.recommendation);
-        
+
         // Update items with live data
         setEnhancedItems(prev => prev.map((item, index) => ({
           ...item,
@@ -97,6 +77,25 @@ export default function ComparisonScreen() {
       setIsLoadingLive(false);
     }
   }, [enhancedItems]);
+
+  const triggerHaptic = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  };
+
+  // Check access
+  if (!hasAccess('equipment-comparison')) {
+    return (
+      <Paywall
+        visible={true}
+        onClose={() => router.back()}
+        feature="equipment-comparison"
+        featureName="Equipment Comparison"
+        requiredTier="enthusiast"
+      />
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -128,7 +127,7 @@ export default function ComparisonScreen() {
           <IconSymbol name="chevron.left" size={24} color={colors.foreground} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: colors.foreground }]}>Compare Equipment</Text>
-        <Pressable 
+        <Pressable
           onPress={fetchLiveData}
           disabled={isLoadingLive}
           style={({ pressed }) => [styles.refreshButton, { opacity: pressed || isLoadingLive ? 0.5 : 1 }]}
@@ -143,7 +142,7 @@ export default function ComparisonScreen() {
 
       {/* AI Recommendation Banner */}
       {aiRecommendation && (
-        <Animated.View 
+        <Animated.View
           entering={FadeIn.duration(400)}
           style={[styles.aiBanner, { backgroundColor: colors.primary + '15', borderColor: colors.primary }]}
         >
@@ -160,23 +159,23 @@ export default function ComparisonScreen() {
           const data = item.staticData;
           const live = item.liveData;
           if (!data) return null;
-          
+
           return (
-            <Animated.View 
+            <Animated.View
               key={data.id}
               entering={FadeInDown.delay(index * 100).duration(400)}
             >
               <View style={[styles.column, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Pressable 
-                  onPress={() => { triggerHaptic(); removeItem(data.id); }} 
+                <Pressable
+                  onPress={() => { triggerHaptic(); removeItem(data.id); }}
                   style={styles.removeButton}
                 >
                   <IconSymbol name="xmark" size={20} color={colors.muted} />
                 </Pressable>
-                
+
                 <Image source={data.image} style={styles.image} contentFit="contain" />
                 <Text style={[styles.name, { color: colors.foreground }]}>{data.name}</Text>
-                
+
                 {/* Price with live update indicator */}
                 <View style={styles.priceRow}>
                   <Text style={[styles.price, { color: colors.primary }]}>
@@ -188,7 +187,7 @@ export default function ComparisonScreen() {
                     </View>
                   )}
                 </View>
-                
+
                 {/* Rating */}
                 <View style={styles.ratingRow}>
                   <IconSymbol name="star.fill" size={16} color={colors.warning} />
@@ -201,7 +200,7 @@ export default function ComparisonScreen() {
                     </Text>
                   )}
                 </View>
-                
+
                 <View style={styles.specs}>
                   {'boilerType' in data && <SpecRow label="Boiler" value={data.boilerType} colors={colors} />}
                   {'pumpPressure' in data && <SpecRow label="Pressure" value={`${data.pumpPressure} bar`} colors={colors} />}
@@ -240,15 +239,15 @@ export default function ComparisonScreen() {
           );
         })}
       </ScrollView>
-      
+
       <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
-        <Pressable 
-          onPress={() => { triggerHaptic(); clearAll(); }} 
+        <Pressable
+          onPress={() => { triggerHaptic(); clearAll(); }}
           style={({ pressed }) => [styles.clearButton, { opacity: pressed ? 0.6 : 1 }]}
         >
           <Text style={[styles.clearText, { color: colors.muted }]}>Clear All</Text>
         </Pressable>
-        
+
         {!aiRecommendation && (
           <Pressable
             onPress={fetchLiveData}

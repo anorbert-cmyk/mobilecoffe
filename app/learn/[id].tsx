@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { ScrollView, Text, View, Pressable, StyleSheet, Dimensions } from "react-native";
+import { ScrollView, Text, View, Pressable, StyleSheet, Dimensions , Platform } from "react-native";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
 
 import { ScreenContainer } from "@/components/screen-container";
 import { Breadcrumb } from "@/components/breadcrumb";

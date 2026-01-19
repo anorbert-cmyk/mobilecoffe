@@ -9,8 +9,7 @@ import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
 import { useMyEquipment } from '@/lib/equipment/my-equipment-provider';
-import { espressoMachines } from '@/data/machines';
-import { coffeeGrinders } from '@/data/machines';
+import { espressoMachines , coffeeGrinders } from '@/data/machines';
 
 type EquipmentType = 'machine' | 'grinder';
 type AddMode = 'select-type' | 'catalog' | 'custom';

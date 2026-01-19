@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ScrollView, Text, View, Pressable, StyleSheet, Modal } from "react-native";
+import { ScrollView, Text, View, Pressable, StyleSheet, Modal , Platform } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, Stack } from "expo-router";
 import * as Haptics from "expo-haptics";
-import { Platform } from "react-native";
 import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 
 import { ScreenContainer } from "@/components/screen-container";

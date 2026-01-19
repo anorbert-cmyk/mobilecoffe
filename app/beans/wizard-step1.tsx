@@ -41,7 +41,7 @@ export default function BeanWizardStep1() {
               Find Your Perfect Beans
             </Text>
             <Text className="text-base text-muted leading-relaxed">
-              Let's discover specialty coffee beans that match your taste. How do you prefer to choose your coffee?
+              Let&apos;s discover specialty coffee beans that match your taste. How do you prefer to choose your coffee?
             </Text>
           </View>
 
@@ -113,7 +113,7 @@ export default function BeanWizardStep1() {
           {/* Info */}
           <View className="mt-8 p-4 bg-primary/5 rounded-2xl">
             <Text className="text-sm text-muted text-center leading-relaxed">
-              💡 Don't worry, you can always browse all beans later
+              💡 Don&apos;t worry, you can always browse all beans later
             </Text>
           </View>
         </View>

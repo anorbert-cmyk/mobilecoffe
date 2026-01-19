@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, ScrollView, Pressable, StyleSheet, Dimensions , Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
-import Animated, { 
-  FadeIn, 
+import Animated, {
+  FadeIn,
   FadeInDown,
   useSharedValue,
   useAnimatedStyle,
@@ -40,7 +39,7 @@ function calculateMatchPercentage(
   purpose: any
 ): number {
   let score = 70; // Base score
-  
+
   // Budget match (30 points)
   const priceMatch = budgetRange && machine.priceRange.toLowerCase() === budgetRange.toLowerCase();
   if (priceMatch) score += 30;
@@ -50,7 +49,7 @@ function calculateMatchPercentage(
   ) === 1) {
     score += 15; // Close match
   }
-  
+
   return Math.min(score, 98); // Cap at 98%
 }
 
@@ -141,7 +140,7 @@ function PremiumRecommendationCard({
                 </Text>
               </View>
             </View>
-            
+
             {/* Save Button */}
             <FavoriteButton id={item.id} type={type === 'machine' ? 'machine' : 'grinder'} size={20} />
           </View>
@@ -160,14 +159,14 @@ function PremiumRecommendationCard({
               </Text>
             </View>
             <View style={[styles.matchBarBackground, { backgroundColor: colors.border }]}>
-              <View 
+              <View
                 style={[
-                  styles.matchBarFill, 
-                  { 
+                  styles.matchBarFill,
+                  {
                     backgroundColor: colors.primary,
                     width: `${matchPercentage}%`,
                   }
-                ]} 
+                ]}
               />
             </View>
             <Text style={[styles.matchReason, { color: colors.muted }]}>
@@ -287,21 +286,21 @@ export default function RecommendationsScreen() {
 
   return (
     <ScreenContainer>
-      <ScrollView 
+      <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
         <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
-          <Text 
+          <Text
             style={[styles.title, { color: colors.foreground }]}
             accessibilityRole="header"
           >
             Your Perfect Match
           </Text>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Based on your preferences, we've found the best equipment for you
+            Based on your preferences, we&apos;ve found the best equipment for you
           </Text>
         </Animated.View>
 
@@ -313,7 +312,7 @@ export default function RecommendationsScreen() {
               Espresso Machines
             </Text>
           </View>
-          
+
           {recommendations.machines.map((machine, index) => (
             <PremiumRecommendationCard
               key={machine.id}
@@ -337,7 +336,7 @@ export default function RecommendationsScreen() {
               Coffee Grinders
             </Text>
           </View>
-          
+
           {recommendations.grinders.map((grinder, index) => (
             <PremiumRecommendationCard
               key={grinder.id}
@@ -354,7 +353,7 @@ export default function RecommendationsScreen() {
         </View>
 
         {/* Bottom CTA */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(600).duration(400)}
           style={[styles.bottomCta, { backgroundColor: colors.surfaceElevated }]}
         >
@@ -404,7 +403,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  
+
   // Header
   header: {
     paddingHorizontal: 20,
@@ -488,7 +487,7 @@ const styles = StyleSheet.create({
   cardContent: {
     padding: 20,
   },
-  
+
   // Title Row
   titleRow: {
     flexDirection: 'row',

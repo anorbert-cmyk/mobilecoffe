@@ -1,9 +1,8 @@
-import { View, Text, Pressable, StyleSheet, Linking } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Linking , Platform } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
 
 import { ScreenContainer } from '@/components/screen-container';
 import { useColors } from '@/hooks/use-colors';
@@ -13,7 +12,7 @@ import { coffeeBeans } from '@/data/beans';
 export default function PurchaseConfirmationScreen() {
   const colors = useColors();
   const params = useLocalSearchParams<{ beanId: string; roaster: string; affiliateUrl: string }>();
-  
+
   const bean = coffeeBeans.find(b => b.id === params.beanId);
 
   const triggerHaptic = () => {
@@ -40,7 +39,7 @@ export default function PurchaseConfirmationScreen() {
     <ScreenContainer>
       <View style={styles.container}>
         {/* Success Animation */}
-        <Animated.View 
+        <Animated.View
           entering={ZoomIn.delay(200).duration(500)}
           style={[styles.successCircle, { backgroundColor: colors.success + '20' }]}
         >
@@ -52,13 +51,13 @@ export default function PurchaseConfirmationScreen() {
             Great Choice!
           </Text>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            You're about to visit {params.roaster || 'the roaster'}'s website
+            You&apos;re about to visit {params.roaster || 'the roaster'}&apos;s website
           </Text>
         </Animated.View>
 
         {/* Bean Preview */}
         {bean && (
-          <Animated.View 
+          <Animated.View
             entering={FadeInDown.delay(500).duration(400)}
             style={[styles.beanCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
           >
@@ -75,19 +74,19 @@ export default function PurchaseConfirmationScreen() {
         )}
 
         {/* Info Box */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(600).duration(400)}
           style={[styles.infoBox, { backgroundColor: colors.primary + '10', borderColor: colors.primary }]}
         >
           <IconSymbol name="info.circle.fill" size={20} color={colors.primary} />
           <Text style={[styles.infoText, { color: colors.foreground }]}>
-            You'll be redirected to the roaster's official website to complete your purchase. 
+            You&apos;ll be redirected to the roaster&apos;s official website to complete your purchase.
             Coffee Craft may earn a small commission at no extra cost to you.
           </Text>
         </Animated.View>
 
         {/* Action Buttons */}
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(700).duration(400)}
           style={styles.actions}
         >
@@ -116,7 +115,7 @@ export default function PurchaseConfirmationScreen() {
         </Animated.View>
 
         {/* Trust Badges */}
-        <Animated.View 
+        <Animated.View
           entering={FadeIn.delay(800).duration(400)}
           style={styles.trustBadges}
         >
