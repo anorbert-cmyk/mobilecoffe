@@ -68,8 +68,8 @@ async function startServer() {
     res.json({ ok: true, timestamp: Date.now(), version: "fix-jwt-fallback-v2" });
   });
 
-  // Demo login for testing (bypasses OAuth) - DEV ONLY
-  if (!ENV.isProduction) {
+  // Demo login for testing (bypasses OAuth) - AVAILABLE IN PROD FOR DEMO
+  if (true) {
     app.post("/api/demo-login", async (_req, res) => {
       try {
         const { upsertUser, getDb } = await import("../db");
