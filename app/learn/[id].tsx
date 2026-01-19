@@ -53,6 +53,51 @@ export default function LearnCategoryScreen() {
     },
   });
 
+  // Hooks must be called unconditionally (Rules of Hooks)
+  const heroAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: interpolate(
+            scrollY.value,
+            [-300, 0, 300],
+            [-150, 0, 150],
+            Extrapolation.CLAMP
+          ),
+        },
+        {
+          scale: interpolate(
+            scrollY.value,
+            [-300, 0],
+            [2, 1],
+            Extrapolation.CLAMP
+          ),
+        },
+      ],
+    };
+  });
+
+  const headerContentStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        scrollY.value,
+        [0, 200],
+        [1, 0],
+        Extrapolation.CLAMP
+      ),
+      transform: [
+        {
+          translateY: interpolate(
+            scrollY.value,
+            [0, 200],
+            [0, 50],
+            Extrapolation.CLAMP
+          ),
+        },
+      ],
+    };
+  });
+
   if (!category) {
     return (
       <ScreenContainer className="items-center justify-center">
@@ -63,50 +108,6 @@ export default function LearnCategoryScreen() {
 
   if (selectedArticle) {
     const heroImage = articleHeroImages[category.id] || require('@/assets/images/espresso.png');
-
-    const heroAnimatedStyle = useAnimatedStyle(() => {
-      return {
-        transform: [
-          {
-            translateY: interpolate(
-              scrollY.value,
-              [-300, 0, 300],
-              [-150, 0, 150],
-              Extrapolation.CLAMP
-            ),
-          },
-          {
-            scale: interpolate(
-              scrollY.value,
-              [-300, 0],
-              [2, 1],
-              Extrapolation.CLAMP
-            ),
-          },
-        ],
-      };
-    });
-
-    const headerContentStyle = useAnimatedStyle(() => {
-      return {
-        opacity: interpolate(
-          scrollY.value,
-          [0, 200],
-          [1, 0],
-          Extrapolation.CLAMP
-        ),
-        transform: [
-          {
-            translateY: interpolate(
-              scrollY.value,
-              [0, 200],
-              [0, 50],
-              Extrapolation.CLAMP
-            ),
-          },
-        ],
-      };
-    });
 
     return (
       <>
