@@ -11,9 +11,11 @@ export default function DashboardOverview() {
     const colors = useColors();
     const router = useRouter();
 
-    const { data: apiBusiness, isLoading } = trpc.business.getMine.useQuery();
+    const { data: apiBusiness, isLoading, refetch } = trpc.business.getMine.useQuery();
 
-    // Use API data if available, otherwise fall back to demo data
+    // Fix: If apiBusiness exists but lacks relations (old server), use it but check for missing fields or merge with demo if needed.
+    // Ideally for the dashboard main view, we just need basic info, but if we want to show stats, we need arrays.
+    // For now, let's allow apiBusiness to drive the main view, but if it's completely missing, use demo.
     const business = apiBusiness || demoBusiness;
     const isDemo = !apiBusiness;
 

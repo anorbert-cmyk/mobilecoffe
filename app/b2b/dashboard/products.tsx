@@ -15,8 +15,9 @@ export default function ProductsManager() {
     const router = useRouter();
 
     const { data: apiBusiness, refetch } = trpc.business.getMine.useQuery();
+    // Fix: apiBusiness exists but might miss 'products' on old server versions.
     const business = apiBusiness || demoBusiness;
-    const products = business?.products || [];
+    const products = apiBusiness?.products ?? demoBusiness.products ?? [];
 
     const deleteProduct = trpc.product.deleteProduct.useMutation({
         onSuccess: () => refetch()

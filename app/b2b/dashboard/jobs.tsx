@@ -14,8 +14,10 @@ export default function JobsManager() {
     const router = useRouter();
 
     const { data: apiBusiness, refetch } = trpc.business.getMine.useQuery();
+    // Fix: apiBusiness exists but might miss 'jobs' on old server versions.
+    // We define 'business' for the header/context, but use safe fallback for the list.
     const business = apiBusiness || demoBusiness;
-    const jobs = business?.jobs || [];
+    const jobs = apiBusiness?.jobs ?? demoBusiness.jobs ?? [];
 
     const deleteJob = trpc.job.delete.useMutation({
         onSuccess: () => refetch()

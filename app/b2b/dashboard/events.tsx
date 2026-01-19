@@ -15,8 +15,9 @@ export default function EventsManager() {
     const router = useRouter();
 
     const { data: apiBusiness, refetch } = trpc.business.getMine.useQuery();
+    // Fix: apiBusiness exists but might miss 'events' on old server versions.
     const business = apiBusiness || demoBusiness;
-    const events = business?.events || [];
+    const events = apiBusiness?.events ?? demoBusiness.events ?? [];
 
     const deleteEvent = trpc.event.delete.useMutation({
         onSuccess: () => {
