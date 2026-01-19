@@ -7,12 +7,14 @@ import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { PremiumButton } from '@/components/ui/premium-button';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { demoBusiness } from '@/data/demoBusiness';
 
 export default function JobsManager() {
     const colors = useColors();
     const router = useRouter();
 
-    const { data: business, refetch } = trpc.business.getMine.useQuery();
+    const { data: apiBusiness, refetch } = trpc.business.getMine.useQuery();
+    const business = apiBusiness || demoBusiness;
     const jobs = business?.jobs || [];
 
     const deleteJob = trpc.job.delete.useMutation({
@@ -84,7 +86,7 @@ export default function JobsManager() {
             </View>
 
             <FlatList
-                data={jobs}
+                data={jobs as any}
                 keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}

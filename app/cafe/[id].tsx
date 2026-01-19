@@ -49,12 +49,12 @@ export default function CafeDetailScreen() {
         phone: demoCafe.phone,
         website: demoCafe.website,
         headerImageUrls: [demoCafe.image],
-        openingHours: { week: demoCafe.openingHours },
+        openingHours: { week: demoCafe.openingHours?.monday || 'Varies' },
         products: [],
         events: [],
         jobs: [],
         subscriptions: [],
-        services: { wifi: demoCafe.features.includes('WiFi') },
+        services: { wifi: demoCafe.amenities?.wifi ?? false },
     } : undefined);
 
     const triggerHaptic = () => {

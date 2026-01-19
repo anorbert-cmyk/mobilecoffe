@@ -94,13 +94,16 @@ export default function FindCoffeeScreen() {
       latitude: 47.4979, // Hardcoded for now, ideally in address
       longitude: 19.0402,
       description: b.description || "",
-      openingHours: b.openingHours?.week || "9:00 - 17:00",
+      openingHours: { monday: "9:00 - 17:00", tuesday: "9:00 - 17:00", wednesday: "9:00 - 17:00", thursday: "9:00 - 17:00", friday: "9:00 - 17:00", saturday: "10:00 - 16:00", sunday: "Closed" },
       phone: b.phone || undefined,
       website: b.website || undefined,
       isPromoted: b.subscriptions?.some((s: any) => s.plan === 'premium'),
-      neighborhood: b.address?.city || "Budapest", // Added missing field
-      isOpen: true, // Mock open status
-      features: b.services || ["Wifi", "Specialty Coffee"], // Added missing field
+      neighborhood: b.address?.city || "Budapest",
+      isOpen: true,
+      amenities: { wifi: true, dogFriendly: false, cardPayment: true, terrace: false, brunch: false, laptopFriendly: true, wheelchairAccessible: false, parking: false, reservations: false, takeaway: true, delivery: false, oatMilk: true, specialty: true },
+      menu: [],
+      events: [],
+      jobs: [],
     }));
 
     // Merge with demo cafes

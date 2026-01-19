@@ -20,7 +20,7 @@ describe('Cafe Data', () => {
       expect(cafe.address).toBeDefined();
       expect(typeof cafe.latitude).toBe('number');
       expect(typeof cafe.longitude).toBe('number');
-      expect(Array.isArray(cafe.features)).toBe(true);
+      expect(typeof cafe.amenities).toBe('object');
     });
   });
 
@@ -28,7 +28,7 @@ describe('Cafe Data', () => {
     const cafe = getCafeById('espresso-embassy');
     expect(cafe).toBeDefined();
     expect(cafe?.name).toBe('Espresso Embassy');
-    
+
     const nonExistent = getCafeById('non-existent');
     expect(nonExistent).toBeUndefined();
   });
@@ -50,12 +50,12 @@ describe('Cafe Data', () => {
   it('should sort cafes by distance', () => {
     const userLat = 47.4979;
     const userLon = 19.0402;
-    
+
     const sorted = sortCafesByDistance(demoCafes, userLat, userLon);
-    
+
     expect(sorted.length).toBe(demoCafes.length);
     expect(sorted[0].distance).toBeDefined();
-    
+
     // Verify sorting order
     for (let i = 1; i < sorted.length; i++) {
       expect(sorted[i].distance).toBeGreaterThanOrEqual(sorted[i - 1].distance);
@@ -85,7 +85,7 @@ describe('Learning Data', () => {
       expect(category.emoji).toBeDefined();
       expect(Array.isArray(category.articles)).toBe(true);
       expect(category.articles.length).toBeGreaterThan(0);
-      
+
       // Check articles
       category.articles.forEach((article) => {
         expect(article.id).toBeDefined();
@@ -100,7 +100,7 @@ describe('Learning Data', () => {
     const category = getCategoryById('brewing-basics');
     expect(category).toBeDefined();
     expect(category?.title).toBe('Brewing Basics');
-    
+
     const nonExistent = getCategoryById('non-existent');
     expect(nonExistent).toBeUndefined();
   });
@@ -109,7 +109,7 @@ describe('Learning Data', () => {
     const article = getArticleById('brewing-basics', 'what-is-specialty-coffee');
     expect(article).toBeDefined();
     expect(article?.title).toBe('What is Specialty Coffee?');
-    
+
     const nonExistent = getArticleById('brewing-basics', 'non-existent');
     expect(nonExistent).toBeUndefined();
   });

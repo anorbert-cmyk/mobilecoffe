@@ -8,12 +8,14 @@ import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { PremiumButton } from '@/components/ui/premium-button';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { demoBusiness } from '@/data/demoBusiness';
 
 export default function EventsManager() {
     const colors = useColors();
     const router = useRouter();
 
-    const { data: business, refetch } = trpc.business.getMine.useQuery();
+    const { data: apiBusiness, refetch } = trpc.business.getMine.useQuery();
+    const business = apiBusiness || demoBusiness;
     const events = business?.events || [];
 
     const deleteEvent = trpc.event.delete.useMutation({
@@ -67,7 +69,7 @@ export default function EventsManager() {
             </View>
 
             <FlatList
-                data={events}
+                data={events as any}
                 keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}

@@ -5,28 +5,22 @@ import { trpc } from '@/lib/trpc';
 import { PremiumButton } from '@/components/ui/premium-button';
 import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { demoBusiness } from '@/data/demoBusiness';
 
 export default function DashboardOverview() {
     const colors = useColors();
     const router = useRouter();
 
-    const { data: business, isLoading } = trpc.business.getMine.useQuery();
+    const { data: apiBusiness, isLoading } = trpc.business.getMine.useQuery();
+
+    // Use API data if available, otherwise fall back to demo data
+    const business = apiBusiness || demoBusiness;
+    const isDemo = !apiBusiness;
 
     if (isLoading) return (
         <ScreenContainer>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Text style={{ color: colors.foreground }}>Loading...</Text>
-            </View>
-        </ScreenContainer>
-    );
-
-    if (!business) return (
-        <ScreenContainer>
-            <View style={{ padding: 20, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ fontSize: 18, marginBottom: 16, color: colors.foreground }}>No business profile found.</Text>
-                <PremiumButton onPress={() => router.push('/b2b/register')}>
-                    Create Business Profile
-                </PremiumButton>
             </View>
         </ScreenContainer>
     );
