@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { ScrollView, Text, View, Pressable, StyleSheet, Dimensions , Platform } from "react-native";
+import { ScrollView, Text, View, Pressable, StyleSheet, Dimensions, Platform } from "react-native";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  interpolate,
+  Extrapolation
+} from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
 import { ScreenContainer } from "@/components/screen-container";
@@ -35,8 +43,15 @@ export default function LearnCategoryScreen() {
   const router = useRouter();
   const colors = useColors();
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const scrollY = useSharedValue(0);
 
   const category = getCategoryById(id);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
 
   if (!category) {
     return (
@@ -48,7 +63,51 @@ export default function LearnCategoryScreen() {
 
   if (selectedArticle) {
     const heroImage = articleHeroImages[category.id] || require('@/assets/images/espresso.png');
-    
+
+    const heroAnimatedStyle = useAnimatedStyle(() => {
+      return {
+        transform: [
+          {
+            translateY: interpolate(
+              scrollY.value,
+              [-300, 0, 300],
+              [-150, 0, 150],
+              Extrapolation.CLAMP
+            ),
+          },
+          {
+            scale: interpolate(
+              scrollY.value,
+              [-300, 0],
+              [2, 1],
+              Extrapolation.CLAMP
+            ),
+          },
+        ],
+      };
+    });
+
+    const headerContentStyle = useAnimatedStyle(() => {
+      return {
+        opacity: interpolate(
+          scrollY.value,
+          [0, 200],
+          [1, 0],
+          Extrapolation.CLAMP
+        ),
+        transform: [
+          {
+            translateY: interpolate(
+              scrollY.value,
+              [0, 200],
+              [0, 50],
+              Extrapolation.CLAMP
+            ),
+          },
+        ],
+      };
+    });
+
     return (
       <>
         <Stack.Screen
@@ -56,211 +115,159 @@ export default function LearnCategoryScreen() {
             headerShown: false,
           }}
         />
-        <ScrollView 
-          style={{ flex: 1, backgroundColor: colors.background }}
-          contentContainerStyle={styles.articleContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <Breadcrumb items={[
-            { label: 'Home', href: '/' },
-            { label: 'Learn', href: '/learn' },
-            { label: selectedArticle.title }
-          ]} />
-          {/* Hero Section */}
-          <View style={[styles.heroSection, { backgroundColor: colors.surface }]}>
-            <Image
-              source={heroImage}
-              style={styles.heroImage}
-              contentFit="cover"
-              contentPosition="center"
-              transition={300}
-            />
-            <LinearGradient
-              colors={['transparent', colors.background]}
-              style={styles.heroGradient}
-            />
-            
-            {/* Back Button */}
-            <Pressable
-              onPress={() => {
-                triggerHaptic();
-                setSelectedArticle(null);
-              }}
-              style={[styles.floatingBackButton, { backgroundColor: `${colors.background}CC` }]}
-              accessibilityRole="button"
-              accessibilityLabel="Go back"
-            >
-              <IconSymbol name="arrow.left" size={20} color={colors.foreground} />
-            </Pressable>
-          </View>
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
+          {/* Fixed Back Button */}
+          <Pressable
+            onPress={() => {
+              triggerHaptic();
+              setSelectedArticle(null);
+            }}
+            style={[styles.floatingBackButton, { backgroundColor: 'rgba(0,0,0,0.3)' }]}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <IconSymbol name="arrow.left" size={24} color="#FFF" />
+          </Pressable>
 
-          {/* Article Content */}
-          <Animated.View entering={FadeIn.duration(400)} style={styles.content}>
-            {/* Category Badge */}
-            <View style={[styles.categoryBadge, { backgroundColor: `${colors.primary}15` }]}>
-              <Text style={[styles.categoryBadgeText, { color: colors.primary }]}>
-                {category.title}
-              </Text>
+          <Animated.ScrollView
+            onScroll={scrollHandler}
+            scrollEventThrottle={16}
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.articleScrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Parallax Hero */}
+            <View style={styles.heroContainer}>
+              <Animated.View style={[styles.heroImageContainer, heroAnimatedStyle]}>
+                <Image
+                  source={heroImage}
+                  style={styles.heroImage}
+                  contentFit="cover"
+                />
+                <LinearGradient
+                  colors={['transparent', 'rgba(0,0,0,0.6)']}
+                  style={styles.heroOverlay}
+                />
+              </Animated.View>
+
+              <Animated.View style={[styles.heroTextContainer, headerContentStyle]}>
+                <View style={[styles.categoryBadge, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.categoryBadgeText}>
+                    {category.title}
+                  </Text>
+                </View>
+                <Text style={styles.heroTitle}>{selectedArticle.title}</Text>
+                <View style={styles.heroMeta}>
+                  <IconSymbol name="clock.fill" size={14} color="rgba(255,255,255,0.8)" />
+                  <Text style={styles.heroMetaText}>{selectedArticle.readTime || '5 min read'}</Text>
+                </View>
+              </Animated.View>
             </View>
 
-            {/* Title */}
-            <Text style={[styles.articleTitle, { color: colors.foreground }]}>
-              {selectedArticle.title}
-            </Text>
+            {/* Content Body */}
+            <View style={[styles.contentBody, { backgroundColor: colors.background }]}>
+              {/* Render article content */}
+              {selectedArticle.content.split('\n\n').map((paragraph, index) => {
+                // Headers
+                if (paragraph.startsWith('# ')) {
+                  return (
+                    <Animated.Text key={index} entering={FadeInDown.delay(100).duration(500)} style={[styles.h1, { color: colors.foreground }]}>
+                      {paragraph.replace('# ', '')}
+                    </Animated.Text>
+                  );
+                }
+                if (paragraph.startsWith('## ')) {
+                  return (
+                    <Animated.Text key={index} entering={FadeInDown.delay(100).duration(500)} style={[styles.h2, { color: colors.foreground }]}>
+                      {paragraph.replace('## ', '')}
+                    </Animated.Text>
+                  );
+                }
+                if (paragraph.startsWith('### ')) {
+                  return (
+                    <Animated.Text key={index} entering={FadeInDown.delay(100).duration(500)} style={[styles.h3, { color: colors.foreground }]}>
+                      {paragraph.replace('### ', '')}
+                    </Animated.Text>
+                  );
+                }
 
-            {/* Meta Info */}
-            <View style={styles.metaInfo}>
-              <View style={styles.metaItem}>
-                <IconSymbol name="clock.fill" size={16} color={colors.muted} />
-                <Text style={[styles.metaText, { color: colors.muted }]}>
-                  {selectedArticle.readTime || '5 min read'}
-                </Text>
-              </View>
-              <View style={styles.metaDivider} />
-              <View style={styles.metaItem}>
-                <IconSymbol name="book.fill" size={16} color={colors.muted} />
-                <Text style={[styles.metaText, { color: colors.muted }]}>
-                  {category.title}
-                </Text>
-              </View>
-            </View>
+                // Pull Quotes
+                if (paragraph.startsWith('> ')) {
+                  return (
+                    <Animated.View
+                      key={index}
+                      entering={FadeInDown.delay(200).duration(600)}
+                      style={[styles.pullQuote, { borderColor: colors.primary }]}
+                    >
+                      <IconSymbol name="quote.opening" size={32} color={colors.primary} style={{ opacity: 0.2, marginBottom: 8 }} />
+                      <Text style={[styles.pullQuoteText, { color: colors.foreground }]}>
+                        {paragraph.replace('> ', '')}
+                      </Text>
+                    </Animated.View>
+                  );
+                }
 
-            {/* Render markdown-like content */}
-            {selectedArticle.content.split('\n\n').map((paragraph, index) => {
-              // Handle headers
-              if (paragraph.startsWith('# ')) {
-                return (
-                  <Animated.Text 
-                    key={index} 
-                    entering={FadeInDown.delay(index * 50).duration(400)}
-                    style={[styles.h1, { color: colors.foreground }]}
-                  >
-                    {paragraph.replace('# ', '')}
-                  </Animated.Text>
-                );
-              }
-              if (paragraph.startsWith('## ')) {
-                return (
-                  <Animated.Text 
-                    key={index} 
-                    entering={FadeInDown.delay(index * 50).duration(400)}
-                    style={[styles.h2, { color: colors.foreground }]}
-                  >
-                    {paragraph.replace('## ', '')}
-                  </Animated.Text>
-                );
-              }
-              if (paragraph.startsWith('### ')) {
-                return (
-                  <Animated.Text 
-                    key={index} 
-                    entering={FadeInDown.delay(index * 50).duration(400)}
-                    style={[styles.h3, { color: colors.foreground }]}
-                  >
-                    {paragraph.replace('### ', '')}
-                  </Animated.Text>
-                );
-              }
-              
-              // Handle pull quotes (> prefix)
-              if (paragraph.startsWith('> ')) {
-                return (
-                  <Animated.View 
-                    key={index} 
-                    entering={FadeInDown.delay(index * 50).duration(400)}
-                    style={[styles.pullQuote, { 
-                      backgroundColor: `${colors.primary}10`,
-                      borderLeftColor: colors.primary,
-                    }]}
-                  >
-                    <IconSymbol name="quote.opening" size={24} color={colors.primary} style={styles.quoteIcon} />
-                    <Text style={[styles.pullQuoteText, { color: colors.foreground }]}>
-                      {paragraph.replace('> ', '')}
-                    </Text>
-                  </Animated.View>
-                );
-              }
+                // Pro Tips
+                if (paragraph.startsWith('! ')) {
+                  return (
+                    <Animated.View
+                      key={index}
+                      entering={FadeInDown.delay(200).duration(600)}
+                      style={[styles.tipBox, { backgroundColor: `${colors.warning}10`, borderColor: `${colors.warning}30` }]}
+                    >
+                      <View style={styles.tipHeader}>
+                        <IconSymbol name="lightbulb.fill" size={20} color={colors.warning} />
+                        <Text style={[styles.tipTitle, { color: colors.warning }]}>Pro Tip</Text>
+                      </View>
+                      <Text style={[styles.tipText, { color: colors.foreground }]}>
+                        {paragraph.replace('! ', '')}
+                      </Text>
+                    </Animated.View>
+                  );
+                }
 
-              // Handle tip boxes (! prefix)
-              if (paragraph.startsWith('! ')) {
-                return (
-                  <Animated.View 
-                    key={index} 
-                    entering={FadeInDown.delay(index * 50).duration(400)}
-                    style={[styles.tipBox, { 
-                      backgroundColor: `${colors.warning}15`,
-                      borderColor: colors.warning,
-                    }]}
-                  >
-                    <View style={styles.tipHeader}>
-                      <IconSymbol name="lightbulb.fill" size={20} color={colors.warning} />
-                      <Text style={[styles.tipTitle, { color: colors.warning }]}>Pro Tip</Text>
+                // Lists
+                if (paragraph.includes('\n- ')) {
+                  const lines = paragraph.split('\n');
+                  return (
+                    <View key={index} style={styles.listContainer}>
+                      {lines.map((line, i) => {
+                        if (line.startsWith('- ')) {
+                          return (
+                            <View key={i} style={styles.listItem}>
+                              <View style={[styles.bullet, { backgroundColor: colors.primary }]} />
+                              <Text style={[styles.listText, { color: colors.foreground }]}>
+                                {line.replace('- ', '').replace(/\*\*(.*?)\*\*/g, '$1')}
+                              </Text>
+                            </View>
+                          );
+                        }
+                        return <Text key={i} style={[styles.paragraph, { color: colors.foreground }]}>{line}</Text>;
+                      })}
                     </View>
-                    <Text style={[styles.tipText, { color: colors.foreground }]}>
-                      {paragraph.replace('! ', '')}
-                    </Text>
-                  </Animated.View>
-                );
-              }
-              
-              // Handle lists
-              if (paragraph.includes('\n- ')) {
-                const lines = paragraph.split('\n');
-                return (
-                  <Animated.View 
-                    key={index} 
-                    entering={FadeInDown.delay(index * 50).duration(400)}
-                    style={styles.listContainer}
-                  >
-                    {lines.map((line, lineIndex) => {
-                      if (line.startsWith('- ')) {
-                        return (
-                          <View key={lineIndex} style={styles.listItem}>
-                            <View style={[styles.bulletPoint, { backgroundColor: colors.primary }]} />
-                            <Text style={[styles.listText, { color: colors.foreground }]}>
-                              {line.replace('- ', '').replace(/\*\*(.*?)\*\*/g, '$1')}
-                            </Text>
-                          </View>
-                        );
-                      }
-                      if (line.trim()) {
-                        return (
-                          <Text key={lineIndex} style={[styles.paragraph, { color: colors.foreground }]}>
-                            {line.replace(/\*\*(.*?)\*\*/g, '$1')}
-                          </Text>
-                        );
-                      }
-                      return null;
-                    })}
-                  </Animated.View>
-                );
-              }
-              
-              // Regular paragraphs
-              if (paragraph.trim()) {
-                return (
-                  <Animated.Text 
-                    key={index} 
-                    entering={FadeInDown.delay(index * 50).duration(400)}
-                    style={[styles.paragraph, { color: colors.foreground }]}
-                  >
-                    {paragraph.replace(/\*\*(.*?)\*\*/g, '$1')}
-                  </Animated.Text>
-                );
-              }
-              
-              return null;
-            })}
+                  );
+                }
 
-            {/* Bottom Spacing */}
-            <View style={{ height: 100 }} />
-          </Animated.View>
-        </ScrollView>
+                // Paragraphs
+                if (paragraph.trim()) {
+                  return (
+                    <Text key={index} style={[styles.paragraph, { color: colors.foreground, opacity: 0.9 }]}>
+                      {paragraph.replace(/\*\*(.*?)\*\*/g, '$1')}
+                    </Text>
+                  );
+                }
+                return null;
+              })}
+
+              <View style={{ height: 100 }} />
+            </View>
+          </Animated.ScrollView>
+        </View>
       </>
     );
   }
 
-  // Category list view
+  // Category list view (unchanged but cleaned up styles)
   return (
     <>
       <Stack.Screen
@@ -274,14 +281,14 @@ export default function LearnCategoryScreen() {
         }}
       />
       <ScreenContainer>
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         >
           <Text style={[styles.categoryDescription, { color: colors.muted }]}>
             {category.description}
           </Text>
-          
+
           {category.articles.map((article, index) => (
             <Animated.View key={article.id} entering={FadeInDown.delay(index * 100).duration(400)}>
               <Pressable
@@ -291,13 +298,11 @@ export default function LearnCategoryScreen() {
                 }}
                 style={({ pressed }) => [
                   styles.articleCard,
-                  { 
+                  {
                     backgroundColor: colors.surface,
-                    opacity: pressed ? 0.7 : 1,
+                    transform: [{ scale: pressed ? 0.98 : 1 }],
                   }
                 ]}
-                accessibilityRole="button"
-                accessibilityLabel={`Read ${article.title}`}
               >
                 <View style={styles.articleCardContent}>
                   <View style={styles.articleCardHeader}>
@@ -324,205 +329,132 @@ export default function LearnCategoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  // Article View
-  articleContainer: {
-    flexGrow: 1,
-  },
-  heroSection: {
+  // Hero
+  heroContainer: {
+    height: 400,
     width: '100%',
-    height: 280,
-    position: 'relative',
     overflow: 'hidden',
+    position: 'relative',
+    justifyContent: 'flex-end',
+  },
+  heroImageContainer: {
+    ...StyleSheet.absoluteFillObject,
   },
   heroImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
   },
-  heroGradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '60%',
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  heroTextContainer: {
+    padding: 24,
+    paddingBottom: 40,
+  },
+  heroTitle: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#FFF',
+    letterSpacing: -0.5,
+    marginBottom: 12,
+    lineHeight: 42,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  heroMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  heroMetaText: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  categoryBadge: {
+    backgroundColor: '#000',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 16,
+  },
+  categoryBadgeText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
   },
   floatingBackButton: {
     position: 'absolute',
     top: 60,
     left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    zIndex: 100,
   },
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+
+  // Content Body
+  contentBody: {
+    flex: 1,
+    marginTop: -24,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    padding: 24,
+    minHeight: 500,
   },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginBottom: 16,
+  articleScrollContent: {
+    flexGrow: 1,
   },
-  categoryBadgeText: {
-    fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  articleTitle: {
-    fontSize: 32,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-    lineHeight: 40,
-    marginBottom: 16,
-  },
-  metaInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 32,
-    paddingBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.05)',
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  metaDivider: {
-    width: 1,
-    height: 16,
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    marginHorizontal: 12,
-  },
-  metaText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  
+
   // Typography
-  h1: {
-    fontSize: 28,
-    fontWeight: '700',
-    letterSpacing: -0.4,
-    lineHeight: 36,
-    marginTop: 32,
-    marginBottom: 16,
-  },
-  h2: {
-    fontSize: 24,
-    fontWeight: '700',
-    letterSpacing: -0.3,
-    lineHeight: 32,
-    marginTop: 28,
-    marginBottom: 14,
-  },
-  h3: {
-    fontSize: 20,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-    lineHeight: 28,
-    marginTop: 24,
-    marginBottom: 12,
-  },
-  paragraph: {
-    fontSize: 17,
-    lineHeight: 28,
-    marginBottom: 20,
-  },
-  
-  // Pull Quote
+  h1: { fontSize: 28, fontWeight: '800', marginBottom: 16, marginTop: 32 },
+  h2: { fontSize: 24, fontWeight: '700', marginBottom: 16, marginTop: 32 },
+  h3: { fontSize: 20, fontWeight: '700', marginBottom: 12, marginTop: 24 },
+  paragraph: { fontSize: 18, lineHeight: 30, marginBottom: 20, letterSpacing: 0.1 },
+
+  // Components
   pullQuote: {
-    paddingLeft: 20,
-    paddingRight: 20,
-    paddingTop: 24,
-    paddingBottom: 24,
-    borderLeftWidth: 4,
-    borderRadius: 8,
-    marginVertical: 24,
-    position: 'relative',
-  },
-  quoteIcon: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
-    opacity: 0.3,
+    marginVertical: 32,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    borderLeftWidth: 0, // Override default
   },
   pullQuoteText: {
-    fontSize: 20,
-    lineHeight: 32,
-    fontWeight: '600',
+    fontSize: 22,
+    lineHeight: 34,
+    fontWeight: '500',
     fontStyle: 'italic',
+    textAlign: 'center',
   },
-
-  // Tip Box
   tipBox: {
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
-    marginVertical: 20,
+    marginVertical: 24,
   },
-  tipHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
-  },
-  tipTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  tipText: {
-    fontSize: 16,
-    lineHeight: 24,
-  },
-  
-  // Lists
-  listContainer: {
-    marginBottom: 20,
-  },
-  listItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  bulletPoint: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginTop: 10,
-    marginRight: 12,
-  },
-  listText: {
-    flex: 1,
-    fontSize: 17,
-    lineHeight: 28,
-  },
+  tipHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
+  tipTitle: { fontSize: 16, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
+  tipText: { fontSize: 16, lineHeight: 26 },
 
-  // Category List View
-  listContent: {
-    padding: 20,
-  },
-  categoryDescription: {
-    fontSize: 16,
-    lineHeight: 24,
-    marginBottom: 24,
-  },
+  // Lists
+  listContainer: { marginBottom: 24 },
+  listItem: { flexDirection: 'row', gap: 12, marginBottom: 12 },
+  bullet: { width: 6, height: 6, borderRadius: 3, marginTop: 12 },
+  listText: { flex: 1, fontSize: 18, lineHeight: 30 },
+
+  // Category List
+  listContent: { padding: 20 },
+  categoryDescription: { fontSize: 16, lineHeight: 24, marginBottom: 24 },
   articleCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     padding: 20,
-    borderRadius: 16,
+    borderRadius: 20,
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -530,30 +462,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  articleCardContent: {
-    flex: 1,
-    marginRight: 12,
-  },
-  articleCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  articleCardTitle: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: '700',
-    lineHeight: 24,
-    marginRight: 8,
-  },
-  articleCardMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  articleCardMetaText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
+  articleCardContent: { flex: 1, marginRight: 12 },
+  articleCardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
+  articleCardTitle: { flex: 1, fontSize: 18, fontWeight: '700', marginRight: 8 },
+  articleCardMeta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  articleCardMetaText: { fontSize: 14, fontWeight: '500' },
 });

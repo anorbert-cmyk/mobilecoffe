@@ -1,9 +1,18 @@
-import { useState, useMemo } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Linking , Platform } from 'react-native';
+import { useState, useMemo, useEffect } from 'react';
+import { View, Text, Pressable, ScrollView, StyleSheet, Linking, Platform, Dimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  withSpring,
+  Layout
+} from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -16,6 +25,8 @@ import {
   BeanMatch
 } from '@/lib/bean-matcher/bean-matcher';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 type FlavorPreference = 'chocolate-nutty' | 'fruity-bright' | 'balanced' | 'bold-strong';
 
 interface FlavorOption {
@@ -23,13 +34,38 @@ interface FlavorOption {
   name: string;
   description: string;
   icon: string;
+  gradient: [string, string];
 }
 
 const FLAVOR_OPTIONS: FlavorOption[] = [
-  { id: 'chocolate-nutty', name: 'Chocolate & Nutty', description: 'Rich, comforting, classic', icon: '🍫' },
-  { id: 'fruity-bright', name: 'Fruity & Bright', description: 'Vibrant, complex, exciting', icon: '🍓' },
-  { id: 'balanced', name: 'Balanced', description: 'Smooth, versatile, easy-drinking', icon: '⚖️' },
-  { id: 'bold-strong', name: 'Bold & Strong', description: 'Intense, full-bodied, powerful', icon: '💪' },
+  {
+    id: 'chocolate-nutty',
+    name: 'Chocolate & Nutty',
+    description: 'Rich, comforting, classic profile',
+    icon: '🍫',
+    gradient: ['#78350F', '#451A03']
+  },
+  {
+    id: 'fruity-bright',
+    name: 'Fruity & Bright',
+    description: 'Vibrant, complex, exciting acidity',
+    icon: '🍓',
+    gradient: ['#EC4899', '#BE185D']
+  },
+  {
+    id: 'balanced',
+    name: 'Balanced',
+    description: 'Smooth, versatile, easy-drinking',
+    icon: '⚖️',
+    gradient: ['#10B981', '#047857']
+  },
+  {
+    id: 'bold-strong',
+    name: 'Bold & Strong',
+    description: 'Intense, full-bodied, powerful kick',
+    icon: '💪',
+    gradient: ['#1F2937', '#000000']
+  },
 ];
 
 export default function BeanMatcherStep3() {
@@ -43,6 +79,11 @@ export default function BeanMatcherStep3() {
 
   const [selectedFlavor, setSelectedFlavor] = useState<FlavorPreference | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const progress = useSharedValue(0.66);
+
+  useEffect(() => {
+    progress.value = withTiming(1, { duration: 1000 });
+  }, []);
 
   const triggerHaptic = () => {
     if (Platform.OS !== 'web') {
@@ -128,6 +169,10 @@ export default function BeanMatcherStep3() {
     Linking.openURL(affiliateUrl);
   };
 
+  const progressBarAnimatedStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
+
   if (showResults) {
     return (
       <ScreenContainer>
@@ -137,49 +182,61 @@ export default function BeanMatcherStep3() {
           </Pressable>
           <View style={styles.headerCenter}>
             <Text style={[styles.title, { color: colors.foreground }]}>Your Matches</Text>
-            <Text style={[styles.subtitle, { color: colors.muted }]}>Based on your equipment</Text>
+            <Text style={[styles.subtitle, { color: colors.muted }]}>Curated just for you</Text>
           </View>
           <View style={styles.placeholder} />
         </View>
 
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={styles.resultsContent} showsVerticalScrollIndicator={false}>
           {/* Equipment Summary */}
           <Animated.View
             entering={FadeIn.duration(400)}
-            style={[styles.summaryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            style={[styles.summaryCard, { backgroundColor: colors.surface + '80', borderColor: colors.border }]}
           >
-            <Text style={[styles.summaryTitle, { color: colors.foreground }]}>Your Setup</Text>
-            <View style={styles.summaryRow}>
-              <Text style={[styles.summaryLabel, { color: colors.muted }]}>Brewing:</Text>
-              <Text style={[styles.summaryValue, { color: colors.foreground }]}>
-                {machine?.name || params.method?.replace('-', ' ') || 'Espresso Machine'}
-              </Text>
+            <View style={styles.summaryHeader}>
+              <IconSymbol name="slider.horizontal.3" size={20} color={colors.primary} />
+              <Text style={[styles.summaryTitle, { color: colors.foreground }]}>Your Configuration</Text>
             </View>
-            {grinder && (
-              <View style={styles.summaryRow}>
-                <Text style={[styles.summaryLabel, { color: colors.muted }]}>Grinder:</Text>
-                <Text style={[styles.summaryValue, { color: colors.foreground }]}>{grinder.name}</Text>
+            <View style={styles.summaryGrid}>
+              <View style={styles.summaryItem}>
+                <Text style={[styles.summaryLabel, { color: colors.muted }]}>Method</Text>
+                <Text style={[styles.summaryValue, { color: colors.foreground }]}>
+                  {machine?.name || params.method?.replace('-', ' ') || 'Espresso Machine'}
+                </Text>
               </View>
-            )}
-            <View style={styles.summaryRow}>
-              <Text style={[styles.summaryLabel, { color: colors.muted }]}>Preference:</Text>
-              <Text style={[styles.summaryValue, { color: colors.foreground }]}>
-                {FLAVOR_OPTIONS.find(f => f.id === selectedFlavor)?.name || 'Any'}
-              </Text>
+              {grinder && (
+                <View style={styles.summaryItem}>
+                  <Text style={[styles.summaryLabel, { color: colors.muted }]}>Grinder</Text>
+                  <Text style={[styles.summaryValue, { color: colors.foreground }]}>{grinder.name}</Text>
+                </View>
+              )}
+              <View style={styles.summaryItem}>
+                <Text style={[styles.summaryLabel, { color: colors.muted }]}>Profile</Text>
+                <Text style={[styles.summaryValue, { color: colors.foreground }]}>
+                  {FLAVOR_OPTIONS.find(f => f.id === selectedFlavor)?.name || 'Any'}
+                </Text>
+              </View>
             </View>
           </Animated.View>
 
           {/* Recommendations */}
-          <Text style={[styles.resultsTitle, { color: colors.foreground }]}>
-            Top {recommendations.length} Recommendations
+          <Text style={[styles.resultsSectionTitle, { color: colors.foreground }]}>
+            Top Recommendations
           </Text>
 
           {recommendations.map((match, index) => (
             <Animated.View
               key={match.bean.id}
-              entering={FadeInDown.delay(index * 100).duration(400)}
+              entering={FadeInDown.delay(index * 150).duration(600)}
+              style={styles.resultItemContainer}
             >
               <View style={[styles.beanCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                {index === 0 && (
+                  <View style={[styles.badgeContainer, { backgroundColor: colors.primary }]}>
+                    <Text style={styles.badgeText}>BEST MATCH</Text>
+                  </View>
+                )}
+
                 <View style={styles.beanHeader}>
                   <Image
                     source={match.bean.image}
@@ -187,34 +244,33 @@ export default function BeanMatcherStep3() {
                     contentFit="cover"
                   />
                   <View style={styles.beanInfo}>
-                    <View style={styles.matchBadge}>
-                      <Text style={[styles.matchScore, { color: colors.primary }]}>
-                        {match.matchScore}% Match
-                      </Text>
-                    </View>
-                    <Text style={[styles.beanName, { color: colors.foreground }]}>
-                      {match.bean.name}
-                    </Text>
                     <Text style={[styles.beanRoaster, { color: colors.muted }]}>
                       {match.bean.roaster}
                     </Text>
-                    <Text style={[styles.beanPrice, { color: colors.primary }]}>
-                      ${match.bean.price.toFixed(2)} / {match.bean.weight}g
+                    <Text style={[styles.beanName, { color: colors.foreground }]}>
+                      {match.bean.name}
                     </Text>
+
+                    <View style={styles.matchScoreContainer}>
+                      <View style={[styles.scoreCircle, { borderColor: colors.primary }]}>
+                        <Text style={[styles.scoreText, { color: colors.primary }]}>{match.matchScore}</Text>
+                      </View>
+                      <Text style={[styles.scoreLabel, { color: colors.primary }]}>Match Score</Text>
+                    </View>
                   </View>
                 </View>
 
                 <View style={styles.flavorNotes}>
                   {match.bean.flavorNotes.slice(0, 3).map((note, i) => (
-                    <View key={i} style={[styles.flavorTag, { backgroundColor: colors.primary + '15' }]}>
-                      <Text style={[styles.flavorTagText, { color: colors.primary }]}>{note}</Text>
+                    <View key={i} style={[styles.flavorTag, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                      <Text style={[styles.flavorTagText, { color: colors.foreground }]}>{note}</Text>
                     </View>
                   ))}
                 </View>
 
                 {match.matchReasons.length > 0 && (
-                  <View style={styles.reasonsSection}>
-                    <Text style={[styles.reasonsTitle, { color: colors.foreground }]}>Why it&apos;s a match:</Text>
+                  <View style={[styles.reasonsSection, { backgroundColor: colors.background + '80' }]}>
+                    <Text style={[styles.reasonsTitle, { color: colors.foreground }]}>Why it works:</Text>
                     {match.matchReasons.slice(0, 2).map((reason, i) => (
                       <View key={i} style={styles.reasonRow}>
                         <IconSymbol name="checkmark.circle.fill" size={16} color={colors.success} />
@@ -224,30 +280,36 @@ export default function BeanMatcherStep3() {
                   </View>
                 )}
 
-                {match.brewTips.length > 0 && (
-                  <View style={[styles.tipsSection, { backgroundColor: colors.warning + '10' }]}>
-                    <Text style={[styles.tipsTitle, { color: colors.warning }]}>💡 Brew Tips</Text>
-                    {match.brewTips.slice(0, 2).map((tip, i) => (
-                      <Text key={i} style={[styles.tipText, { color: colors.muted }]}>• {tip}</Text>
-                    ))}
+                <View style={styles.cardFooter}>
+                  <View>
+                    <Text style={[styles.priceLabel, { color: colors.muted }]}>Price</Text>
+                    <Text style={[styles.beanPrice, { color: colors.foreground }]}>
+                      ${match.bean.price.toFixed(2)}
+                    </Text>
                   </View>
-                )}
 
-                <Pressable
-                  onPress={() => handleBuyBean(match.bean.affiliateUrl)}
-                  style={({ pressed }) => [
-                    styles.buyButton,
-                    { backgroundColor: colors.primary, opacity: pressed ? 0.9 : 1 }
-                  ]}
-                >
-                  <Text style={styles.buyButtonText}>Buy from {match.bean.roaster}</Text>
-                  <IconSymbol name="arrow.up.right" size={16} color="#FFF" />
-                </Pressable>
+                  <Pressable
+                    onPress={() => handleBuyBean(match.bean.affiliateUrl)}
+                    style={({ pressed }) => [
+                      styles.buyButton,
+                      { backgroundColor: colors.primary, opacity: pressed ? 0.9 : 1 }
+                    ]}
+                  >
+                    <Text style={styles.buyButtonText}>Get It</Text>
+                    <IconSymbol name="arrow.up.right" size={16} color="#FFF" />
+                  </Pressable>
+                </View>
               </View>
             </Animated.View>
           ))}
 
           <View style={{ height: 40 }} />
+
+          <Pressable onPress={() => router.push('/(tabs)/find')} style={styles.secondaryAction}>
+            <Text style={[styles.secondaryActionText, { color: colors.muted }]}>Browse all coffees</Text>
+          </Pressable>
+
+          <View style={{ height: 60 }} />
         </ScrollView>
       </ScreenContainer>
     );
@@ -256,23 +318,27 @@ export default function BeanMatcherStep3() {
   return (
     <ScreenContainer>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <IconSymbol name="chevron.left" size={24} color={colors.foreground} />
-        </Pressable>
-        <View style={styles.headerCenter}>
-          <Text style={[styles.title, { color: colors.foreground }]}>Find Your Coffee</Text>
-          <Text style={[styles.subtitle, { color: colors.muted }]}>Step 3 of 3</Text>
+        <View style={styles.headerTop}>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <IconSymbol name="chevron.left" size={24} color={colors.foreground} />
+          </Pressable>
+          <View style={styles.stepIndicator}>
+            <Text style={[styles.stepText, { color: colors.muted }]}>Step 3 of 3</Text>
+          </View>
+          <View style={{ width: 40 }} />
         </View>
-        <View style={styles.placeholder} />
+        <View style={[styles.progressBarContainer, { backgroundColor: colors.border }]}>
+          <Animated.View style={[styles.progressBar, progressBarAnimatedStyle, { backgroundColor: colors.primary }]} />
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeIn.duration(400)}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+          <Text style={[styles.title, { color: colors.foreground }]}>
             What flavors do you enjoy?
           </Text>
-          <Text style={[styles.sectionDescription, { color: colors.muted }]}>
-            Select your preference (optional)
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
+            We'll filter the perfect beans for your palate.
           </Text>
         </Animated.View>
 
@@ -280,117 +346,169 @@ export default function BeanMatcherStep3() {
           {FLAVOR_OPTIONS.map((flavor, index) => (
             <Animated.View
               key={flavor.id}
-              entering={FadeInDown.delay(index * 50).duration(300)}
+              entering={FadeInDown.delay(index * 100).duration(500)}
             >
               <Pressable
                 onPress={() => handleFlavorSelect(flavor.id)}
                 style={({ pressed }) => [
                   styles.flavorCard,
                   {
-                    backgroundColor: selectedFlavor === flavor.id ? colors.primary : colors.surface,
+                    backgroundColor: selectedFlavor === flavor.id ? colors.surface : colors.background,
                     borderColor: selectedFlavor === flavor.id ? colors.primary : colors.border,
-                    opacity: pressed ? 0.8 : 1,
+                    borderWidth: selectedFlavor === flavor.id ? 2 : 1,
+                    transform: [{ scale: pressed ? 0.98 : 1 }],
                   }
                 ]}
               >
-                <Text style={styles.flavorIcon}>{flavor.icon}</Text>
-                <Text style={[
-                  styles.flavorName,
-                  { color: selectedFlavor === flavor.id ? '#FFF' : colors.foreground }
+                <View style={[
+                  styles.flavorIconContainer,
+                  selectedFlavor === flavor.id && { backgroundColor: flavor.gradient[0] + '20' }
                 ]}>
-                  {flavor.name}
-                </Text>
-                <Text style={[
-                  styles.flavorDescription,
-                  { color: selectedFlavor === flavor.id ? 'rgba(255,255,255,0.8)' : colors.muted }
-                ]}>
-                  {flavor.description}
-                </Text>
+                  <Text style={styles.flavorIcon}>{flavor.icon}</Text>
+                </View>
+
+                <View style={styles.flavorInfo}>
+                  <Text style={[
+                    styles.flavorName,
+                    { color: selectedFlavor === flavor.id ? colors.primary : colors.foreground }
+                  ]}>
+                    {flavor.name}
+                  </Text>
+                  <Text style={[
+                    styles.flavorDescription,
+                    { color: colors.muted }
+                  ]}>
+                    {flavor.description}
+                  </Text>
+                </View>
+
+                {selectedFlavor === flavor.id && (
+                  <View style={[styles.checkCircle, { backgroundColor: colors.primary }]}>
+                    <IconSymbol name="checkmark" size={14} color="#FFF" />
+                  </View>
+                )}
               </Pressable>
             </Animated.View>
           ))}
         </View>
 
         <Pressable
-          onPress={() => { setSelectedFlavor(null); }}
+          onPress={() => { triggerHaptic(); setSelectedFlavor(null); setShowResults(true); }}
           style={({ pressed }) => [
             styles.skipButton,
             { opacity: pressed ? 0.7 : 1 }
           ]}
         >
           <Text style={[styles.skipButtonText, { color: colors.muted }]}>
-            Skip - Show all recommendations
+            Skip and show all matches
           </Text>
         </Pressable>
 
         <View style={{ height: 120 }} />
       </ScrollView>
 
-      <Animated.View
-        entering={FadeIn.duration(300)}
-        style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}
-      >
-        <Pressable
-          onPress={handleGetRecommendations}
-          style={({ pressed }) => [
-            styles.continueButton,
-            { backgroundColor: colors.primary, opacity: pressed ? 0.9 : 1 }
-          ]}
+      {selectedFlavor && (
+        <Animated.View
+          entering={FadeInDown.duration(300)}
+          style={styles.fabContainer}
         >
-          <IconSymbol name="sparkles" size={20} color="#FFF" />
-          <Text style={styles.continueButtonText}>Get Recommendations</Text>
-        </Pressable>
-      </Animated.View>
+          <Pressable
+            onPress={handleGetRecommendations}
+            style={({ pressed }) => [
+              styles.fab,
+              { backgroundColor: colors.primary, opacity: pressed ? 0.9 : 1 }
+            ]}
+          >
+            <IconSymbol name="sparkles" size={20} color="#FFF" />
+            <Text style={styles.fabText}>Reveal Matches</Text>
+          </Pressable>
+        </Animated.View>
+      )}
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1 },
-  backButton: { padding: 8 },
+  header: { paddingTop: 10, width: '100%' },
+  headerTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 16 },
+  backButton: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   headerCenter: { flex: 1, alignItems: 'center' },
-  title: { fontSize: 17, fontWeight: '600' },
-  subtitle: { fontSize: 13, marginTop: 2 },
+  stepIndicator: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.05)' },
+  stepText: { fontSize: 13, fontWeight: '600' },
+  progressBarContainer: { height: 4, width: '100%', overflow: 'hidden' },
+  progressBar: { height: '100%' },
+  content: { padding: 24 },
+  title: { fontSize: 32, fontWeight: '800', marginBottom: 8, letterSpacing: -0.5 },
+  subtitle: { fontSize: 17, lineHeight: 24, marginBottom: 32 },
   placeholder: { width: 40 },
-  content: { padding: 20 },
-  sectionTitle: { fontSize: 22, fontWeight: '700', marginBottom: 4 },
-  sectionDescription: { fontSize: 15, marginBottom: 20 },
-  flavorGrid: { gap: 12 },
-  flavorCard: { padding: 16, borderRadius: 16, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  flavorIcon: { fontSize: 32 },
-  flavorName: { fontSize: 17, fontWeight: '600' },
-  flavorDescription: { fontSize: 13, marginTop: 2 },
-  skipButton: { alignItems: 'center', padding: 16, marginTop: 16 },
-  skipButtonText: { fontSize: 15 },
-  footer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, borderTopWidth: 1 },
-  continueButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 16, borderRadius: 12, gap: 8 },
-  continueButtonText: { color: '#FFF', fontSize: 17, fontWeight: '600' },
-  // Results styles
-  summaryCard: { padding: 16, borderRadius: 12, borderWidth: 1, marginBottom: 24 },
-  summaryTitle: { fontSize: 15, fontWeight: '600', marginBottom: 12 },
-  summaryRow: { flexDirection: 'row', marginBottom: 6 },
-  summaryLabel: { width: 80, fontSize: 14 },
-  summaryValue: { flex: 1, fontSize: 14, fontWeight: '500' },
-  resultsTitle: { fontSize: 20, fontWeight: '700', marginBottom: 16 },
-  beanCard: { padding: 16, borderRadius: 16, borderWidth: 1, marginBottom: 16 },
-  beanHeader: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  beanImage: { width: 80, height: 80, borderRadius: 12 },
-  beanInfo: { flex: 1 },
-  matchBadge: { marginBottom: 4 },
-  matchScore: { fontSize: 13, fontWeight: '700' },
-  beanName: { fontSize: 17, fontWeight: '600', marginBottom: 2 },
-  beanRoaster: { fontSize: 13, marginBottom: 4 },
-  beanPrice: { fontSize: 15, fontWeight: '600' },
-  flavorNotes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
-  flavorTag: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  flavorTagText: { fontSize: 12, fontWeight: '500' },
-  reasonsSection: { marginBottom: 12 },
-  reasonsTitle: { fontSize: 13, fontWeight: '600', marginBottom: 6 },
-  reasonRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
-  reasonText: { fontSize: 13, flex: 1 },
-  tipsSection: { padding: 12, borderRadius: 8, marginBottom: 12 },
-  tipsTitle: { fontSize: 13, fontWeight: '600', marginBottom: 6 },
-  tipText: { fontSize: 13, marginBottom: 2 },
-  buyButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 14, borderRadius: 10, gap: 6 },
-  buyButtonText: { color: '#FFF', fontSize: 15, fontWeight: '600' },
+
+  // Selection Styles
+  flavorGrid: { gap: 16 },
+  flavorCard: {
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  flavorIconContainer: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.03)' },
+  flavorIcon: { fontSize: 28 },
+  flavorInfo: { flex: 1 },
+  flavorName: { fontSize: 18, fontWeight: '700', marginBottom: 4 },
+  flavorDescription: { fontSize: 14, lineHeight: 20 },
+  checkCircle: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  skipButton: { alignItems: 'center', padding: 20, marginTop: 16 },
+  skipButtonText: { fontSize: 15, fontWeight: '500' },
+  fabContainer: { position: 'absolute', bottom: 40, left: 20, right: 20 },
+  fab: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 56, borderRadius: 28, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6, gap: 10 },
+  fabText: { color: '#FFF', fontSize: 18, fontWeight: '700' },
+
+  // Results Styles
+  resultsContent: { padding: 20 },
+  summaryCard: { padding: 20, borderRadius: 20, borderWidth: 1, marginBottom: 32, gap: 16 },
+  summaryHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  summaryTitle: { fontSize: 18, fontWeight: '700' },
+  summaryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 24 },
+  summaryItem: { minWidth: '40%' },
+  summaryLabel: { fontSize: 13, marginBottom: 4, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
+  summaryValue: { fontSize: 16, fontWeight: '500' },
+
+  resultsSectionTitle: { fontSize: 24, fontWeight: '800', marginBottom: 20 },
+  resultItemContainer: { marginBottom: 24 },
+  beanCard: { borderRadius: 24, borderWidth: 1, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 16, elevation: 4 },
+  badgeContainer: { position: 'absolute', top: 0, right: 0, paddingHorizontal: 12, paddingVertical: 6, borderBottomLeftRadius: 16, zIndex: 10 },
+  badgeText: { color: '#FFF', fontSize: 12, fontWeight: '800' },
+  beanHeader: { padding: 20, flexDirection: 'row', gap: 16 },
+  beanImage: { width: 100, height: 100, borderRadius: 16, backgroundColor: '#f0f0f0' },
+  beanInfo: { flex: 1, justifyContent: 'center' },
+  beanRoaster: { fontSize: 14, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
+  beanName: { fontSize: 20, fontWeight: '800', lineHeight: 26, marginBottom: 12 },
+  matchScoreContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  scoreCircle: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  scoreText: { fontSize: 12, fontWeight: '800' },
+  scoreLabel: { fontSize: 13, fontWeight: '600' },
+
+  flavorNotes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 20, marginBottom: 20 },
+  flavorTag: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 100, borderWidth: 1 },
+  flavorTagText: { fontSize: 13, fontWeight: '500' },
+
+  reasonsSection: { padding: 20, gap: 8 },
+  reasonsTitle: { fontSize: 14, fontWeight: '700', marginBottom: 4 },
+  reasonRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  reasonText: { fontSize: 14, flex: 1, lineHeight: 20 },
+
+  cardFooter: { padding: 20, paddingTop: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  priceLabel: { fontSize: 12, textTransform: 'uppercase', fontWeight: '600' },
+  beanPrice: { fontSize: 20, fontWeight: '700' },
+  buyButton: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 14, gap: 8 },
+  buyButtonText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
+
+  secondaryAction: { alignItems: 'center', padding: 16 },
+  secondaryActionText: { fontSize: 15, fontWeight: '500' },
 });

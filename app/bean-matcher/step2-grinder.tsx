@@ -1,8 +1,14 @@
-import { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet , Platform } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, Pressable, ScrollView, StyleSheet, Platform, Dimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
 import { ScreenContainer } from '@/components/screen-container';
@@ -10,11 +16,19 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
 import { coffeeGrinders } from '@/data/machines';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 export default function BeanMatcherStep2() {
   const colors = useColors();
   const params = useLocalSearchParams<{ method: string; machineId: string }>();
   const [selectedGrinderId, setSelectedGrinderId] = useState<string | null>(null);
   const [hasGrinder, setHasGrinder] = useState<boolean | null>(null);
+
+  const progress = useSharedValue(0.33);
+
+  useEffect(() => {
+    progress.value = withTiming(0.66, { duration: 1000 });
+  }, []);
 
   const triggerHaptic = () => {
     if (Platform.OS !== 'web') {
@@ -50,69 +64,92 @@ export default function BeanMatcherStep2() {
 
   const canContinue = hasGrinder !== null && (hasGrinder === false || selectedGrinderId !== null);
 
+  const progressBarAnimatedStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
+
   return (
     <ScreenContainer>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <IconSymbol name="chevron.left" size={24} color={colors.foreground} />
-        </Pressable>
-        <View style={styles.headerCenter}>
-          <Text style={[styles.title, { color: colors.foreground }]}>Find Your Coffee</Text>
-          <Text style={[styles.subtitle, { color: colors.muted }]}>Step 2 of 3</Text>
+      {/* Header with Progress */}
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <IconSymbol name="chevron.left" size={24} color={colors.foreground} />
+          </Pressable>
+          <View style={styles.stepIndicator}>
+            <Text style={[styles.stepText, { color: colors.muted }]}>Step 2 of 3</Text>
+          </View>
+          <View style={{ width: 40 }} />
         </View>
-        <View style={styles.placeholder} />
+        <View style={[styles.progressBarContainer, { backgroundColor: colors.border }]}>
+          <Animated.View style={[styles.progressBar, progressBarAnimatedStyle, { backgroundColor: colors.primary }]} />
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeIn.duration(400)}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+          <Text style={[styles.title, { color: colors.foreground }]}>
             Do you have a grinder?
           </Text>
-          <Text style={[styles.sectionDescription, { color: colors.muted }]}>
-            Fresh grinding makes a big difference
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
+            Fresh grinding makes the biggest difference in flavor.
           </Text>
         </Animated.View>
 
         <View style={styles.optionRow}>
-          <Pressable
-            onPress={() => { triggerHaptic(); setHasGrinder(true); }}
-            style={({ pressed }) => [
-              styles.optionCard,
-              {
-                backgroundColor: hasGrinder === true ? colors.primary : colors.surface,
-                borderColor: hasGrinder === true ? colors.primary : colors.border,
-                opacity: pressed ? 0.8 : 1,
-              }
-            ]}
-          >
-            <Text style={[styles.optionIcon]}>✓</Text>
-            <Text style={[
-              styles.optionText,
-              { color: hasGrinder === true ? '#FFF' : colors.foreground }
-            ]}>
-              Yes, I have a grinder
-            </Text>
-          </Pressable>
+          <Animated.View entering={FadeInDown.delay(100).duration(400)} style={{ flex: 1 }}>
+            <Pressable
+              onPress={() => { triggerHaptic(); setHasGrinder(true); }}
+              style={({ pressed }) => [
+                styles.optionCard,
+                {
+                  backgroundColor: hasGrinder === true ? colors.primary : colors.surface,
+                  borderColor: hasGrinder === true ? colors.primary : colors.border,
+                  transform: [{ scale: pressed ? 0.98 : 1 }],
+                }
+              ]}
+            >
+              <View style={[
+                styles.optionIconContainer,
+                { backgroundColor: hasGrinder === true ? 'rgba(255,255,255,0.2)' : colors.background }
+              ]}>
+                <IconSymbol name="checkmark" size={20} color={hasGrinder === true ? '#FFF' : colors.foreground} />
+              </View>
+              <Text style={[
+                styles.optionText,
+                { color: hasGrinder === true ? '#FFF' : colors.foreground }
+              ]}>
+                Yes, I do
+              </Text>
+            </Pressable>
+          </Animated.View>
 
-          <Pressable
-            onPress={handleNoGrinder}
-            style={({ pressed }) => [
-              styles.optionCard,
-              {
-                backgroundColor: hasGrinder === false ? colors.primary : colors.surface,
-                borderColor: hasGrinder === false ? colors.primary : colors.border,
-                opacity: pressed ? 0.8 : 1,
-              }
-            ]}
-          >
-            <Text style={[styles.optionIcon]}>✗</Text>
-            <Text style={[
-              styles.optionText,
-              { color: hasGrinder === false ? '#FFF' : colors.foreground }
-            ]}>
-              No, I use pre-ground
-            </Text>
-          </Pressable>
+          <Animated.View entering={FadeInDown.delay(200).duration(400)} style={{ flex: 1 }}>
+            <Pressable
+              onPress={handleNoGrinder}
+              style={({ pressed }) => [
+                styles.optionCard,
+                {
+                  backgroundColor: hasGrinder === false ? colors.primary : colors.surface,
+                  borderColor: hasGrinder === false ? colors.primary : colors.border,
+                  transform: [{ scale: pressed ? 0.98 : 1 }],
+                }
+              ]}
+            >
+              <View style={[
+                styles.optionIconContainer,
+                { backgroundColor: hasGrinder === false ? 'rgba(255,255,255,0.2)' : colors.background }
+              ]}>
+                <IconSymbol name="xmark" size={20} color={hasGrinder === false ? '#FFF' : colors.foreground} />
+              </View>
+              <Text style={[
+                styles.optionText,
+                { color: hasGrinder === false ? '#FFF' : colors.foreground }
+              ]}>
+                No, pre-ground
+              </Text>
+            </Pressable>
+          </Animated.View>
         </View>
 
         {hasGrinder === true && (
@@ -121,10 +158,14 @@ export default function BeanMatcherStep2() {
               Select your grinder
             </Text>
             <Text style={[styles.sectionDescription, { color: colors.muted }]}>
-              Or skip if not listed
+              We'll tailor the coarseness for you
             </Text>
 
-            <View style={styles.grinderList}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.grinderList}
+            >
               {coffeeGrinders.map((grinder) => (
                 <Pressable
                   key={grinder.id}
@@ -134,7 +175,7 @@ export default function BeanMatcherStep2() {
                     {
                       backgroundColor: selectedGrinderId === grinder.id ? `${colors.primary}15` : colors.surface,
                       borderColor: selectedGrinderId === grinder.id ? colors.primary : colors.border,
-                      opacity: pressed ? 0.8 : 1,
+                      transform: [{ scale: pressed ? 0.95 : 1 }],
                     }
                   ]}
                 >
@@ -150,11 +191,13 @@ export default function BeanMatcherStep2() {
                       {grinder.name}
                     </Text>
                     <Text style={[styles.grinderSpecs, { color: colors.muted }]}>
-                      {grinder.burrType} burr • {grinder.burrSize}mm
+                      {grinder.burrType} burr
                     </Text>
                   </View>
                   {selectedGrinderId === grinder.id && (
-                    <IconSymbol name="checkmark.circle.fill" size={24} color={colors.primary} />
+                    <View style={styles.checkIcon}>
+                      <IconSymbol name="checkmark.circle.fill" size={24} color={colors.primary} />
+                    </View>
                   )}
                 </Pressable>
               ))}
@@ -163,43 +206,46 @@ export default function BeanMatcherStep2() {
                 onPress={() => handleGrinderSelect('other')}
                 style={({ pressed }) => [
                   styles.grinderCard,
+                  styles.otherGrinderCard,
                   {
                     backgroundColor: selectedGrinderId === 'other' ? `${colors.primary}15` : colors.surface,
                     borderColor: selectedGrinderId === 'other' ? colors.primary : colors.border,
-                    opacity: pressed ? 0.8 : 1,
+                    transform: [{ scale: pressed ? 0.95 : 1 }],
                   }
                 ]}
               >
-                <View style={[styles.otherIcon, { backgroundColor: colors.muted + '30' }]}>
+                <View style={[styles.otherIcon, { backgroundColor: colors.muted + '20' }]}>
                   <IconSymbol name="plus" size={24} color={colors.muted} />
                 </View>
                 <View style={styles.grinderInfo}>
                   <Text style={[styles.grinderName, { color: colors.foreground }]}>
-                    Other Grinder
+                    Other
                   </Text>
                   <Text style={[styles.grinderSpecs, { color: colors.muted }]}>
-                    My grinder is not listed
+                    Unlisted model
                   </Text>
                 </View>
                 {selectedGrinderId === 'other' && (
-                  <IconSymbol name="checkmark.circle.fill" size={24} color={colors.primary} />
+                  <View style={styles.checkIcon}>
+                    <IconSymbol name="checkmark.circle.fill" size={24} color={colors.primary} />
+                  </View>
                 )}
               </Pressable>
-            </View>
+            </ScrollView>
           </Animated.View>
         )}
 
         {hasGrinder === false && (
-          <Animated.View entering={FadeInDown.duration(400)} style={styles.tipCard}>
+          <Animated.View entering={FadeInDown.duration(400)} style={[styles.tipCard, { backgroundColor: `${colors.warning}15`, borderColor: colors.warning }]}>
             <View style={[styles.tipIcon, { backgroundColor: colors.warning + '20' }]}>
               <Text style={{ fontSize: 24 }}>💡</Text>
             </View>
             <View style={styles.tipContent}>
-              <Text style={[styles.tipTitle, { color: colors.foreground }]}>
+              <Text style={[styles.tipTitle, { color: colors.warning }]}>
                 Pro Tip
               </Text>
-              <Text style={[styles.tipText, { color: colors.muted }]}>
-                We&apos;ll recommend beans that work well pre-ground, but consider investing in a grinder for the best flavor!
+              <Text style={[styles.tipText, { color: colors.foreground }]}>
+                We'll recommend beans that come in vacuum-sealed packs for freshness.
               </Text>
             </View>
           </Animated.View>
@@ -211,17 +257,17 @@ export default function BeanMatcherStep2() {
       {canContinue && (
         <Animated.View
           entering={FadeIn.duration(300)}
-          style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}
+          style={styles.fabContainer}
         >
           <Pressable
             onPress={handleContinue}
             style={({ pressed }) => [
-              styles.continueButton,
+              styles.fab,
               { backgroundColor: colors.primary, opacity: pressed ? 0.9 : 1 }
             ]}
           >
-            <Text style={styles.continueButtonText}>Continue</Text>
-            <IconSymbol name="chevron.right" size={20} color="#FFF" />
+            <Text style={styles.fabText}>Continue</Text>
+            <IconSymbol name="arrow.right" size={20} color="#FFF" />
           </Pressable>
         </Animated.View>
       )}
@@ -230,33 +276,203 @@ export default function BeanMatcherStep2() {
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1 },
-  backButton: { padding: 8 },
-  headerCenter: { flex: 1, alignItems: 'center' },
-  title: { fontSize: 17, fontWeight: '600' },
-  subtitle: { fontSize: 13, marginTop: 2 },
-  placeholder: { width: 40 },
-  content: { padding: 20 },
-  sectionTitle: { fontSize: 22, fontWeight: '700', marginBottom: 4 },
-  sectionDescription: { fontSize: 15, marginBottom: 20 },
-  optionRow: { gap: 12, marginBottom: 24 },
-  optionCard: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 12, borderWidth: 1, gap: 12 },
-  optionIcon: { fontSize: 20, fontWeight: '700' },
-  optionText: { fontSize: 16, fontWeight: '500' },
-  grinderSection: { marginTop: 8 },
-  grinderList: { gap: 12 },
-  grinderCard: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 12, borderWidth: 1, gap: 12 },
-  grinderImage: { width: 60, height: 60, borderRadius: 8 },
-  grinderInfo: { flex: 1 },
-  grinderName: { fontSize: 15, fontWeight: '600' },
-  grinderSpecs: { fontSize: 13, marginTop: 2 },
-  otherIcon: { width: 60, height: 60, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  tipCard: { flexDirection: 'row', padding: 16, borderRadius: 12, gap: 12, marginTop: 16 },
-  tipIcon: { width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  tipContent: { flex: 1 },
-  tipTitle: { fontSize: 15, fontWeight: '600', marginBottom: 4 },
-  tipText: { fontSize: 14, lineHeight: 20 },
-  footer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, borderTopWidth: 1 },
-  continueButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 16, borderRadius: 12, gap: 8 },
-  continueButtonText: { color: '#FFF', fontSize: 17, fontWeight: '600' },
+  header: {
+    paddingTop: 10,
+    width: '100%',
+  },
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepIndicator: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+  },
+  stepText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  progressBarContainer: {
+    height: 4,
+    width: '100%',
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+  },
+  content: {
+    padding: 24,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '800',
+    marginBottom: 8,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 17,
+    lineHeight: 24,
+    marginBottom: 32,
+  },
+  optionRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 24,
+  },
+  optionCard: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    gap: 12,
+    height: 140,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  optionIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  optionText: {
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  grinderSection: {
+    marginTop: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  sectionDescription: {
+    fontSize: 15,
+    marginBottom: 20,
+  },
+  grinderList: {
+    gap: 16,
+    paddingRight: 24,
+  },
+  grinderCard: {
+    width: 150,
+    height: 180,
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  otherGrinderCard: {
+    borderStyle: 'dashed',
+  },
+  grinderImage: {
+    width: 80,
+    height: 90,
+    marginBottom: 8,
+  },
+  grinderInfo: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  grinderName: {
+    fontSize: 15,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  grinderSpecs: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  checkIcon: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+  },
+  otherIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  tipCard: {
+    flexDirection: 'row',
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    gap: 16,
+    marginTop: 8,
+  },
+  tipIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tipContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  tipTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  tipText: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  fabContainer: {
+    position: 'absolute',
+    bottom: 40,
+    left: 20,
+    right: 20,
+  },
+  fab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 56,
+    borderRadius: 28,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    gap: 8,
+  },
+  fabText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
 });
