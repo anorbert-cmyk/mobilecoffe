@@ -44,6 +44,24 @@ export const businessRouter = router({
         return business;
     }),
 
+    getAll: publicProcedure
+        .query(async () => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+            const allBusinesses = await db.query.businesses.findMany({
+                where: eq(businesses.isVerified, true), // Only show verified businesses
+                with: {
+                    products: true,
+                    events: true,
+                    menuCategories: true
+                },
+                limit: 50, // Limit for now
+            });
+
+            return allBusinesses;
+        }),
+
     getById: publicProcedure
         .input(z.object({ id: z.number() }))
         .query(async ({ input }) => {
@@ -54,6 +72,9 @@ export const businessRouter = router({
                 where: eq(businesses.id, input.id),
                 with: {
                     products: true,
+                    events: true,
+                    jobs: true, // Correct relation name
+                    subscriptions: true,
                     menuCategories: {
                         with: {
                             items: true
@@ -61,6 +82,10 @@ export const businessRouter = router({
                     }
                 }
             });
+
+            if (!business) {
+                throw new TRPCError({ code: "NOT_FOUND", message: "Business not found" });
+            }
 
             return business;
         }),

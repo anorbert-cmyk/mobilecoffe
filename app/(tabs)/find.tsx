@@ -11,7 +11,9 @@ import { useColors } from "@/hooks/use-colors";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { demoCafes, Cafe, sortCafesByDistance, formatDistance } from "@/data/cafes";
 import { coffeeBeans } from "@/data/beans";
+import { useRouter } from "expo-router";
 import { useMyEquipment } from "@/lib/equipment/my-equipment-provider";
+import { trpc } from "@/lib/trpc";
 import { perplexityService } from "@/lib/perplexity/perplexity-service";
 
 interface CafeWithDistance extends Cafe {
@@ -27,8 +29,9 @@ type BeanFilter = {
 
 export default function FindCoffeeScreen() {
   const colors = useColors();
+  const router = useRouter();
   const { equipment } = useMyEquipment();
-  
+
   const [cafes, setCafes] = useState<CafeWithDistance[]>([]);
   const [filteredCafes, setFilteredCafes] = useState<CafeWithDistance[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,49 +60,74 @@ export default function FindCoffeeScreen() {
   const flavorNotes = [...new Set(allFlavorNotes)].sort();
 
   useEffect(() => {
-    loadCafes();
-  }, []);
-
-  useEffect(() => {
     applyFilters();
   }, [cafes, searchQuery, beanFilter, showMyBeansOnly]);
 
-  const loadCafes = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setLocationError('Enable location to see distances');
-        const defaultLat = 47.4979;
-        const defaultLon = 19.0402;
-        const sortedCafes = sortCafesByDistance(demoCafes, defaultLat, defaultLon);
-        setCafes(sortedCafes as CafeWithDistance[]);
-        setLoading(false);
-        return;
-      }
+  const { data: remoteCafes, isLoading } = trpc.business.getAll.useQuery(undefined, {
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-      
-      setUserLocation({
-        lat: location.coords.latitude,
-        lon: location.coords.longitude,
-      });
-      
-      const sortedCafes = sortCafesByDistance(
-        demoCafes,
-        location.coords.latitude,
-        location.coords.longitude
-      );
-      setCafes(sortedCafes as CafeWithDistance[]);
-    } catch (error) {
-      setLocationError('Could not get location');
+  useEffect(() => {
+    if (remoteCafes) {
+      mergeRemoteCafes(remoteCafes);
+    } else if (!isLoading && !remoteCafes) {
+      // Fallback to demo data if request failed or empty
       const sortedCafes = sortCafesByDistance(demoCafes, 47.4979, 19.0402);
       setCafes(sortedCafes as CafeWithDistance[]);
+      setLoading(false);
+    }
+  }, [remoteCafes, isLoading]);
+
+  const mergeRemoteCafes = async (backendCafes: any[]) => {
+    // Transform backend cafes to Cafe type
+    const mappedRemote: CafeWithDistance[] = backendCafes.map((b) => ({
+      id: String(b.id),
+      name: b.name,
+      // Use seeded image or fallback
+      image: b.headerImageUrls?.[0] || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=3547&auto=format&fit=crop",
+      rating: 4.8, // Mock rating for now
+      reviewCount: 120, // Mock reviews
+      distance: 0, // Calculated later
+      address: b.address?.street ? `${b.address.street}, ${b.address.city}` : b.address?.city || "Budapest",
+      specialties: b.products?.filter((p: any) => p.type === 'coffee').map((p: any) => p.name) || ["Specialty Coffee"],
+      priceLevel: 3,
+      latitude: 47.4979, // Hardcoded for now, ideally in address
+      longitude: 19.0402,
+      description: b.description || "",
+      openingHours: b.openingHours?.week || "9:00 - 17:00",
+      phone: b.phone || undefined,
+      website: b.website || undefined,
+      isPromoted: b.subscriptions?.some((s: any) => s.plan === 'premium'),
+      neighborhood: b.address?.city || "Budapest", // Added missing field
+      isOpen: true, // Mock open status
+      features: b.services || ["Wifi", "Specialty Coffee"], // Added missing field
+    }));
+
+    // Merge with demo cafes
+    const combined = [...mappedRemote, ...demoCafes];
+
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        const location = await Location.getCurrentPositionAsync({});
+        setUserLocation({ lat: location.coords.latitude, lon: location.coords.longitude });
+        const sorted = sortCafesByDistance(combined, location.coords.latitude, location.coords.longitude);
+        setCafes(sorted as CafeWithDistance[]);
+      } else {
+        const sorted = sortCafesByDistance(combined, 47.4979, 19.0402);
+        setCafes(sorted as CafeWithDistance[]);
+      }
+    } catch (e) {
+      console.warn("Location error", e);
+      const sorted = sortCafesByDistance(combined, 47.4979, 19.0402);
+      setCafes(sorted as CafeWithDistance[]);
     } finally {
       setLoading(false);
     }
   };
+
+  // Keep searchRealCafes separate for Perplexity
+
 
   const searchRealCafes = async () => {
     if (!userLocation) {
@@ -127,7 +155,7 @@ export default function FindCoffeeScreen() {
         // Merge with existing cafes (avoid duplicates)
         const existingNames = new Set(cafes.map(c => c.name.toLowerCase()));
         const newCafes = results.filter((r: any) => !existingNames.has(r.name.toLowerCase()));
-        
+
         const allCafes = [...cafes, ...newCafes];
         const sorted = sortCafesByDistance(allCafes, userLocation.lat, userLocation.lon);
         setCafes(sorted as CafeWithDistance[]);
@@ -162,7 +190,7 @@ export default function FindCoffeeScreen() {
           if (beanFilter.flavorNote && !bean.flavorNotes.includes(beanFilter.flavorNote)) return false;
           return true;
         });
-        
+
         // For demo, assume cafes carry beans based on their specialty
         return matchingBeans.length > 0;
       });
@@ -173,8 +201,8 @@ export default function FindCoffeeScreen() {
       filtered = filtered.filter(cafe => {
         // For demo, match cafe specialty with bean characteristics
         const favBeans = coffeeBeans.filter(b => uniqueFavoriteBeans.includes(b.id));
-        return favBeans.some(bean => 
-          cafe.specialties.some(s => 
+        return favBeans.some(bean =>
+          cafe.specialties.some(s =>
             s.toLowerCase().includes(bean.origin.toLowerCase()) ||
             s.toLowerCase().includes(bean.roastLevel.toLowerCase())
           )
@@ -232,7 +260,7 @@ export default function FindCoffeeScreen() {
             contentFit="cover"
             transition={300}
           />
-          
+
           {/* Rating badge */}
           <View style={[styles.ratingBadge, { backgroundColor: colors.surface }]}>
             <IconSymbol name="star.fill" size={14} color="#FFB800" />
@@ -257,7 +285,7 @@ export default function FindCoffeeScreen() {
           <Text style={[styles.cafeName, { color: colors.foreground }]}>
             {item.name}
           </Text>
-          
+
           <View style={styles.cafeMetaRow}>
             <Text style={[styles.cafeSpecialty, { color: colors.primary }]}>
               {item.specialties[0] || 'Specialty Coffee'}
@@ -362,10 +390,10 @@ export default function FindCoffeeScreen() {
                 }
               ]}
             >
-              <IconSymbol 
-                name="slider.horizontal.3" 
-                size={18} 
-                color={showFilters || hasActiveFilters ? "#FFF" : colors.foreground} 
+              <IconSymbol
+                name="slider.horizontal.3"
+                size={18}
+                color={showFilters || hasActiveFilters ? "#FFF" : colors.foreground}
               />
               <Text style={[
                 styles.filterButtonText,
@@ -394,10 +422,10 @@ export default function FindCoffeeScreen() {
                   }
                 ]}
               >
-                <IconSymbol 
-                  name="heart.fill" 
-                  size={18} 
-                  color={showMyBeansOnly ? "#FFF" : colors.error} 
+                <IconSymbol
+                  name="heart.fill"
+                  size={18}
+                  color={showMyBeansOnly ? "#FFF" : colors.error}
                 />
                 <Text style={[
                   styles.myBeansButtonText,
@@ -433,7 +461,7 @@ export default function FindCoffeeScreen() {
 
         {/* Filter Panel */}
         {showFilters && (
-          <Animated.View 
+          <Animated.View
             entering={FadeIn.duration(300)}
             style={[styles.filterPanel, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}
           >
@@ -448,7 +476,7 @@ export default function FindCoffeeScreen() {
                         key={origin}
                         onPress={() => {
                           triggerHaptic();
-                          setBeanFilter(prev => 
+                          setBeanFilter(prev =>
                             prev.origin === origin ? { ...prev, origin: undefined } : { ...prev, origin }
                           );
                         }}
@@ -482,7 +510,7 @@ export default function FindCoffeeScreen() {
                       key={level}
                       onPress={() => {
                         triggerHaptic();
-                        setBeanFilter(prev => 
+                        setBeanFilter(prev =>
                           prev.roastLevel === level ? { ...prev, roastLevel: undefined } : { ...prev, roastLevel: level }
                         );
                       }}
