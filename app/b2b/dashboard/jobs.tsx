@@ -12,11 +12,8 @@ export default function JobsManager() {
     const colors = useColors();
     const router = useRouter();
 
-    const { data: business } = trpc.business.getMine.useQuery();
-    const { data: jobs, refetch } = trpc.job.listByBusiness.useQuery(
-        { businessId: business?.id! },
-        { enabled: !!business }
-    );
+    const { data: business, refetch } = trpc.business.getMine.useQuery();
+    const jobs = business?.jobs || [];
 
     const deleteJob = trpc.job.delete.useMutation({
         onSuccess: () => refetch()

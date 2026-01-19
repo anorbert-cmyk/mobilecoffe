@@ -38,6 +38,9 @@ export const businessRouter = router({
             where: eq(businesses.ownerId, ctx.user.id),
             with: {
                 subscriptions: true,
+                products: true,
+                events: true,
+                jobs: true,
             }
         });
 

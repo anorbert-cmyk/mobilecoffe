@@ -13,11 +13,8 @@ export default function EventsManager() {
     const colors = useColors();
     const router = useRouter();
 
-    const { data: business } = trpc.business.getMine.useQuery();
-    const { data: events, refetch, isLoading } = trpc.event.listByBusiness.useQuery(
-        { businessId: business?.id! },
-        { enabled: !!business }
-    );
+    const { data: business, refetch } = trpc.business.getMine.useQuery();
+    const events = business?.events || [];
 
     const deleteEvent = trpc.event.delete.useMutation({
         onSuccess: () => {

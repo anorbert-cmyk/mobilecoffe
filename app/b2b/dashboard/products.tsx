@@ -13,11 +13,8 @@ export default function ProductsManager() {
     const colors = useColors();
     const router = useRouter();
 
-    const { data: business } = trpc.business.getMine.useQuery();
-    const { data: products, refetch } = trpc.product.listProducts.useQuery(
-        { businessId: business?.id! },
-        { enabled: !!business }
-    );
+    const { data: business, refetch } = trpc.business.getMine.useQuery();
+    const products = business?.products || [];
 
     const deleteProduct = trpc.product.deleteProduct.useMutation({
         onSuccess: () => refetch()
