@@ -73,4 +73,50 @@ export const eventRouter = router({
             await db.delete(events).where(eq(events.id, input.id));
             return { success: true };
         }),
+
+    update: protectedProcedure
+        .input(z.object({
+            id: z.number(),
+            name: z.string().min(1).optional(),
+            description: z.string().min(1).optional(),
+            date: z.string().or(z.date()).transform(val => new Date(val)).optional(),
+            location: z.string().min(1).optional(),
+            price: z.number().min(0).optional(),
+            currency: z.string().optional(),
+            imageUrl: z.string().optional(),
+            maxAttendees: z.number().optional(),
+            isPublished: z.boolean().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+            const event = await db.query.events.findFirst({
+                where: eq(events.id, input.id),
+                with: { business: true }
+            });
+
+            if (!event || event.business.ownerId !== ctx.user.id) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            const { id, ...updateData } = input;
+            await db.update(events).set({
+                ...updateData,
+                updatedAt: new Date(),
+            }).where(eq(events.id, id));
+
+            return { success: true };
+        }),
+
+    getById: publicProcedure
+        .input(z.object({ id: z.number() }))
+        .query(async ({ input }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+            return await db.query.events.findFirst({
+                where: eq(events.id, input.id),
+            });
+        }),
 });

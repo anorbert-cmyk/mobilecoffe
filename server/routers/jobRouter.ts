@@ -72,4 +72,74 @@ export const jobRouter = router({
                 with: { business: true }
             });
         }),
+
+    listByBusiness: publicProcedure
+        .input(z.object({ businessId: z.number() }))
+        .query(async ({ input }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+            return await db.query.jobListings.findMany({
+                where: eq(jobListings.businessId, input.businessId),
+                orderBy: (listings, { desc }) => [desc(listings.createdAt)],
+            });
+        }),
+
+    getById: publicProcedure
+        .input(z.object({ id: z.number() }))
+        .query(async ({ input }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+            return await db.query.jobListings.findFirst({
+                where: eq(jobListings.id, input.id),
+            });
+        }),
+
+    delete: protectedProcedure
+        .input(z.object({ id: z.number() }))
+        .mutation(async ({ ctx, input }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+            const job = await db.query.jobListings.findFirst({
+                where: eq(jobListings.id, input.id),
+                with: { business: true }
+            });
+
+            if (!job || job.business.ownerId !== ctx.user.id) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            await db.delete(jobListings).where(eq(jobListings.id, input.id));
+            return { success: true };
+        }),
+
+    update: protectedProcedure
+        .input(z.object({
+            id: z.number(),
+            title: z.string().optional(),
+            description: z.string().optional(),
+            netSalaryMin: z.number().optional(),
+            netSalaryMax: z.number().optional(),
+            contractType: z.enum(["full-time", "part-time", "contract", "internship", "seasonal"]).optional(),
+            workingHours: z.string().optional(),
+            status: z.enum(["draft", "active", "paused", "expired", "filled"]).optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+            const job = await db.query.jobListings.findFirst({
+                where: eq(jobListings.id, input.id),
+                with: { business: true }
+            });
+
+            if (!job || job.business.ownerId !== ctx.user.id) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            const { id, ...updateData } = input;
+            await db.update(jobListings).set(updateData).where(eq(jobListings.id, id));
+
+            return { success: true };
+        }),
 });

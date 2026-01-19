@@ -67,6 +67,68 @@ export const productRouter = router({
             });
         }),
 
+    getProductById: publicProcedure
+        .input(z.object({ id: z.number() }))
+        .query(async ({ input }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+            return await db.query.products.findFirst({
+                where: eq(products.id, input.id),
+            });
+        }),
+
+    deleteProduct: protectedProcedure
+        .input(z.object({ id: z.number() }))
+        .mutation(async ({ ctx, input }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+            const product = await db.query.products.findFirst({
+                where: eq(products.id, input.id),
+                with: { business: true }
+            });
+
+            if (!product || product.business.ownerId !== ctx.user.id) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            await db.delete(products).where(eq(products.id, input.id));
+            return { success: true };
+        }),
+
+    updateProduct: protectedProcedure
+        .input(z.object({
+            id: z.number(),
+            name: z.string().optional(),
+            description: z.string().optional(),
+            price: z.number().optional(),
+            type: z.enum(["coffee", "equipment", "accessory"]).optional(),
+            roastLevel: z.enum(["light", "medium", "medium-dark", "dark"]).optional(),
+            processMethod: z.enum(["washed", "natural", "honey", "anaerobic"]).optional(),
+            isAvailable: z.boolean().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+            const product = await db.query.products.findFirst({
+                where: eq(products.id, input.id),
+                with: { business: true }
+            });
+
+            if (!product || product.business.ownerId !== ctx.user.id) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            const { id, ...updateData } = input;
+            await db.update(products).set({
+                ...updateData,
+                updatedAt: new Date(),
+            }).where(eq(products.id, id));
+
+            return { success: true };
+        }),
+
     // --- Menu ---
     createCategory: protectedProcedure
         .input(z.object({ businessId: z.number(), name: z.string() }))
