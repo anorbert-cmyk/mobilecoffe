@@ -102,4 +102,6 @@ async function startServer() {
   });
 }
 
+const { migrateDb } = await import("../db");
+await migrateDb();
 startServer().catch(console.error);

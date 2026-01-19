@@ -19,6 +19,30 @@ export async function getDb() {
   return _db;
 }
 
+export async function migrateDb() {
+  const db = await getDb();
+  if (!db) {
+    console.error("[Database] Cannot migrate: database not available");
+    return;
+  }
+
+  if (process.env.NODE_ENV === "production" || true) { // Always try to migrate for now to fix state
+    try {
+      console.log("[Database] Running migrations...");
+      const { migrate } = await import("drizzle-orm/mysql2/migrator");
+      const path = await import("path");
+      const migrationsFolder = path.join(process.cwd(), "drizzle");
+
+      await migrate(db, { migrationsFolder });
+      console.log("[Database] Migrations completed successfully");
+    } catch (error) {
+      console.error("[Database] Migration failed:", error);
+      // In production, effective schema mismatch is fatal, but we don't want to crash 
+      // if it's just a lock issue or transient. Warn for now.
+    }
+  }
+}
+
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) {
     throw new Error("User openId is required for upsert");
