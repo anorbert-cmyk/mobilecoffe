@@ -77,7 +77,7 @@ export default function DashboardOverview() {
                                 {business.name}
                             </Text>
                             <Text style={[styles.role, { color: colors.muted }]}>
-                                {business.type.toUpperCase()} • {(business.address as any)?.city || 'Location not set'}
+                                {(business.type || 'CAFE').toUpperCase()} • {(business.address as any)?.city || 'Location not set'}
                             </Text>
                         </View>
                         <View style={{ backgroundColor: colors.surface, padding: 8, borderRadius: 12, borderWidth: 1, borderColor: colors.border }}>

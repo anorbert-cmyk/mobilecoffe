@@ -222,19 +222,43 @@ export default function CafeDetailScreen() {
                                     {business.description || "We are a dedicated team of coffee enthusiasts bringing you the best specialty coffee experience in town."}
                                 </Text>
 
+                                {/* Amenities Grid */}
+                                <Text style={[styles.sectionTitle, { color: colors.foreground, marginTop: 24 }]}>Amenities</Text>
+                                <View style={styles.amenitiesGrid}>
+                                    {[
+                                        { key: 'wifi', icon: 'wifi', label: 'WiFi' },
+                                        { key: 'dogFriendly', icon: 'pawprint.fill', label: 'Dog Friendly' },
+                                        { key: 'cardPayment', icon: 'creditcard.fill', label: 'Card Payment' },
+                                        { key: 'terrace', icon: 'sun.max.fill', label: 'Terrace' },
+                                        { key: 'brunch', icon: 'fork.knife', label: 'Brunch' },
+                                        { key: 'laptopFriendly', icon: 'laptopcomputer', label: 'Laptop OK' },
+                                        { key: 'wheelchairAccessible', icon: 'figure.roll', label: 'Accessible' },
+                                        { key: 'parking', icon: 'parkingsign', label: 'Parking' },
+                                        { key: 'reservations', icon: 'calendar.badge.clock', label: 'Reservations' },
+                                        { key: 'takeaway', icon: 'bag.fill', label: 'Takeaway' },
+                                        { key: 'oatMilk', icon: 'leaf.fill', label: 'Oat Milk' },
+                                        { key: 'specialty', icon: 'star.fill', label: 'Specialty' },
+                                    ].filter(a => (business.services as any)?.[a.key]).map((amenity) => (
+                                        <View key={amenity.key} style={[styles.amenityBadge, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                                            <IconSymbol name={amenity.icon as any} size={18} color={colors.primary} />
+                                            <Text style={[styles.amenityLabel, { color: colors.foreground }]}>{amenity.label}</Text>
+                                        </View>
+                                    ))}
+                                </View>
+
                                 <View style={styles.infoGrid}>
                                     <PremiumCard style={styles.infoCard}>
                                         <IconSymbol name="clock.fill" size={24} color={colors.primary} />
                                         <Text style={[styles.infoLabel, { color: colors.muted }]}>Open Today</Text>
                                         <Text style={[styles.infoValue, { color: colors.foreground }]}>
-                                            {openingHours?.week || "9:00 - 17:00"}
+                                            {openingHours?.monday || openingHours?.week || "9:00 - 17:00"}
                                         </Text>
                                     </PremiumCard>
 
                                     <PremiumCard style={styles.infoCard}>
-                                        <IconSymbol name="wifi" size={24} color={colors.primary} />
-                                        <Text style={[styles.infoLabel, { color: colors.muted }]}>Wifi</Text>
-                                        <Text style={[styles.infoValue, { color: colors.foreground }]}>Free Access</Text>
+                                        <IconSymbol name="star.fill" size={24} color="#FFB800" />
+                                        <Text style={[styles.infoLabel, { color: colors.muted }]}>Rating</Text>
+                                        <Text style={[styles.infoValue, { color: colors.foreground }]}>4.8 ★</Text>
                                     </PremiumCard>
                                 </View>
 
@@ -306,29 +330,39 @@ export default function CafeDetailScreen() {
                                 <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Upcoming Events</Text>
                                 {business.events?.length > 0 ? (
                                     business.events.map((event) => (
-                                        <PremiumCard key={event.id} style={styles.eventCard}>
-                                            <Image source={{ uri: event.imageUrl || undefined }} style={styles.eventImage} />
-                                            <View style={styles.eventContent}>
-                                                <View style={[styles.dateBadge, { backgroundColor: colors.surface }]}>
-                                                    <Text style={[styles.dateDay, { color: colors.foreground }]}>
-                                                        {new Date(event.date).getDate()}
-                                                    </Text>
-                                                    <Text style={[styles.dateMonth, { color: colors.primary }]}>
-                                                        {new Date(event.date).toLocaleString('default', { month: 'short' }).toUpperCase()}
-                                                    </Text>
+                                        <Pressable
+                                            key={event.id}
+                                            onPress={() => {
+                                                triggerHaptic();
+                                                router.push(`/cafe/event/${event.id}?cafeId=${rawId}`);
+                                            }}
+                                        >
+                                            <PremiumCard style={styles.eventCard}>
+                                                <Image source={{ uri: event.imageUrl || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800' }} style={styles.eventImage} />
+                                                <View style={styles.eventContent}>
+                                                    <View style={[styles.dateBadge, { backgroundColor: colors.surface }]}>
+                                                        <Text style={[styles.dateDay, { color: colors.foreground }]}>
+                                                            {new Date(event.date).getDate()}
+                                                        </Text>
+                                                        <Text style={[styles.dateMonth, { color: colors.primary }]}>
+                                                            {new Date(event.date).toLocaleString('default', { month: 'short' }).toUpperCase()}
+                                                        </Text>
+                                                    </View>
+                                                    <View style={{ flex: 1 }}>
+                                                        <Text style={[styles.eventName, { color: colors.foreground }]}>{event.name}</Text>
+                                                        <Text style={[styles.eventLocation, { color: colors.muted }]}>
+                                                            <IconSymbol name="mappin" size={12} color={colors.muted} /> {event.location}
+                                                        </Text>
+                                                        <Text style={[styles.eventPrice, { color: colors.primary }]}>
+                                                            {event.price && event.price > 0 ? `${event.price} ${event.currency}` : 'Free'}
+                                                        </Text>
+                                                    </View>
                                                 </View>
-                                                <View style={{ flex: 1 }}>
-                                                    <Text style={[styles.eventName, { color: colors.foreground }]}>{event.name}</Text>
-                                                    <Text style={[styles.eventLocation, { color: colors.muted }]}>
-                                                        <IconSymbol name="mappin" size={12} color={colors.muted} /> {event.location}
-                                                    </Text>
-                                                    <Text style={[styles.eventPrice, { color: colors.primary }]}>
-                                                        {event.price && event.price > 0 ? `${event.price} ${event.currency}` : 'Free'}
-                                                    </Text>
+                                                <View style={{ padding: 16, paddingTop: 0 }}>
+                                                    <PremiumButton size="sm">View Details</PremiumButton>
                                                 </View>
-                                            </View>
-                                            <PremiumButton size="sm" style={{ marginTop: 12 }}>Register</PremiumButton>
-                                        </PremiumCard>
+                                            </PremiumCard>
+                                        </Pressable>
                                     ))
                                 ) : (
                                     <Text style={{ color: colors.muted, textAlign: 'center', marginTop: 20 }}>No upcoming events.</Text>
@@ -341,21 +375,31 @@ export default function CafeDetailScreen() {
                                 <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Join Our Team</Text>
                                 {business.jobs?.length > 0 ? (
                                     business.jobs.map((job) => (
-                                        <PremiumCard key={job.id} style={styles.jobCard}>
-                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
-                                                <Text style={[styles.jobTitle, { color: colors.foreground }]}>{job.title}</Text>
-                                                <View style={[styles.jobTypeBadge, { backgroundColor: colors.surface }]}>
-                                                    <Text style={[styles.jobTypeText, { color: colors.foreground }]}>{job.contractType}</Text>
+                                        <Pressable
+                                            key={job.id}
+                                            onPress={() => {
+                                                triggerHaptic();
+                                                router.push(`/cafe/job/${job.id}?cafeId=${rawId}`);
+                                            }}
+                                        >
+                                            <PremiumCard style={styles.jobCard}>
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                                                    <Text style={[styles.jobTitle, { color: colors.foreground }]}>{job.title}</Text>
+                                                    <View style={[styles.jobTypeBadge, { backgroundColor: job.contractType === 'full-time' ? '#10B98120' : '#3B82F620' }]}>
+                                                        <Text style={[styles.jobTypeText, { color: job.contractType === 'full-time' ? '#10B981' : '#3B82F6' }]}>
+                                                            {job.contractType === 'full-time' ? 'Full-time' : 'Part-time'}
+                                                        </Text>
+                                                    </View>
                                                 </View>
-                                            </View>
-                                            <Text style={[styles.jobSalary, { color: colors.success }]}>
-                                                {job.netSalaryMin} - {job.netSalaryMax} Ft
-                                            </Text>
-                                            <Text style={[styles.jobDesc, { color: colors.muted }]} numberOfLines={2}>
-                                                {job.description}
-                                            </Text>
-                                            <PremiumButton variant="outline" size="sm" style={{ marginTop: 12 }}>Apply Now</PremiumButton>
-                                        </PremiumCard>
+                                                <Text style={[styles.jobSalary, { color: colors.success }]}>
+                                                    {job.netSalaryMin?.toLocaleString()} - {job.netSalaryMax?.toLocaleString()} Ft
+                                                </Text>
+                                                <Text style={[styles.jobDesc, { color: colors.muted }]} numberOfLines={2}>
+                                                    {job.description}
+                                                </Text>
+                                                <PremiumButton variant="outline" size="sm" style={{ marginTop: 12 }}>View Details</PremiumButton>
+                                            </PremiumCard>
+                                        </Pressable>
                                     ))
                                 ) : (
                                     <Text style={{ color: colors.muted, textAlign: 'center', marginTop: 20 }}>No open positions.</Text>
@@ -417,6 +461,10 @@ const styles = StyleSheet.create({
     infoLabel: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase' },
     infoValue: { fontSize: 16, fontWeight: '700', textAlign: 'center' },
     contactRow: { flexDirection: 'row', gap: 12 },
+
+    amenitiesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24 },
+    amenityBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },
+    amenityLabel: { fontSize: 13, fontWeight: '500' },
 
     menuItemCard: { flexDirection: 'row', padding: 12, gap: 12, marginBottom: 12, alignItems: 'center' },
     menuItemImage: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#eee' },
