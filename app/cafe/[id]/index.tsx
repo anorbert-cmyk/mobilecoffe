@@ -15,7 +15,7 @@ import { trpc } from '@/lib/trpc';
 
 import { getCafeById, Cafe } from '@/data/cafes';
 
-type Tab = 'overview' | 'menu' | 'events' | 'jobs';
+type Tab = 'overview' | 'menu' | 'shop' | 'events' | 'jobs';
 
 export default function CafeDetailScreen() {
     const { id } = useLocalSearchParams();
@@ -70,8 +70,8 @@ export default function CafeDetailScreen() {
             location: demoCafe.address,
         })),
         // Map jobs directly  
-        jobs: demoCafe.jobs.map(j => ({
-            id: parseInt(j.id) || 0,
+        jobs: demoCafe.jobs.map((j, idx) => ({
+            id: parseInt(j.id) || (1000 + idx), // Fallback ID if string
             title: j.title,
             description: j.description,
             contractType: j.type,
@@ -81,6 +81,7 @@ export default function CafeDetailScreen() {
         })),
         subscriptions: [],
         services: demoCafe.amenities,
+        shop: demoCafe.shop || [],
     } : undefined);
 
     const triggerHaptic = () => {
@@ -140,6 +141,7 @@ export default function CafeDetailScreen() {
     const tabs = [
         { key: 'overview', label: 'Overview' },
         { key: 'menu', label: 'Menu' },
+        { key: 'shop', label: 'Shop' },
         { key: 'events', label: `Events (${business.events?.length || 0})` },
         { key: 'jobs', label: `Jobs (${business.jobs?.length || 0})` },
     ];
@@ -334,7 +336,7 @@ export default function CafeDetailScreen() {
                                             key={event.id}
                                             onPress={() => {
                                                 triggerHaptic();
-                                                router.push(`/cafe/event/${event.id}?cafeId=${rawId}`);
+                                                router.push(`/cafe/${rawId}/event/${event.id}`);
                                             }}
                                         >
                                             <PremiumCard style={styles.eventCard}>
@@ -370,6 +372,34 @@ export default function CafeDetailScreen() {
                             </Animated.View>
                         )}
 
+                        {activeTab === 'shop' && (
+                            <Animated.View entering={FadeInDown.duration(300)}>
+                                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Webshop</Text>
+                                <View style={styles.shopGrid}>
+                                    {(business as any).shop?.map((product: any) => (
+                                        <Pressable
+                                            key={product.id}
+                                            style={[styles.shopCard, { backgroundColor: colors.surface }]}
+                                            onPress={() => {
+                                                triggerHaptic();
+                                                router.push(`/cafe/${rawId}/product/${product.id}`);
+                                            }}
+                                        >
+                                            <Image source={{ uri: product.imageUrl }} style={styles.shopImage} />
+                                            <View style={{ padding: 12 }}>
+                                                <Text style={[styles.shopCategory, { color: colors.primary }]}>{product.category.toUpperCase()}</Text>
+                                                <Text style={[styles.shopName, { color: colors.foreground }]} numberOfLines={2}>{product.name}</Text>
+                                                <Text style={[styles.shopPrice, { color: colors.foreground }]}>{product.price.toLocaleString()} Ft</Text>
+                                            </View>
+                                        </Pressable>
+                                    ))}
+                                </View>
+                                {(!(business as any).shop || (business as any).shop.length === 0) && (
+                                    <Text style={{ color: colors.muted, textAlign: 'center', marginTop: 20 }}>No products available.</Text>
+                                )}
+                            </Animated.View>
+                        )}
+
                         {activeTab === 'jobs' && (
                             <Animated.View entering={FadeInDown.duration(300)}>
                                 <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Join Our Team</Text>
@@ -379,7 +409,7 @@ export default function CafeDetailScreen() {
                                             key={job.id}
                                             onPress={() => {
                                                 triggerHaptic();
-                                                router.push(`/cafe/job/${job.id}?cafeId=${rawId}`);
+                                                router.push(`/cafe/${rawId}/job/${job.id}`);
                                             }}
                                         >
                                             <PremiumCard style={styles.jobCard}>
@@ -461,6 +491,13 @@ const styles = StyleSheet.create({
     infoLabel: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase' },
     infoValue: { fontSize: 16, fontWeight: '700', textAlign: 'center' },
     contactRow: { flexDirection: 'row', gap: 12 },
+
+    shopGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+    shopCard: { width: '48%', borderRadius: 16, overflow: 'hidden', marginBottom: 12 },
+    shopImage: { width: '100%', height: 140, backgroundColor: '#eee' },
+    shopCategory: { fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginBottom: 4 },
+    shopName: { fontSize: 14, fontWeight: '700', marginBottom: 4, height: 40 },
+    shopPrice: { fontSize: 14, fontWeight: '600' },
 
     amenitiesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24 },
     amenityBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },

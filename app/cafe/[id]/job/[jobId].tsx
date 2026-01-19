@@ -12,7 +12,8 @@ import { useColors } from '@/hooks/use-colors';
 import { demoCafes } from '@/data/cafes';
 
 export default function JobDetailScreen() {
-    const { jobId, cafeId } = useLocalSearchParams();
+    const { jobId, id } = useLocalSearchParams();
+    const cafeId = id;
     const colors = useColors();
     const router = useRouter();
 

@@ -62,6 +62,16 @@ export interface OpeningHours {
   sunday: string;
 }
 
+export interface ShopProduct {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  imageUrl: string;
+  category: 'beans' | 'equipment' | 'merch';
+  weight?: string; // e.g. "250g"
+}
+
 export interface Cafe {
   id: string;
   name: string;
@@ -83,6 +93,7 @@ export interface Cafe {
   specialties: string[];
   amenities: CafeAmenities;
   menu: MenuCategory[];
+  shop?: ShopProduct[];
   events: CafeEvent[];
   jobs: CafeJob[];
 }
@@ -98,6 +109,34 @@ export const demoCafes: Cafe[] = [
     rating: 4.8,
     reviewCount: 1247,
     priceLevel: 2,
+    shop: [
+      {
+        id: 'ethiopia-yirgacheffe',
+        name: 'Ethiopia Yirgacheffe',
+        price: 4900,
+        description: 'Floral and citrusy notes with a tea-like body. Light roast, perfect for filter coffee.',
+        imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&q=80', // Fallback, will use asset in UI
+        category: 'beans',
+        weight: '250g'
+      },
+      {
+        id: 'colombia-huila',
+        name: 'Colombia Huila',
+        price: 4500,
+        description: 'Caramel sweetness with hints of red apple and chocolate. Medium roast, great for espresso.',
+        imageUrl: 'https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?w=800&q=80',
+        category: 'beans',
+        weight: '250g'
+      },
+      {
+        id: 'hario-v60',
+        name: 'Hario V60 Kit',
+        price: 8900,
+        description: 'Everything you need to start brewing pour-over coffee at home. Includes dripper, server, and filters.',
+        imageUrl: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80',
+        category: 'equipment'
+      }
+    ],
     address: 'Arany János u. 15',
     neighborhood: 'District V',
     image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80',

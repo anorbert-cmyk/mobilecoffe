@@ -1,96 +1,90 @@
-import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Pressable, Dimensions, Platform } from 'react-native';
 import { router } from 'expo-router';
-import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring, interpolate, useAnimatedScrollHandler } from 'react-native-reanimated';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
 
 import { ScreenContainer } from '@/components/screen-container';
-import { PremiumCard } from '@/components/ui/premium-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
 import { learningCategories, LearningCategory } from '@/data/learning';
 
+const { width } = Dimensions.get('window');
+const SPACING = 20;
+const ITEM_HEIGHT = 220;
+
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-const categoryIcons: Record<string, string> = {
-  'brewing-basics': 'cup.and.saucer.fill',
-  'roast-levels': 'flame.fill',
-  'coffee-origins': 'globe',
-  'equipment-guide': 'wrench.fill',
-  'home-setup': 'house.fill',
+// Mapping categories to the generated assets
+const categoryImages: Record<string, any> = {
+  'brewing-basics': require('@/assets/images/learn_brewing.png'),
+  'roast-levels': require('@/assets/images/learn_roasting.png'),
+  'bean-origins': require('@/assets/images/learn_origins.png'), // Mapped from 'coffee-origins' equivalent in earlier mental model, checking data
+  'equipment': require('@/assets/images/learn_equipment.png'),
+  'home-setup': require('@/assets/images/learn_home.png'),
 };
 
-const categoryColors: Record<string, { light: string; dark: string }> = {
-  'brewing-basics': { light: '#5D4037', dark: '#D4A574' },
-  'roast-levels': { light: '#E65100', dark: '#FF9800' },
-  'coffee-origins': { light: '#2E7D32', dark: '#66BB6A' },
-  'equipment-guide': { light: '#1565C0', dark: '#42A5F5' },
-  'home-setup': { light: '#6A1B9A', dark: '#AB47BC' },
-};
-
-// Separate component for category card to properly use hooks
-function CategoryCard({ item, index }: { item: LearningCategory; index: number }) {
+function LearningCard({ item, index }: { item: LearningCategory; index: number }) {
   const colors = useColors();
   const scale = useSharedValue(1);
-  const iconName = categoryIcons[item.id] || 'book.fill';
-  const categoryColor = categoryColors[item.id] || { light: colors.primary, dark: colors.primary };
-  const accentColor = colors.foreground === '#1C1410' ? categoryColor.light : categoryColor.dark;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
+  const imageSource = categoryImages[item.id] || categoryImages['brewing-basics']; // Fallback
+
+  const handlePress = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    router.push(`/learn/${item.id}` as any);
+  };
+
   return (
-    <Animated.View entering={FadeInDown.delay(index * 80).springify()}>
+    <Animated.View
+      entering={FadeInDown.delay(index * 100).springify().damping(15)}
+      style={{ marginBottom: 20 }}
+    >
       <AnimatedPressable
-        onPress={() => router.push(`/learn/${item.id}` as any)}
-        onPressIn={() => { scale.value = withSpring(0.98); }}
+        onPress={handlePress}
+        onPressIn={() => { scale.value = withSpring(0.97); }}
         onPressOut={() => { scale.value = withSpring(1); }}
-        style={animatedStyle}
-        accessibilityRole="button"
-        accessibilityLabel={`Learn about ${item.title}`}
+        style={[styles.cardContainer, animatedStyle]}
       >
-        <PremiumCard style={styles.categoryCard} elevated>
-          <View style={styles.cardContent}>
-            {/* Icon */}
-            <View style={[styles.iconContainer, { backgroundColor: `${accentColor}15` }]}>
-              <IconSymbol name={iconName as any} size={28} color={accentColor} />
+        <Image
+          source={imageSource}
+          style={styles.cardInfoImage}
+          contentFit="cover"
+          transition={300}
+        />
+
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.9)']}
+          style={styles.cardGradient}
+        />
+
+        <View style={styles.cardContent}>
+          <View style={styles.cardHeaderRow}>
+            <View style={styles.badgeContainer}>
+              <BlurView intensity={30} style={styles.badgeBlur}>
+                <Text style={styles.badgeText}>{item.articles.length} LESSONS</Text>
+              </BlurView>
             </View>
-            
-            {/* Content */}
-            <View style={styles.textContent}>
-              <Text 
-                style={[styles.categoryTitle, { color: colors.foreground }]}
-                numberOfLines={1}
-                accessibilityRole="header"
-              >
-                {item.title}
-              </Text>
-              <Text 
-                style={[styles.categoryDescription, { color: colors.muted }]}
-                numberOfLines={2}
-              >
-                {item.description}
-              </Text>
-              
-              {/* Article count */}
-              <View style={styles.metaRow}>
-                <View style={[styles.articleCount, { backgroundColor: colors.surfaceElevated }]}>
-                  <Text style={[styles.articleCountText, { color: colors.muted }]}>
-                    {item.articles.length} {item.articles.length === 1 ? 'article' : 'articles'}
-                  </Text>
-                </View>
-                <View style={[styles.readTime, { backgroundColor: colors.surfaceElevated }]}>
-                  <IconSymbol name="clock.fill" size={12} color={colors.muted} />
-                  <Text style={[styles.readTimeText, { color: colors.muted }]}>
-                    {Math.ceil(item.articles.reduce((acc, a) => acc + a.readTime, 0))} min
-                  </Text>
-                </View>
-              </View>
-            </View>
-            
-            {/* Arrow */}
-            <IconSymbol name="chevron.right" size={20} color={colors.muted} />
+            <BlurView intensity={30} style={styles.iconBadge}>
+              <IconSymbol name="chevron.right" size={16} color="#FFF" />
+            </BlurView>
           </View>
-        </PremiumCard>
+
+          <View>
+            <Text style={styles.cardTitle}>{item.title}</Text>
+            <Text style={styles.cardDescription} numberOfLines={2}>
+              {item.description}
+            </Text>
+          </View>
+        </View>
       </AnimatedPressable>
     </Animated.View>
   );
@@ -98,249 +92,255 @@ function CategoryCard({ item, index }: { item: LearningCategory; index: number }
 
 export default function LearnCoffeeScreen() {
   const colors = useColors();
+  const scrollY = useSharedValue(0);
 
-  const renderCategoryItem = ({ item, index }: { item: LearningCategory; index: number }) => (
-    <CategoryCard item={item} index={index} />
-  );
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
 
-  // Quick tips data
-  const quickTips = [
-    {
-      icon: 'info.circle.fill',
-      title: 'Fresh is Best',
-      text: 'Use coffee beans within 2-4 weeks of roasting for optimal flavor.',
-    },
-    {
-      icon: 'thermometer',
-      title: 'Water Temperature',
-      text: 'Ideal brewing temperature is 90-96°C (195-205°F).',
-    },
-    {
-      icon: 'gauge',
-      title: 'Measure Everything',
-      text: 'Use a scale for consistent results. Ratio: 1:15 to 1:18.',
-    },
-  ];
+  const heroImageStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: interpolate(
+            scrollY.value,
+            [-300, 0, 300],
+            [-100, 0, 100] // Parallax effect
+          ),
+        },
+        {
+          scale: interpolate(
+            scrollY.value,
+            [-300, 0],
+            [1.5, 1], // Zoom on pull down
+            'clamp'
+          )
+        }
+      ],
+    };
+  });
 
   return (
-    <ScreenContainer>
-      <FlatList
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <Animated.FlatList
         data={learningCategories}
-        renderItem={renderCategoryItem}
+        renderItem={({ item, index }) => <LearningCard item={item} index={index} />}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
         ListHeaderComponent={
-          <View style={styles.header}>
-            <Animated.Text 
-              entering={FadeInDown.delay(0).springify()}
-              style={[styles.title, { color: colors.foreground }]}
-              accessibilityRole="header"
-            >
-              Learn Coffee
-            </Animated.Text>
-            <Animated.Text 
-              entering={FadeInDown.delay(100).springify()}
-              style={[styles.subtitle, { color: colors.muted }]}
-            >
-              Master the art of coffee making
-            </Animated.Text>
-            
-            {/* Quick stats */}
-            <Animated.View 
-              entering={FadeInDown.delay(200).springify()}
-              style={styles.statsRow}
-            >
-              <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.statNumber, { color: colors.primary }]}>
-                  {learningCategories.length}
-                </Text>
-                <Text style={[styles.statLabel, { color: colors.muted }]}>
-                  Topics
-                </Text>
+          <View style={styles.headerContainer}>
+            <View style={styles.heroContainer}>
+              <Animated.Image
+                source={require('@/assets/images/learn_hero.png')}
+                style={[styles.heroImage, heroImageStyle]}
+              />
+              <LinearGradient
+                colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.4)', colors.background]}
+                style={styles.heroGradient}
+                locations={[0, 0.6, 1]}
+              />
+              <View style={styles.heroContent}>
+                <Animated.Text
+                  entering={FadeInDown.delay(200).springify()}
+                  style={styles.heroEyebrow}
+                >
+                  CRYSTAL ACADEMY
+                </Animated.Text>
+                <Animated.Text
+                  entering={FadeInDown.delay(300).springify()}
+                  style={styles.heroTitle}
+                >
+                  Master the Art of Coffee
+                </Animated.Text>
               </View>
-              <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.statNumber, { color: colors.primary }]}>
-                  {learningCategories.reduce((acc, cat) => acc + cat.articles.length, 0)}
-                </Text>
-                <Text style={[styles.statLabel, { color: colors.muted }]}>
-                  Articles
-                </Text>
-              </View>
-              <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.statNumber, { color: colors.primary }]}>
-                  {Math.ceil(learningCategories.reduce((acc, cat) => 
-                    acc + cat.articles.reduce((a, art) => a + art.readTime, 0), 0
-                  ))}
-                </Text>
-                <Text style={[styles.statLabel, { color: colors.muted }]}>
-                  Minutes
-                </Text>
-              </View>
-            </Animated.View>
+            </View>
+
+            <View style={styles.statsRow}>
+              <BlurView intensity={Platform.OS === 'ios' ? 20 : 0} style={[styles.statItem, { backgroundColor: Platform.OS === 'android' ? colors.surface : undefined }]}>
+                <IconSymbol name="book.fill" size={20} color={colors.primary} />
+                <View>
+                  <Text style={[styles.statValue, { color: colors.foreground }]}>{learningCategories.length}</Text>
+                  <Text style={[styles.statLabel, { color: colors.muted }]}>Courses</Text>
+                </View>
+              </BlurView>
+              <BlurView intensity={Platform.OS === 'ios' ? 20 : 0} style={[styles.statItem, { backgroundColor: Platform.OS === 'android' ? colors.surface : undefined }]}>
+                <IconSymbol name="doc.text.fill" size={20} color={colors.primary} />
+                <View>
+                  <Text style={[styles.statValue, { color: colors.foreground }]}>
+                    {learningCategories.reduce((acc, cat) => acc + cat.articles.length, 0)}
+                  </Text>
+                  <Text style={[styles.statLabel, { color: colors.muted }]}>Articles</Text>
+                </View>
+              </BlurView>
+              <BlurView intensity={Platform.OS === 'ios' ? 20 : 0} style={[styles.statItem, { backgroundColor: Platform.OS === 'android' ? colors.surface : undefined }]}>
+                <IconSymbol name="clock.fill" size={20} color={colors.primary} />
+                <View>
+                  <Text style={[styles.statValue, { color: colors.foreground }]}>45m</Text>
+                  <Text style={[styles.statLabel, { color: colors.muted }]}>Content</Text>
+                </View>
+              </BlurView>
+            </View>
+
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Explore Courses</Text>
           </View>
         }
-        ListFooterComponent={
-          <Animated.View 
-            entering={FadeInDown.delay(500).springify()}
-            style={styles.tipsSection}
-          >
-            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-              Quick Tips
-            </Text>
-            {quickTips.map((tip, index) => (
-              <View 
-                key={index}
-                style={[styles.tipCard, { backgroundColor: colors.surface }]}
-              >
-                <View style={[styles.tipIconContainer, { backgroundColor: `${colors.primary}15` }]}>
-                  <IconSymbol name={tip.icon as any} size={20} color={colors.primary} />
-                </View>
-                <View style={styles.tipContent}>
-                  <Text style={[styles.tipTitle, { color: colors.foreground }]}>
-                    {tip.title}
-                  </Text>
-                  <Text style={[styles.tipText, { color: colors.muted }]}>
-                    {tip.text}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </Animated.View>
-        }
       />
-    </ScreenContainer>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    paddingHorizontal: 4,
-    paddingTop: 8,
-    paddingBottom: 24,
+  screen: {
+    flex: 1,
   },
-  title: {
-    fontSize: 34,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-    marginBottom: 4,
+  listContent: {
+    paddingBottom: 40,
   },
-  subtitle: {
-    fontSize: 17,
-    lineHeight: 22,
+  headerContainer: {
     marginBottom: 20,
+  },
+  heroContainer: {
+    height: 400,
+    width: '100%',
+    overflow: 'hidden',
+    marginBottom: -40, // overlap with stats
+    justifyContent: 'flex-end',
+  },
+  heroImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  heroGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  heroContent: {
+    padding: 24,
+    paddingBottom: 80,
+  },
+  heroEyebrow: {
+    color: '#D4A574', // Goldish
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 2,
+    marginBottom: 8,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  heroTitle: {
+    color: '#FFF',
+    fontSize: 42,
+    fontWeight: '800',
+    lineHeight: 48,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
   },
   statsRow: {
     flexDirection: 'row',
+    paddingHorizontal: 20,
     gap: 12,
+    marginBottom: 30,
   },
-  statCard: {
+  statItem: {
     flex: 1,
-    padding: 16,
-    borderRadius: 14,
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+    padding: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
-  statNumber: {
-    fontSize: 24,
+  statValue: {
+    fontSize: 18,
     fontWeight: '700',
-    marginBottom: 2,
   },
   statLabel: {
     fontSize: 12,
-    fontWeight: '500',
-  },
-  listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 100,
-  },
-  categoryCard: {
-    padding: 16,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-  },
-  iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  textContent: {
-    flex: 1,
-  },
-  categoryTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  categoryDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  articleCount: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  articleCountText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  readTime: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    gap: 4,
-  },
-  readTimeText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  tipsSection: {
-    marginTop: 32,
-    paddingBottom: 20,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
+    paddingHorizontal: 20,
     marginBottom: 16,
   },
-  tipCard: {
-    flexDirection: 'row',
-    padding: 14,
-    borderRadius: 14,
-    marginBottom: 10,
-    gap: 12,
-    alignItems: 'flex-start',
+  cardContainer: {
+    marginHorizontal: 20,
+    height: ITEM_HEIGHT,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: '#000', // fallback
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  tipIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+  cardInfoImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  cardGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  cardContent: {
+    flex: 1,
+    justifyContent: 'space-between',
+    padding: 20,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  badgeContainer: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  badgeBlur: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  badgeText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  iconBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
-  tipContent: {
-    flex: 1,
+  cardTitle: {
+    color: '#FFF',
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: 8,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
-  tipTitle: {
+  cardDescription: {
+    color: 'rgba(255,255,255,0.8)',
     fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  tipText: {
-    fontSize: 14,
     lineHeight: 20,
+    fontWeight: '500',
+    maxWidth: '85%',
   },
 });

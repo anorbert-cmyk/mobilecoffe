@@ -13,7 +13,8 @@ import { useColors } from '@/hooks/use-colors';
 import { demoCafes } from '@/data/cafes';
 
 export default function EventDetailScreen() {
-    const { eventId, cafeId } = useLocalSearchParams();
+    const { eventId, id } = useLocalSearchParams();
+    const cafeId = id;
     const colors = useColors();
     const router = useRouter();
 

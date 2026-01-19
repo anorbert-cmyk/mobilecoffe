@@ -306,46 +306,20 @@ export default function FindCoffeeScreen() {
               </Text>
             </View>
 
-            <Text style={[styles.cafeAddress, { color: colors.muted }]} numberOfLines={1}>
-              {item.address}
-            </Text>
+            <View style={styles.cafeMetaRow}>
+              <IconSymbol name="mappin.and.ellipse" size={14} color={colors.muted} />
+              <Text style={[styles.cafeAddress, { color: colors.muted }]} numberOfLines={1}>
+                {item.neighborhood || item.address}
+              </Text>
+            </View>
 
-            {/* Action buttons */}
-            <View style={styles.actions}>
-              <Pressable
-                onPress={(e) => { e.stopPropagation(); openMaps(item); }}
-                style={({ pressed }) => [
-                  styles.actionButton,
-                  { backgroundColor: colors.primary, opacity: pressed ? 0.8 : 1 }
-                ]}
-              >
-                <IconSymbol name="map.fill" size={18} color="#FFF" />
-                <Text style={styles.actionButtonText}>Directions</Text>
-              </Pressable>
-
-              {item.phone && (
-                <Pressable
-                  onPress={(e) => { e.stopPropagation(); openPhone(item.phone!); }}
-                  style={({ pressed }) => [
-                    styles.actionButtonSecondary,
-                    { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }
-                  ]}
-                >
-                  <IconSymbol name="phone.fill" size={18} color={colors.foreground} />
-                </Pressable>
-              )}
-
-              {item.website && (
-                <Pressable
-                  onPress={(e) => { e.stopPropagation(); openWebsite(item.website!); }}
-                  style={({ pressed }) => [
-                    styles.actionButtonSecondary,
-                    { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }
-                  ]}
-                >
-                  <IconSymbol name="globe" size={18} color={colors.foreground} />
-                </Pressable>
-              )}
+            {/* Amenities Icons */}
+            <View style={styles.amenitiesRow}>
+              {item.amenities?.wifi && <IconSymbol name="wifi" size={14} color={colors.muted} style={{ marginRight: 8 }} />}
+              {item.amenities?.dogFriendly && <IconSymbol name="pawprint.fill" size={14} color={colors.muted} style={{ marginRight: 8 }} />}
+              {item.amenities?.cardPayment && <IconSymbol name="creditcard.fill" size={14} color={colors.muted} style={{ marginRight: 8 }} />}
+              {item.amenities?.terrace && <IconSymbol name="sun.max.fill" size={14} color={colors.muted} style={{ marginRight: 8 }} />}
+              {item.amenities?.laptopFriendly && <IconSymbol name="laptopcomputer" size={14} color={colors.muted} style={{ marginRight: 8 }} />}
             </View>
           </View>
         </PremiumCard>
@@ -640,4 +614,10 @@ const styles = StyleSheet.create({
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 60, gap: 12 },
   emptyTitle: { fontSize: 20, fontWeight: '700' },
   emptyDescription: { fontSize: 15, textAlign: 'center' },
+  amenitiesRow: {
+    flexDirection: 'row',
+    marginTop: 12,
+    alignItems: 'center',
+    opacity: 0.8,
+  },
 });
