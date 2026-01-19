@@ -7,9 +7,9 @@ import { useColors } from '@/hooks/use-colors';
 import { trpc } from '@/lib/trpc';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { getApiBaseUrl } from '@/constants/oauth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Auth from '@/lib/_core/auth';
 
-const SESSION_TOKEN_KEY = 'app_session_token';
+
 
 export default function B2BLogin() {
     const router = useRouter();
@@ -46,7 +46,7 @@ export default function B2BLogin() {
 
             if (data.success && data.token) {
                 // Store the session token
-                await AsyncStorage.setItem(SESSION_TOKEN_KEY, data.token);
+                await Auth.setSessionToken(data.token);
 
                 // Invalidate and refetch auth queries
                 await utils.auth.me.invalidate();

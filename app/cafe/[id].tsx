@@ -13,6 +13,8 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
 import { trpc } from '@/lib/trpc';
 
+import { getCafeById, Cafe } from '@/data/cafes';
+
 type Tab = 'overview' | 'menu' | 'events' | 'jobs';
 
 export default function CafeDetailScreen() {
@@ -21,12 +23,39 @@ export default function CafeDetailScreen() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<Tab>('overview');
 
-    const businessId = typeof id === 'string' ? parseInt(id) : undefined;
+    // Determine if ID is numeric (backend) or string (demo)
+    const rawId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : undefined;
+    const isNumericId = rawId ? !isNaN(parseInt(rawId)) : false;
+    const businessId = isNumericId && rawId ? parseInt(rawId) : undefined;
 
-    const { data: business, isLoading } = trpc.business.getById.useQuery(
+    // Query backend only for numeric IDs
+    const { data: backendBusiness, isLoading: isBackendLoading } = trpc.business.getById.useQuery(
         { id: businessId! },
         { enabled: !!businessId }
     );
+
+    // For non-numeric IDs, use demo data
+    const demoCafe = !isNumericId && rawId ? getCafeById(rawId) : undefined;
+
+    // Unified loading state
+    const isLoading = isNumericId ? isBackendLoading : false;
+
+    // Convert demo cafe to a compatible shape (simplified for display)
+    const business = backendBusiness || (demoCafe ? {
+        id: 0,
+        name: demoCafe.name,
+        description: demoCafe.description,
+        address: { street: demoCafe.address, city: demoCafe.neighborhood },
+        phone: demoCafe.phone,
+        website: demoCafe.website,
+        headerImageUrls: [demoCafe.image],
+        openingHours: { week: demoCafe.openingHours },
+        products: [],
+        events: [],
+        jobs: [],
+        subscriptions: [],
+        services: { wifi: demoCafe.features.includes('WiFi') },
+    } : undefined);
 
     const triggerHaptic = () => {
         if (Platform.OS !== 'web') {
