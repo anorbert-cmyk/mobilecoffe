@@ -40,21 +40,47 @@ export default function CafeDetailScreen() {
     // Unified loading state
     const isLoading = isNumericId ? isBackendLoading : false;
 
-    // Convert demo cafe to a compatible shape (simplified for display)
+    // Convert demo cafe to a compatible shape with RICH DATA
     const business = backendBusiness || (demoCafe ? {
         id: 0,
         name: demoCafe.name,
-        description: demoCafe.description,
+        description: demoCafe.longDescription || demoCafe.description,
         address: { street: demoCafe.address, city: demoCafe.neighborhood },
         phone: demoCafe.phone,
         website: demoCafe.website,
         headerImageUrls: [demoCafe.image],
-        openingHours: { week: demoCafe.openingHours?.monday || 'Varies' },
-        products: [],
-        events: [],
-        jobs: [],
+        openingHours: demoCafe.openingHours,
+        // Transform menu categories into flat products list for UI compatibility
+        products: demoCafe.menu.flatMap((category, catIdx) =>
+            category.items.map((item, itemIdx) => ({
+                id: catIdx * 100 + itemIdx,
+                name: item.name,
+                description: item.description || '',
+                price: item.price,
+                currency: 'HUF',
+                type: category.name.toLowerCase().includes('espresso') || category.name.toLowerCase().includes('filter') ? 'coffee' : 'accessory',
+                isPopular: item.isPopular,
+                isVegan: item.isVegan,
+            }))
+        ),
+        // Map events directly
+        events: demoCafe.events.map(e => ({
+            ...e,
+            id: parseInt(e.id) || 0,
+            location: demoCafe.address,
+        })),
+        // Map jobs directly  
+        jobs: demoCafe.jobs.map(j => ({
+            id: parseInt(j.id) || 0,
+            title: j.title,
+            description: j.description,
+            contractType: j.type,
+            netSalaryMin: j.salaryMin,
+            netSalaryMax: j.salaryMax,
+            status: 'active',
+        })),
         subscriptions: [],
-        services: { wifi: demoCafe.amenities?.wifi ?? false },
+        services: demoCafe.amenities,
     } : undefined);
 
     const triggerHaptic = () => {
