@@ -251,93 +251,102 @@ export default function FindCoffeeScreen() {
 
   const renderCafeCard = ({ item, index }: { item: CafeWithDistance; index: number }) => (
     <Animated.View entering={FadeInDown.delay(index * 60).springify()}>
-      <PremiumCard style={styles.card} elevated>
-        {/* Image with overlays */}
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: item.image }}
-            style={styles.cardImage}
-            contentFit="cover"
-            transition={300}
-          />
+      <Pressable
+        onPress={() => {
+          triggerHaptic();
+          router.push({ pathname: '/cafe/[id]', params: { id: item.id } });
+        }}
+        accessibilityRole="button"
+        accessibilityLabel={`View details for ${item.name}`}
+      >
+        <PremiumCard style={styles.card} elevated>
+          {/* Image with overlays */}
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: item.image }}
+              style={styles.cardImage}
+              contentFit="cover"
+              transition={300}
+            />
 
-          {/* Rating badge */}
-          <View style={[styles.ratingBadge, { backgroundColor: colors.surface }]}>
-            <IconSymbol name="star.fill" size={14} color="#FFB800" />
-            <Text style={[styles.ratingBadgeText, { color: colors.foreground }]}>
-              {item.rating.toFixed(1)}
-            </Text>
-          </View>
-
-          {/* Distance badge */}
-          {userLocation && (
-            <View style={[styles.distanceBadge, { backgroundColor: colors.primary }]}>
-              <IconSymbol name="location.fill" size={12} color="#FFF" />
-              <Text style={styles.distanceBadgeText}>
-                {formatDistance(item.distance)}
+            {/* Rating badge */}
+            <View style={[styles.ratingBadge, { backgroundColor: colors.surface }]}>
+              <IconSymbol name="star.fill" size={14} color="#FFB800" />
+              <Text style={[styles.ratingBadgeText, { color: colors.foreground }]}>
+                {item.rating.toFixed(1)}
               </Text>
             </View>
-          )}
-        </View>
 
-        {/* Content */}
-        <View style={styles.cardContent}>
-          <Text style={[styles.cafeName, { color: colors.foreground }]}>
-            {item.name}
-          </Text>
-
-          <View style={styles.cafeMetaRow}>
-            <Text style={[styles.cafeSpecialty, { color: colors.primary }]}>
-              {item.specialties[0] || 'Specialty Coffee'}
-            </Text>
-            <Text style={[styles.priceLevel, { color: colors.muted }]}>
-              {renderPriceLevel(item.priceLevel)}
-            </Text>
-          </View>
-
-          <Text style={[styles.cafeAddress, { color: colors.muted }]} numberOfLines={1}>
-            {item.address}
-          </Text>
-
-          {/* Action buttons */}
-          <View style={styles.actions}>
-            <Pressable
-              onPress={() => openMaps(item)}
-              style={({ pressed }) => [
-                styles.actionButton,
-                { backgroundColor: colors.primary, opacity: pressed ? 0.8 : 1 }
-              ]}
-            >
-              <IconSymbol name="map.fill" size={18} color="#FFF" />
-              <Text style={styles.actionButtonText}>Directions</Text>
-            </Pressable>
-
-            {item.phone && (
-              <Pressable
-                onPress={() => openPhone(item.phone!)}
-                style={({ pressed }) => [
-                  styles.actionButtonSecondary,
-                  { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }
-                ]}
-              >
-                <IconSymbol name="phone.fill" size={18} color={colors.foreground} />
-              </Pressable>
-            )}
-
-            {item.website && (
-              <Pressable
-                onPress={() => openWebsite(item.website!)}
-                style={({ pressed }) => [
-                  styles.actionButtonSecondary,
-                  { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }
-                ]}
-              >
-                <IconSymbol name="globe" size={18} color={colors.foreground} />
-              </Pressable>
+            {/* Distance badge */}
+            {userLocation && (
+              <View style={[styles.distanceBadge, { backgroundColor: colors.primary }]}>
+                <IconSymbol name="location.fill" size={12} color="#FFF" />
+                <Text style={styles.distanceBadgeText}>
+                  {formatDistance(item.distance)}
+                </Text>
+              </View>
             )}
           </View>
-        </View>
-      </PremiumCard>
+
+          {/* Content */}
+          <View style={styles.cardContent}>
+            <Text style={[styles.cafeName, { color: colors.foreground }]}>
+              {item.name}
+            </Text>
+
+            <View style={styles.cafeMetaRow}>
+              <Text style={[styles.cafeSpecialty, { color: colors.primary }]}>
+                {item.specialties[0] || 'Specialty Coffee'}
+              </Text>
+              <Text style={[styles.priceLevel, { color: colors.muted }]}>
+                {renderPriceLevel(item.priceLevel)}
+              </Text>
+            </View>
+
+            <Text style={[styles.cafeAddress, { color: colors.muted }]} numberOfLines={1}>
+              {item.address}
+            </Text>
+
+            {/* Action buttons */}
+            <View style={styles.actions}>
+              <Pressable
+                onPress={(e) => { e.stopPropagation(); openMaps(item); }}
+                style={({ pressed }) => [
+                  styles.actionButton,
+                  { backgroundColor: colors.primary, opacity: pressed ? 0.8 : 1 }
+                ]}
+              >
+                <IconSymbol name="map.fill" size={18} color="#FFF" />
+                <Text style={styles.actionButtonText}>Directions</Text>
+              </Pressable>
+
+              {item.phone && (
+                <Pressable
+                  onPress={(e) => { e.stopPropagation(); openPhone(item.phone!); }}
+                  style={({ pressed }) => [
+                    styles.actionButtonSecondary,
+                    { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }
+                  ]}
+                >
+                  <IconSymbol name="phone.fill" size={18} color={colors.foreground} />
+                </Pressable>
+              )}
+
+              {item.website && (
+                <Pressable
+                  onPress={(e) => { e.stopPropagation(); openWebsite(item.website!); }}
+                  style={({ pressed }) => [
+                    styles.actionButtonSecondary,
+                    { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }
+                  ]}
+                >
+                  <IconSymbol name="globe" size={18} color={colors.foreground} />
+                </Pressable>
+              )}
+            </View>
+          </View>
+        </PremiumCard>
+      </Pressable>
     </Animated.View>
   );
 

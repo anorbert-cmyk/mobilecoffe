@@ -54,7 +54,8 @@ export const businessRouter = router({
                 with: {
                     products: true,
                     events: true,
-                    menuCategories: true
+                    menuCategories: true,
+                    subscriptions: true,
                 },
                 limit: 50, // Limit for now
             });
