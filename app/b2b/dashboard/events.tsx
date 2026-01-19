@@ -63,7 +63,7 @@ export default function EventsManager() {
                                 </Text>
                             </View>
                             <Pressable onPress={() => handleDelete(item.id)} style={{ padding: 8 }}>
-                                <IconSymbol name="trash.fill" size={20} color={colors.destructive || '#ef4444'} />
+                                <IconSymbol name="trash.fill" size={20} color={colors.destructive} />
                             </Pressable>
                         </View>
                     </View>

@@ -12,6 +12,7 @@ export const themeColors: {
   success: { light: string; dark: string };
   warning: { light: string; dark: string };
   error: { light: string; dark: string };
+  destructive: { light: string; dark: string };
   espresso: { light: string; dark: string };
   milk: { light: string; dark: string };
   tabBarActive: { light: string; dark: string };

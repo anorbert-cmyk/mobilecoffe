@@ -141,7 +141,7 @@ export default function DashboardOverview() {
 
                 <PremiumButton
                     variant="outline"
-                    onPress={() => router.push('/cafe/' + business.id)}
+                    onPress={() => router.push({ pathname: '/cafe/[id]', params: { id: business.id } })}
                     leftIcon={<IconSymbol name="eye.fill" size={20} color={colors.primary} />}
                 >
                     View Public Page
