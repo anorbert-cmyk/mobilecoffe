@@ -1,79 +1,130 @@
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, FlatList, Pressable, Platform, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
+import Animated, { FadeInDown, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
+
 import { useColors } from '@/hooks/use-colors';
 import { trpc } from '@/lib/trpc';
-import { Icon } from '@/components/ui/app-icons';
-import { GlassPanel } from '@/components/ui/glass-panel';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function JobList() {
     const router = useRouter();
     const colors = useColors();
-    const { data: jobs, isLoading } = trpc.job.listMine.useQuery();
+    const { data: jobs, isLoading, refetch } = trpc.job.listMine.useQuery();
 
-    const CONTENT_PADDING_BOTTOM = 100;
+    const CONTENT_PADDING_BOTTOM = 120;
 
-    const renderItem = ({ item, index }: { item: any, index: number }) => (
-        <Animated.View entering={FadeInDown.delay(index * 100)}>
-            <GlassPanel style={styles.card}>
-                <View style={styles.cardHeader}>
-                    <View style={{ flex: 1 }}>
-                        <Text style={[styles.jobTitle, { color: colors.foreground }]}>{item.title}</Text>
-                        <Text style={[styles.jobType, { color: colors.muted }]}>{item.contractType}</Text>
+    const renderItem = ({ item, index }: { item: any, index: number }) => {
+        const scale = useSharedValue(1);
+
+        const animatedStyle = useAnimatedStyle(() => ({
+            transform: [{ scale: scale.value }],
+        }));
+
+        const handlePress = () => {
+            if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push(`/b2b/edit-job?id=${item.id}` as any);
+        };
+
+        return (
+            <Animated.View entering={FadeInDown.delay(index * 100).springify().damping(15)}>
+                <AnimatedPressable
+                    onPress={handlePress}
+                    onPressIn={() => { scale.value = withSpring(0.97); }}
+                    onPressOut={() => { scale.value = withSpring(1); }}
+                    style={[styles.jobCard, animatedStyle, { backgroundColor: colors.surface }]}
+                >
+                    <View style={styles.cardHeader}>
+                        <View style={{ flex: 1 }}>
+                            <Text style={[styles.jobTitle, { color: colors.foreground }]}>{item.title}</Text>
+                            <View style={styles.metaRow}>
+                                <View style={[styles.typeBadge, { backgroundColor: colors.primary + '20' }]}>
+                                    <Text style={[styles.typeText, { color: colors.primary }]}>
+                                        {item.contractType?.replace('-', ' ').toUpperCase()}
+                                    </Text>
+                                </View>
+                                {item.status === 'active' && (
+                                    <View style={[styles.statusBadge, { backgroundColor: '#10B98120' }]}>
+                                        <Text style={{ color: '#10B981', fontSize: 10, fontWeight: '700' }}>ACTIVE</Text>
+                                    </View>
+                                )}
+                            </View>
+                        </View>
+                        <View style={[styles.iconContainer, { backgroundColor: colors.background }]}>
+                            <IconSymbol name="chevron.right" size={16} color={colors.muted} />
+                        </View>
                     </View>
-                    <View style={[
-                        styles.statusBadge,
-                        { backgroundColor: item.status === 'active' ? '#10B98120' : '#6B728020' }
-                    ]}>
-                        <Text style={[
-                            styles.statusText,
-                            { color: item.status === 'active' ? '#10B981' : '#6B7280' }
-                        ]}>
-                            {item.status}
-                        </Text>
-                    </View>
-                </View>
 
-                <View style={styles.cardFooter}>
-                    <View style={styles.statRow}>
-                        <Icon name="User" size={14} color={colors.muted} />
-                        <Text style={[styles.statText, { color: colors.muted }]}>{item.views || 0} views</Text>
-                    </View>
+                    <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-                    <Pressable
-                        onPress={() => router.push(`/b2b/edit-job?id=${item.id}` as any)}
-                        style={({ pressed }) => [
-                            styles.editBtn,
-                            { backgroundColor: colors.surface, opacity: pressed ? 0.7 : 1 }
-                        ]}
-                    >
-                        <Icon name="Settings" size={14} color={colors.foreground} />
-                        <Text style={[styles.btnText, { color: colors.foreground }]}>Edit</Text>
-                    </Pressable>
-                </View>
-            </GlassPanel>
-        </Animated.View>
-    );
+                    <View style={styles.cardFooter}>
+                        <View style={styles.statItem}>
+                            <IconSymbol name="eye.fill" size={14} color={colors.muted} />
+                            <Text style={[styles.statText, { color: colors.muted }]}>{item.views || 0} views</Text>
+                        </View>
+                        <View style={styles.statItem}>
+                            <IconSymbol name="clock.fill" size={14} color={colors.muted} />
+                            <Text style={[styles.statText, { color: colors.muted }]}>
+                                {new Date(item.createdAt).toLocaleDateString()}
+                            </Text>
+                        </View>
+                    </View>
+                </AnimatedPressable>
+            </Animated.View>
+        );
+    };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
+            {/* Header */}
+            <View style={styles.header}>
+                <Text style={[styles.headerTitle, { color: colors.foreground }]}>Job Listings</Text>
+                <Text style={[styles.headerSubtitle, { color: colors.muted }]}>
+                    Find the perfect talent for your team
+                </Text>
+            </View>
+
             <FlatList
                 data={jobs || []}
                 renderItem={renderItem}
-                contentContainerStyle={{ padding: 20, paddingBottom: CONTENT_PADDING_BOTTOM, gap: 16 }}
-                ListHeaderComponent={
-                    <View style={styles.header}>
-                        <Text style={[styles.subtitle, { color: colors.muted }]}>Manage your active listings</Text>
-                        <Pressable
-                            onPress={() => router.push('/b2b/dashboard/jobs/add' as any)}
-                            style={[styles.addBtn, { backgroundColor: colors.primary }]}
-                        >
-                            <Icon name="Plus" size={20} color="#FFF" />
-                            <Text style={styles.addBtnText}>Post Job</Text>
-                        </Pressable>
+                contentContainerStyle={[styles.listContent, { paddingBottom: CONTENT_PADDING_BOTTOM }]}
+                showsVerticalScrollIndicator={false}
+                refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.foreground} />}
+                ListEmptyComponent={() => (
+                    <View style={styles.emptyState}>
+                        <View style={[styles.emptyIconContainer, { backgroundColor: colors.surface }]}>
+                            <IconSymbol name="person.crop.circle.badge.plus" size={48} color={colors.muted} />
+                        </View>
+                        <Text style={[styles.emptyTitle, { color: colors.foreground }]}>No active jobs</Text>
+                        <Text style={[styles.emptyDescription, { color: colors.muted }]}>
+                            Create a job posting to start receiving applications from baristas.
+                        </Text>
                     </View>
-                }
+                )}
             />
+
+            {/* Floating Add Button */}
+            <Pressable
+                onPress={() => {
+                    if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    router.push('/b2b/dashboard/jobs/add' as any);
+                }}
+                style={({ pressed }) => [styles.fab, { opacity: pressed ? 0.9 : 1 }]}
+            >
+                <LinearGradient
+                    colors={['#10B981', '#059669']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.fabGradient}
+                >
+                    <IconSymbol name="plus" size={24} color="#FFF" />
+                    <Text style={styles.fabText}>Post Job</Text>
+                </LinearGradient>
+            </Pressable>
         </View>
     );
 }
@@ -83,84 +134,137 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        marginBottom: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 16,
+        paddingBottom: 20,
     },
-    subtitle: {
-        fontSize: 14,
+    headerTitle: {
+        fontSize: 32,
+        fontWeight: '800',
+        marginBottom: 4,
     },
-    addBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 10,
+    headerSubtitle: {
+        fontSize: 15,
+    },
+    listContent: {
+        paddingHorizontal: 20,
+        gap: 16,
+    },
+    jobCard: {
         borderRadius: 20,
-        gap: 6,
-    },
-    addBtnText: {
-        color: '#FFF',
-        fontWeight: '700',
-        fontSize: 14,
-    },
-    card: {
         padding: 16,
-        borderRadius: 16,
+        // Shadow (subtle)
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 2,
     },
     cardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: 12,
     },
     jobTitle: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: '700',
-        marginBottom: 4,
+        marginBottom: 8,
     },
-    jobType: {
-        fontSize: 12,
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
+    metaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    typeBadge: {
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+    },
+    typeText: {
+        fontSize: 10,
+        fontWeight: '700',
     },
     statusBadge: {
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 12,
+        borderRadius: 8,
     },
-    statusText: {
-        fontSize: 10,
-        fontWeight: '700',
-        textTransform: 'uppercase',
+    iconContainer: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    divider: {
+        height: 1,
+        width: '100%',
+        marginVertical: 12,
+        opacity: 0.5,
     },
     cardFooter: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 12,
-        paddingTop: 12,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(150,150,150,0.1)',
+        gap: 16,
     },
-    statRow: {
+    statItem: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
     },
     statText: {
         fontSize: 12,
+        fontWeight: '500',
     },
-    editBtn: {
+
+    // Empty State
+    emptyState: {
+        alignItems: 'center',
+        paddingTop: 60,
+        paddingHorizontal: 40,
+    },
+    emptyIconContainer: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 16,
+    },
+    emptyTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        marginBottom: 8,
+    },
+    emptyDescription: {
+        fontSize: 14,
+        textAlign: 'center',
+        lineHeight: 20,
+    },
+
+    // FAB
+    fab: {
+        position: 'absolute',
+        bottom: Platform.OS === 'ios' ? 100 : 80,
+        right: 20,
+        borderRadius: 28,
+        overflow: 'hidden',
+        shadowColor: '#10B981',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.4,
+        shadowRadius: 16,
+        elevation: 12,
+    },
+    fabGradient: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 12,
-        gap: 6,
+        gap: 8,
+        paddingHorizontal: 20,
+        paddingVertical: 14,
     },
-    btnText: {
-        fontSize: 12,
-        fontWeight: '600',
-    }
+    fabText: {
+        color: '#FFF',
+        fontSize: 15,
+        fontWeight: '700',
+    },
 });
