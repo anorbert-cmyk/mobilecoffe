@@ -33,14 +33,12 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
                 <View style={styles.tabsRow}>
                     {state.routes
                         .filter((route) => {
-                            // Filter out routes where href is null (hidden from tab bar)
-                            const { options } = descriptors[route.key];
-                            // Expo Router adds href to options, but it's not in the base types
-                            return (options as any).href !== null;
+                            // Strict whitelist for visible tabs
+                            const VISIBLE_ROUTES = ['index', 'products', 'jobs/index'];
+                            return VISIBLE_ROUTES.includes(route.name);
                         })
                         .map((route, index) => {
                             const { options } = descriptors[route.key];
-                            // Find actual index in original state for focus detection
                             const actualIndex = state.routes.findIndex(r => r.key === route.key);
                             const isFocused = state.index === actualIndex;
 
@@ -56,10 +54,26 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
                                 }
                             };
 
-                            // Map route names to icons using SF Symbols
+                            // Strict Icon Mapping
                             let iconName: IconSymbolName = 'house.fill';
-                            if (route.name === 'index') iconName = 'house.fill';
-                            if (route.name === 'products') iconName = 'cup.and.saucer.fill'; // Menu
+                            let label = options.title || route.name;
+
+                            if (route.name === 'index') {
+                                iconName = 'chart.pie.fill'; // More business-like than house
+                                label = 'Overview';
+                            }
+                            if (route.name === 'products') {
+                                iconName = 'cup.and.saucer.fill';
+                                label = 'Menu';
+                            }
+                            if (route.name === 'jobs/index') {
+                                iconName = 'person.2.crop.square.stack.fill'; // or briefcase if available, fallback to staff icon
+                                label = 'Jobs';
+                            }
+
+                            // If 'jobs/index' is active, highlight if any job sub-route is active? 
+                            // Expo Router handles basic focus, but for nested stacks we might need logic.
+                            // For now rely on state.index.
 
                             return (
                                 <TabItem
@@ -67,7 +81,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
                                     isFocused={isFocused}
                                     onPress={onPress}
                                     iconName={iconName}
-                                    label={options.title || route.name}
+                                    label={label}
                                     activeColor={colors.primary}
                                     inactiveColor={colors.muted}
                                 />
@@ -87,17 +101,14 @@ function TabItem({
     activeColor,
     inactiveColor
 }: any) {
-    const scale = useSharedValue(1);
     const opacity = useSharedValue(0.6);
 
     useEffect(() => {
-        // Smooth timing instead of bouncy spring
-        scale.value = withTiming(isFocused ? 1.1 : 1, { duration: 200 });
+        // Only opacity change, NO SCALE to prevent bouncing
         opacity.value = withTiming(isFocused ? 1 : 0.6, { duration: 200 });
     }, [isFocused]);
 
     const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
         opacity: opacity.value
     }));
 
@@ -108,8 +119,11 @@ function TabItem({
                     name={iconName}
                     size={24}
                     color={isFocused ? activeColor : inactiveColor}
-                    weight={isFocused ? 'semibold' : 'regular'}
+                    weight={isFocused ? 'bold' : 'regular'}
                 />
+                {/* Text Label for clarity if needed, but user asked for "perfect icons" */}
+                {/* <Text style={{ fontSize: 10, color: isFocused ? activeColor : inactiveColor }}>{label}</Text> */}
+
                 {isFocused && (
                     <Animated.View
                         entering={undefined}
