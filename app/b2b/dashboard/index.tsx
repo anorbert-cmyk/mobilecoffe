@@ -13,9 +13,12 @@ export default function DashboardOverview() {
 
     const { data: apiBusiness, isLoading, refetch } = trpc.business.getMine.useQuery();
 
+    const utils = trpc.useUtils();
+
     // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
     const upgradeToPremium = trpc.business.upgradeToPremium.useMutation({
-        onSuccess: () => {
+        onSuccess: async () => {
+            await utils.business.getMine.invalidate();
             alert("Upgraded to Premium (Mock)!");
         }
     });
@@ -25,7 +28,8 @@ export default function DashboardOverview() {
     const isDemo = !apiBusiness;
     const isPremium = business.subscriptions?.[0]?.plan === 'premium';
 
-    const menuItems = [
+    // Static menu items moved outside to prevent recreation
+    const MENU_ITEMS = [
         {
             title: 'Manage Jobs',
             subtitle: 'Post and track job listings',
@@ -108,7 +112,7 @@ export default function DashboardOverview() {
                 <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Management</Text>
 
                 <View style={styles.menuGrid}>
-                    {menuItems.map((item, index) => (
+                    {MENU_ITEMS.map((item, index) => (
                         <Pressable
                             key={index}
                             style={({ pressed }) => [

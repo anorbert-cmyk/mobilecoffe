@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json, date, decimal } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, json, date, decimal, index } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
 /**
@@ -82,7 +82,9 @@ export const products = mysqlTable("products", {
   isAvailable: boolean("isAvailable").default(true),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+}, (table) => ({
+  businessIdx: index("idx_products_business").on(table.businessId),
+}));
 
 export const menuCategories = mysqlTable("menu_categories", {
   id: int("id").autoincrement().primaryKey(),
@@ -122,7 +124,10 @@ export const jobListings = mysqlTable("job_listings", {
   views: int("views").default(0),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   expiresAt: timestamp("expiresAt"),
-});
+}, (table) => ({
+  businessIdx: index("idx_jobs_business").on(table.businessId),
+  statusIdx: index("idx_jobs_status").on(table.status),
+}));
 
 export const productPromotions = mysqlTable("product_promotions", {
   id: int("id").autoincrement().primaryKey(),
@@ -182,7 +187,9 @@ export const events = mysqlTable("events", {
   isPublished: boolean("isPublished").default(true),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+}, (table) => ({
+  businessIdx: index("idx_events_business").on(table.businessId),
+}));
 
 export const eventRelations = relations(events, ({ one }) => ({
   business: one(businesses, { fields: [events.businessId], references: [businesses.id] }),

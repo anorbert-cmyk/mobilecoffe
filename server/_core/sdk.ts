@@ -278,10 +278,17 @@ class SDKServer {
       throw ForbiddenError("User not found");
     }
 
-    await db.upsertUser({
-      openId: user.openId,
-      lastSignedIn: signedInAt,
-    });
+    // Optimization: Only update lastSignedIn if > 1 hour ago
+    const ONE_HOUR = 60 * 60 * 1000;
+    const lastSignedInTime = user.lastSignedIn ? new Date(user.lastSignedIn).getTime() : 0;
+    const nowTime = signedInAt.getTime();
+
+    if (nowTime - lastSignedInTime > ONE_HOUR) {
+      await db.upsertUser({
+        openId: user.openId,
+        lastSignedIn: signedInAt,
+      });
+    }
 
     return user;
   }
