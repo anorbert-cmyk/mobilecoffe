@@ -16,7 +16,7 @@
 
 ## 2. Target Architecture
 
-```
+```text
 src/
 ├── features/              # NEW: Feature modules
 │   ├── b2b-dashboard/     # B2B Dashboard feature
@@ -112,18 +112,18 @@ src/
 
 ## 6. Risk Mitigation
 
-| Risk | Mitigation |
-|------|------------|
-| Broken imports | Update all import paths systematically |
-| Expo Router issues | Keep `app/` structure unchanged, only refactor internal imports |
-| Team confusion | Document new structure in `ARCHITECTURE.md` |
+| Risk               | Mitigation                                                       |
+| ------------------ | ---------------------------------------------------------------- |
+| Broken imports     | Update all import paths systematically                           |
+| Expo Router issues | Keep `app/` structure unchanged, only refactor internal imports  |
+| Team confusion     | Document new structure in `ARCHITECTURE.md`                      |
 
 ---
 
 ## 7. Agents Required
 
-| # | Agent | Responsibility |
-|---|-------|----------------|
-| 1 | **project-planner** | Create this plan |
-| 2 | **frontend-specialist** | Execute modularization |
-| 3 | **security-auditor** | Verify security & run checks |
+| #   | Agent                    | Responsibility               |
+| --- | ------------------------ | ---------------------------- |
+| 1   | **project-planner**      | Create this plan             |
+| 2   | **frontend-specialist**  | Execute modularization       |
+| 3   | **security-auditor**     | Verify security & run checks |
