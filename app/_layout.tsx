@@ -29,6 +29,13 @@ import { MyEquipmentProvider } from '@/lib/equipment/my-equipment-provider';
 import { NotificationPreferencesProvider } from '@/lib/notifications/notification-preferences-provider';
 import { useColors } from "@/hooks/use-colors";
 import { AuthProvider } from "@/src/features/auth";
+import { ErrorBoundary } from '@/src/shared/components/error-boundary';
+
+// ... (existing imports)
+
+// ...
+
+
 
 const DEFAULT_WEB_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 };
 const DEFAULT_WEB_FRAME: Rect = { x: 0, y: 0, width: 0, height: 0 };
@@ -215,33 +222,35 @@ export default function RootLayout() {
   }, [initialInsets, initialFrame]);
 
   const content = (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <SubscriptionProvider>
-          <ComparisonProvider>
-            <FavoritesProvider>
-              <JournalProvider>
-                <CourseProgressProvider>
-                  <ReadingProgressProvider>
-                    <MyEquipmentProvider>
-                      <NotificationPreferencesProvider>
-                        <UserProfileProvider>
-                          <trpc.Provider client={trpcClient} queryClient={queryClient}>
-                            <QueryClientProvider client={queryClient}>
-                              <AppStack />
-                            </QueryClientProvider>
-                          </trpc.Provider>
-                        </UserProfileProvider>
-                      </NotificationPreferencesProvider>
-                    </MyEquipmentProvider>
-                  </ReadingProgressProvider>
-                </CourseProgressProvider>
-              </JournalProvider>
-            </FavoritesProvider>
-          </ComparisonProvider>
-        </SubscriptionProvider>
-      </AuthProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <SubscriptionProvider>
+            <ComparisonProvider>
+              <FavoritesProvider>
+                <JournalProvider>
+                  <CourseProgressProvider>
+                    <ReadingProgressProvider>
+                      <MyEquipmentProvider>
+                        <NotificationPreferencesProvider>
+                          <UserProfileProvider>
+                            <trpc.Provider client={trpcClient} queryClient={queryClient}>
+                              <QueryClientProvider client={queryClient}>
+                                <AppStack />
+                              </QueryClientProvider>
+                            </trpc.Provider>
+                          </UserProfileProvider>
+                        </NotificationPreferencesProvider>
+                      </MyEquipmentProvider>
+                    </ReadingProgressProvider>
+                  </CourseProgressProvider>
+                </JournalProvider>
+              </FavoritesProvider>
+            </ComparisonProvider>
+          </SubscriptionProvider>
+        </AuthProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 
   const shouldOverrideSafeArea = Platform.OS === "web";
