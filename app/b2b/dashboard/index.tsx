@@ -8,7 +8,7 @@ import * as Haptics from 'expo-haptics';
 
 import { useColors } from '@/hooks/use-colors';
 import { trpc } from '@/lib/trpc';
-import { Icon, IconName } from '@/components/ui/app-icons';
+import { IconSymbol, IconSymbolName } from '@/components/ui/icon-symbol';
 
 const { width } = Dimensions.get('window');
 const SPACING = 20;
@@ -35,7 +35,7 @@ function ActionCard({
 }: {
     title: string;
     subtitle: string;
-    icon: IconName;
+    icon: IconSymbolName;
     color: string;
     index: number;
     onPress: () => void;
@@ -65,14 +65,14 @@ function ActionCard({
                 >
                     <View style={styles.actionCardContent}>
                         <View style={[styles.actionCardIcon, { backgroundColor: color + '40' }]}>
-                            <Icon name={icon} size={28} color={color} />
+                            <IconSymbol name={icon} size={28} color={color} />
                         </View>
                         <View style={styles.actionCardText}>
                             <Text style={styles.actionCardTitle}>{title}</Text>
                             <Text style={styles.actionCardSubtitle}>{subtitle}</Text>
                         </View>
                         <BlurView intensity={30} style={styles.chevronBadge}>
-                            <Icon name="Forward" size={18} color="#FFF" />
+                            <IconSymbol name="chevron.right" size={18} color="#FFF" />
                         </BlurView>
                     </View>
                 </LinearGradient>
@@ -126,16 +126,17 @@ export default function DashboardOverview() {
         };
     });
 
-    const STATS = [
-        { label: 'Views', value: '1.2K', icon: 'Star' as IconName },
-        { label: 'Orders', value: '48', icon: 'Coffee' as IconName },
-        { label: 'Jobs', value: '3', icon: 'Jobs' as IconName },
+    // Bento Grid Stat Cards Data
+    const STATS: { label: string; value: string | number; icon: IconSymbolName; trend?: string; color: string }[] = [
+        { label: 'Monthly Sales', value: '$12.4K', icon: 'dollarsign.circle.fill', trend: '+12%', color: '#10B981' },
+        { label: 'Active Orders', value: 48, icon: 'cup.and.saucer.fill', trend: '+5%', color: '#D97706' },
+        { label: 'Profile Views', value: '1.2K', icon: 'eye.fill', trend: '+2%', color: '#8B5CF6' },
     ];
 
     const ACTIONS = [
-        { title: 'Post a Job', subtitle: 'Find baristas & staff', icon: 'Plus' as IconName, color: '#10B981', route: '/b2b/dashboard/jobs/add' },
-        { title: 'Manage Menu', subtitle: 'Add or edit products', icon: 'Coffee' as IconName, color: '#D97706', route: '/b2b/dashboard/products' },
-        { title: 'View Analytics', subtitle: 'Track your performance', icon: 'Star' as IconName, color: '#8B5CF6', route: '/b2b/dashboard/events' },
+        { title: 'Post a Job', subtitle: 'Find baristas & staff', icon: 'plus' as IconSymbolName, color: '#10B981', route: '/b2b/dashboard/jobs/add' },
+        { title: 'Manage Menu', subtitle: 'Add or edit products', icon: 'cup.and.saucer.fill' as IconSymbolName, color: '#D97706', route: '/b2b/dashboard/products' },
+        { title: 'View Analytics', subtitle: 'Track your performance', icon: 'star.fill' as IconSymbolName, color: '#8B5CF6', route: '/b2b/dashboard/events' },
     ];
 
     return (
@@ -175,7 +176,7 @@ export default function DashboardOverview() {
                                     }}
                                     style={styles.upgradeBtn}
                                 >
-                                    <Icon name="Star" size={16} color="#FFF" />
+                                    <IconSymbol name="star.fill" size={16} color="#FFF" />
                                     <Text style={styles.upgradeText}>Upgrade to Premium</Text>
                                 </Pressable>
                             </Animated.View>
@@ -191,7 +192,7 @@ export default function DashboardOverview() {
                             intensity={Platform.OS === 'ios' ? 25 : 0}
                             style={[styles.statItem, { backgroundColor: Platform.OS === 'android' ? colors.surface : undefined }]}
                         >
-                            <Icon name={stat.icon} size={20} color={colors.primary} />
+                            <IconSymbol name={stat.icon} size={20} color={colors.primary} />
                             <View>
                                 <Text style={[styles.statValue, { color: colors.foreground }]}>{stat.value}</Text>
                                 <Text style={[styles.statLabel, { color: colors.muted }]}>{stat.label}</Text>
@@ -220,7 +221,7 @@ export default function DashboardOverview() {
                 <Animated.View entering={FadeInDown.delay(700).springify()}>
                     <BlurView intensity={Platform.OS === 'ios' ? 20 : 0} style={[styles.tipCard, { backgroundColor: Platform.OS === 'android' ? colors.surface : undefined }]}>
                         <View style={styles.tipHeader}>
-                            <Icon name="Info" size={18} color={colors.primary} />
+                            <IconSymbol name="info.circle.fill" size={18} color={colors.primary} />
                             <Text style={[styles.tipTitle, { color: colors.foreground }]}>Business Tip</Text>
                         </View>
                         <Text style={[styles.tipText, { color: colors.muted }]}>

@@ -36,12 +36,7 @@ export default function DashboardLayout() {
                     title: 'Dashboard',
                 }}
             />
-            <Tabs.Screen
-                name="jobs"
-                options={{
-                    title: 'Jobs',
-                }}
-            />
+
             <Tabs.Screen
                 name="products"
                 options={{

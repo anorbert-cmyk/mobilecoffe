@@ -6,7 +6,7 @@ import { ComponentProps } from "react";
 import { OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
 
 type IconMapping = Record<string, ComponentProps<typeof MaterialIcons>["name"]>;
-type IconSymbolName = keyof typeof MAPPING;
+export type IconSymbolName = keyof typeof MAPPING;
 
 /**
  * SF Symbols to Material Icons mappings
@@ -19,7 +19,7 @@ const MAPPING = {
   "location.fill": "location-on",
   "book.fill": "menu-book",
   "gearshape.fill": "settings",
-  
+
   // Navigation
   "chevron.left": "chevron-left",
   "chevron.right": "chevron-right",
@@ -27,7 +27,7 @@ const MAPPING = {
   "chevron.up": "expand-less",
   "xmark": "close",
   "arrow.left": "arrow-back",
-  
+
   // Actions
   "paperplane.fill": "send",
   "heart.fill": "favorite",
@@ -38,31 +38,31 @@ const MAPPING = {
   "minus": "remove",
   "magnifyingglass": "search",
   "slider.horizontal.3": "tune",
-  
+
   // Coffee related
   "timer": "timer",
   "flame.fill": "local-fire-department",
   "drop.fill": "water-drop",
   "thermometer": "thermostat",
-  
+
   // Machine settings
   "wrench.fill": "build",
   "gauge": "speed",
   "dial.low.fill": "tune",
-  
+
   // Info
   "info.circle.fill": "info",
   "exclamationmark.triangle.fill": "warning",
   "checkmark.circle.fill": "check-circle",
   "xmark.circle.fill": "cancel",
   "checkmark": "check",
-  
+
   // Equipment
   "arrow.down.circle.fill": "download",
   "lightbulb.fill": "lightbulb",
   "list.bullet": "list",
   "trash.fill": "delete",
-  
+
   // Misc
   "map.fill": "map",
   "phone.fill": "phone",
@@ -70,26 +70,26 @@ const MAPPING = {
   "clock.fill": "schedule",
   "calendar": "event",
   "clock": "schedule",
-  
+
   // Theme/Appearance
   "sun.max.fill": "light-mode",
   "moon.fill": "dark-mode",
   "circle.lefthalf.filled": "contrast",
   "paintbrush.fill": "brush",
-  
+
   // Profile
   "person.fill": "person",
   "gearshape.2.fill": "settings",
   "dollarsign.circle.fill": "attach-money",
   "sparkles": "auto-awesome",
   "arrow.counterclockwise": "refresh",
-  
+
   // Courses
   "play.circle.fill": "play-circle-filled",
   "lock.fill": "lock",
   "bell.fill": "notifications",
   "bell.badge.fill": "notifications-active",
-  
+
   // Equipment Management
   "wrench.and.screwdriver.fill": "build",
   "plus.circle.fill": "add-circle",
@@ -106,6 +106,7 @@ export function IconSymbol({
   size = 24,
   color,
   style,
+  weight = 'regular',
 }: {
   name: IconSymbolName;
   size?: number;
@@ -113,6 +114,24 @@ export function IconSymbol({
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
+  if (process.env.EXPO_OS === 'ios') {
+    const { SymbolView } = require('expo-symbols');
+    return (
+      <SymbolView
+        weight={weight}
+        tintColor={color}
+        resizeMode="scaleAspectFit"
+        name={name}
+        style={[
+          {
+            width: size,
+            height: size,
+          },
+          style,
+        ]}
+      />
+    );
+  }
   const iconName = MAPPING[name] || "help-outline";
   return <MaterialIcons color={color} size={size} name={iconName} style={style} />;
 }

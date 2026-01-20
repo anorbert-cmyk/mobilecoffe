@@ -8,7 +8,7 @@ import Animated, {
     useSharedValue,
 } from 'react-native-reanimated';
 import { useColors } from '@/hooks/use-colors';
-import { Icon, IconName } from '@/components/ui/app-icons';
+import { IconSymbol, IconSymbolName } from '@/components/ui/icon-symbol';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 
 const { width } = Dimensions.get('window');
@@ -47,11 +47,11 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
                             }
                         };
 
-                        // Map route names to icons
-                        let iconName: IconName = 'Home';
-                        if (route.name === 'index') iconName = 'Dashboard';
-                        if (route.name === 'jobs') iconName = 'Jobs';
-                        if (route.name === 'products') iconName = 'Coffee'; // Menu uses Coffee icon
+                        // Map route names to icons using SF Symbols
+                        let iconName: IconSymbolName = 'house.fill';
+                        if (route.name === 'index') iconName = 'house.fill';
+                        // Jobs removed
+                        if (route.name === 'products') iconName = 'cup.and.saucer.fill'; // Menu
 
                         return (
                             <TabItem
@@ -95,11 +95,11 @@ function TabItem({
     return (
         <Pressable onPress={onPress} style={styles.tabItem}>
             <Animated.View style={[styles.iconWrapper, animatedStyle]}>
-                <Icon
+                <IconSymbol
                     name={iconName}
                     size={24}
                     color={isFocused ? activeColor : inactiveColor}
-                    strokeWidth={isFocused ? 2.5 : 2}
+                    weight={isFocused ? 'semibold' : 'regular'}
                 />
                 {isFocused && (
                     <Animated.View
