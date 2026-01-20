@@ -37,21 +37,15 @@ export default function DashboardLayout() {
                 }}
             />
             <Tabs.Screen
-                name="products"
-                options={{
-                    title: 'Products',
-                }}
-            />
-            <Tabs.Screen
                 name="jobs"
                 options={{
                     title: 'Jobs',
                 }}
             />
             <Tabs.Screen
-                name="subscription"
+                name="products"
                 options={{
-                    title: 'Plan',
+                    title: 'Menu',
                 }}
             />
         </Tabs>

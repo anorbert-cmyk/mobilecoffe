@@ -50,9 +50,8 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
                         // Map route names to icons
                         let iconName: IconName = 'Home';
                         if (route.name === 'index') iconName = 'Dashboard';
-                        if (route.name === 'products') iconName = 'Products';
                         if (route.name === 'jobs') iconName = 'Jobs';
-                        if (route.name === 'subscription') iconName = 'Plan';
+                        if (route.name === 'products') iconName = 'Coffee'; // Menu uses Coffee icon
 
                         return (
                             <TabItem
