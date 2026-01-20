@@ -23,144 +23,99 @@ export const learningCategories: LearningCategory[] = [
       {
         id: 'what-is-specialty-coffee',
         title: 'What is Specialty Coffee?',
-        // 1. Specialty Coffee - The Foundation
         content: `# What is Specialty Coffee?
 
-**It's more than just a buzzword—it's a promise of quality.**
+Specialty coffee refers to the highest quality coffee beans, typically scoring 80 points or above on a 100-point scale by certified coffee tasters (Q Graders).
 
-Specialty coffee isn't just a marketing term; it's a measurable standard. It refers to the highest grade of coffee beans, scoring **80 points or above** on a 100-point scale by certified Q Graders.
+## The Journey from Farm to Cup
 
-> "Life is too short for bad coffee."
+**1. Origin & Growing Conditions**
+Specialty coffee starts at the farm. The best beans come from specific microclimates at high altitudes (1,200-2,000 meters), where cooler temperatures slow cherry maturation, developing complex flavors.
 
-## The Journey: Farm to Cup
+**2. Careful Processing**
+After harvest, cherries are processed using methods like:
+- **Washed**: Clean, bright flavors
+- **Natural**: Fruity, wine-like notes
+- **Honey**: Sweet, balanced profile
 
-Specialty coffee represents the top 3% of global production. Here's what makes it different from commodity coffee:
+**3. Expert Roasting**
+Specialty roasters develop unique profiles to highlight each coffee's characteristics, rather than roasting everything dark to hide defects.
 
-### 1. 🏔️ Specific Microclimates
-The best beans are grown at high altitudes (1,200-2,000m), where cooler temperatures slow down cherry maturation. This extended growth period allows complex sugars and acids to develop, creating the unique flavor notes we love.
-
-### 2. 🍒 Careful Processing
-After harvest, cherries are processed with extreme care.
-- **Washed**: Clean, bright, high acidity.
-- **Natural**: Dried in the fruit. Jammy, wine-like, sweet.
-- **Honey**: A hybrid method. Sweet like honey, balanced.
-
-### 3. 🔥 Artisan Roasting
-Specialty roasters don't burn beans to hide defects (looking at you, dark roast chains). They roast to *highlight* the bean's natural character—whether that's Ethiopian jasmine or Colombian caramel.
+**4. Precise Brewing**
+The final step is brewing with care: proper grind size, water temperature, and ratios to extract the best flavors.
 
 ## Why It Matters
 
-By choosing specialty, you're voting for a better industry:
-*   **Traceability**: You know exactly who grew your coffee.
-*   **Sustainability**: Farmers are paid premium prices, often 2-3x Fair Trade rates.
-*   **Taste**: You'll discover flavors you never knew coffee could have—blueberry, jasmine, earl grey, dark chocolate.
-
-## Your Challenge
-        content: `# What is Specialty Coffee?
-
-**It's more than just a buzzword—it's a promise of quality.**
-
-Specialty coffee isn't just a marketing term; it's a measurable standard. It refers to the highest grade of coffee beans, scoring **80 points or above** on a 100-point scale by certified Q Graders.
-
-> "Life is too short for bad coffee."
-
-## The Journey: Farm to Cup
-
-Specialty coffee represents the top 3% of global production. Here's what makes it different from commodity coffee:
-
-### 1. 🏔️ Specific Microclimates
-The best beans are grown at high altitudes (1,200-2,000m), where cooler temperatures slow down cherry maturation. This extended growth period allows complex sugars and acids to develop, creating the unique flavor notes we love.
-
-### 2. 🍒 Careful Processing
-After harvest, cherries are processed with extreme care.
-- **Washed**: Clean, bright, high acidity.
-- **Natural**: Dried in the fruit. Jammy, wine-like, sweet.
-- **Honey**: A hybrid method. Sweet like honey, balanced.
-
-### 3. 🔥 Artisan Roasting
-Specialty roasters don't burn beans to hide defects (looking at you, dark roast chains). They roast to *highlight* the bean's natural character—whether that's Ethiopian jasmine or Colombian caramel.
-
-## Why It Matters
-
-By choosing specialty, you're voting for a better industry:
-*   **Traceability**: You know exactly who grew your coffee.
-*   **Sustainability**: Farmers are paid premium prices, often 2-3x Fair Trade rates.
-*   **Taste**: You'll discover flavors you never knew coffee could have—blueberry, jasmine, earl grey, dark chocolate.
-
-## Your Challenge
-Next time you buy beans, look for the **Region** and **Altitude** on the bag. If it's there, you're on the right track.`,
-        readTime: 6
+Specialty coffee represents only about 3% of global production. By choosing specialty, you're supporting:
+- Sustainable farming practices
+- Fair compensation for farmers
+- Exceptional taste experiences
+- Traceability from farm to cup`,
+        readTime: 5
       },
       {
         id: 'water-quality',
         title: 'The Importance of Water Quality',
-        content: `# Coffee is 98% Water. Don't Ruin It.
+        content: `# The Importance of Water Quality
 
-**You can buy the best beans in the world, but if your water sucks, your coffee will suck.**
+Coffee is 98% water, making water quality crucial to your brew.
 
-Water acts as the solvent that extracts flavor compounds from the grounds. Ideally, it needs to grab the good stuff (sugars, acids) and leave the bad stuff behind.
+## Ideal Water Characteristics
 
-## The Chemistry of Good Water
+**Total Dissolved Solids (TDS):** 75-250 ppm
+Water that's too soft won't extract properly; too hard creates scale and mutes flavors.
 
-You don't need a PhD, but you should know these two terms:
+**pH Level:** 6.5-7.5 (neutral)
+Slightly acidic water enhances bright notes; alkaline water creates flat, dull coffee.
 
-### 1. Hardness (TDS)
-**Target: 75-150 ppm**
-- **Too Soft**: Coffee tastes flat, sour, and lacks body (distilled water is a no-go).
-- **Too Hard**: Coffee tastes chalky, dull, and mutes the delicate acidity. Plus, it kills your espresso machine with scale.
+**Chlorine:** 0 ppm
+Chlorine creates off-flavors. Use filtered water or let tap water sit uncovered for 24 hours.
 
-### 2. Alkalinity (Buffer)
-**Target: 40-70 ppm**
-- Acts as a buffer against acidity.
-- **Too Low**: Coffee tastes sharply sour/acidic.
-- **Too High**: Coffee tastes "flat" and boring because the buffer neutralizes the good acids.
+## Simple Solutions
 
-## 🚱 The Enemies
-1.  **Chlorine**: Tastes chemical/medicinal. Use a carbon filter.
-2.  **Odors**: Any smell in the water will end up in the cup.
+1. **Filtered Water**: A basic carbon filter removes chlorine and improves taste
+2. **Bottled Water**: Look for mineral content around 100-150 ppm
+3. **Third Wave Water**: Mineral packets designed specifically for coffee
 
-## Solutions (Ranked)
-1.  **Mineral Packets (Third Wave Water)**: The gold standard. Add a packet to distilled water for perfect specs.
-2.  **BWT / Peak Water Jug**: Pitchers designed specifically to optimize water for coffee.
-3.  **Bottled Spring Water**: Look for "Volvic" or "Crystal Geyser" (check the label for ~150 TDS).
-4.  **Carbon Filter (Brita)**: Better than tap, but doesn't fix hardness issues.
+## Temperature Matters
 
-> **Pro Tip:** Never use hot tap water for brewing. It picks up heavy metals from pipes. Always heat fresh, cold water.`,
+- **Ideal range**: 90-96°C (195-205°F)
+- **Too hot**: Bitter, over-extracted
+- **Too cold**: Sour, under-extracted
+
+**Pro tip**: After boiling, wait 30-45 seconds before pouring for optimal temperature.`,
         readTime: 5
       },
       {
         id: 'grind-size-guide',
         title: 'Grind Size Guide',
-        content: `# Grind Size: The Secret Variables
+        content: `# Grind Size Guide
 
-**You can buy the best beans and have perfect water, but if your grind is wrong, your coffee is ruined.**
+The grind size dramatically affects extraction and flavor.
 
-Grind size controls the surface area of the coffee.
-*   **Finer Grind**: More surface area = Faster extraction (risk of bitterness).
-*   **Coarser Grind**: Less surface area = Slower extraction (risk of sourness).
+## The Rule
 
-## The Golden Rule
-> **Consistent particles = Consistent flavor.**
+**Finer grind = More surface area = Faster extraction**
+**Coarser grind = Less surface area = Slower extraction**
 
-If your grinder produces "boulders" (big chunks) and "dust" (fine powder) at the same time, you'll get both sour and bitter flavors. This is why **Burr Grinders** > Blade Grinders.
+## Grind Sizes by Method
 
-## Grind Size Cheat Sheet
-
-| Brew Method | Size | Texture Reference |
-| :--- | :--- | :--- |
-| **Turkish** | Extra Fine | Powder / Flour |
-| **Espresso** | Fine | Table Salt |
-| **AeroPress** | Medium-Fine | Beach Sand |
-| **Pour Over** | Medium | Sea Salt |
-| **Chemex** | Med-Coarse | Kosher Salt |
-| **French Press**| Coarse | Breadcrumbs |
-| **Cold Brew** | Extra Coarse | Peppercorns |
+| Method | Grind Size | Texture Reference |
+|--------|------------|-------------------|
+| Turkish | Extra Fine | Powder, like flour |
+| Espresso | Fine | Table salt |
+| Moka Pot | Medium-Fine | Sand |
+| Pour Over | Medium | Sea salt |
+| French Press | Coarse | Breadcrumbs |
+| Cold Brew | Extra Coarse | Peppercorns |
 
 ## Troubleshooting
-*   **Sour/Salty?** → Grind Finer.
-*   **Bitter/Dry?** → Grind Coarser.
 
-> **Pro Tip:** Change your grind size *before* you change your dose or water temp. It has the biggest impact.
+**Coffee tastes sour/weak?**
+→ Grind finer (under-extracted)
+
+**Coffee tastes bitter/harsh?**
+→ Grind coarser (over-extracted)
 
 ## Burr vs Blade Grinders
 
@@ -168,20 +123,20 @@ If your grinder produces "boulders" (big chunks) and "dust" (fine powder) at the
 **Burr Grinders**: Uniform particles, adjustable settings
 
 Invest in a burr grinder—it's the single biggest upgrade for home brewing.`,
-      readTime: 5
+        readTime: 5
       }
-]
+    ]
   },
-{
-  id: 'roast-levels',
+  {
+    id: 'roast-levels',
     title: 'Roast Levels',
-      description: 'Understanding light, medium, and dark roasts',
-        emoji: '🔥',
-          articles: [
-            {
-              id: 'roast-spectrum',
-              title: 'The Roast Spectrum',
-              content: `# The Roast Spectrum
+    description: 'Understanding light, medium, and dark roasts',
+    emoji: '🔥',
+    articles: [
+      {
+        id: 'roast-spectrum',
+        title: 'The Roast Spectrum',
+        content: `# The Roast Spectrum
 
 Roasting transforms green coffee beans into the aromatic brown beans we know.
 
@@ -224,12 +179,12 @@ Roasting transforms green coffee beans into the aromatic brown beans we know.
 ## The Caffeine Myth
 
 Contrary to popular belief, light roasts have slightly MORE caffeine than dark roasts. The roasting process burns off some caffeine, so the longer the roast, the less caffeine remains.`,
-      readTime: 5
-            },
-  {
-    id: 'first-second-crack',
-    title: 'First and Second Crack',
-    content: `# First and Second Crack
+        readTime: 5
+      },
+      {
+        id: 'first-second-crack',
+        title: 'First and Second Crack',
+        content: `# First and Second Crack
 
 During roasting, beans go through two audible "cracks" that indicate development stages.
 
@@ -265,20 +220,20 @@ The time between first crack and end of roast is called "development time." This
 ## Specialty Coffee Approach
 
 Most specialty roasters stop between first crack and early second crack to preserve origin characteristics while developing sweetness.`,
-  readTime: 5
-            }
-          ]
-},
-{
-  id: 'bean-origins',
+        readTime: 5
+      }
+    ]
+  },
+  {
+    id: 'bean-origins',
     title: 'Coffee Origins',
-      description: 'Explore flavors from around the world',
-        emoji: '🌍',
-          articles: [
-            {
-              id: 'coffee-belt',
-              title: 'The Coffee Belt',
-              content: `# The Coffee Belt
+    description: 'Explore flavors from around the world',
+    emoji: '🌍',
+    articles: [
+      {
+        id: 'coffee-belt',
+        title: 'The Coffee Belt',
+        content: `# The Coffee Belt
 
 Coffee grows in a band around the equator known as the "Coffee Belt" or "Bean Belt."
 
@@ -311,12 +266,12 @@ Coffee thrives between the Tropics of Cancer and Capricorn (23.5°N to 23.5°S) 
 ## Terroir
 
 Like wine, coffee expresses "terroir"—the complete natural environment where it grows. The same variety planted in different regions will taste distinctly different.`,
-              readTime: 5
-            },
-            {
-              id: 'arabica-vs-robusta',
-              title: 'Arabica vs Robusta',
-              content: `# Arabica vs Robusta
+        readTime: 5
+      },
+      {
+        id: 'arabica-vs-robusta',
+        title: 'Arabica vs Robusta',
+        content: `# Arabica vs Robusta
 
 The two main commercial coffee species have distinct characteristics.
 
@@ -360,20 +315,20 @@ The two main commercial coffee species have distinct characteristics.
 ## The Quality Gap
 
 While Robusta has a reputation for low quality, specialty-grade Robusta does exist. Some Italian espresso blends traditionally include 10-20% Robusta for extra crema and caffeine kick.`,
-              readTime: 5
-            }
-          ]
-},
-{
-  id: 'equipment',
+        readTime: 5
+      }
+    ]
+  },
+  {
+    id: 'equipment',
     title: 'Equipment Guide',
-      description: 'Essential tools for home brewing',
-        emoji: '⚙️',
-          articles: [
-            {
-              id: 'essential-equipment',
-              title: 'Essential Home Equipment',
-              content: `# Essential Home Equipment
+    description: 'Essential tools for home brewing',
+    emoji: '⚙️',
+    articles: [
+      {
+        id: 'essential-equipment',
+        title: 'Essential Home Equipment',
+        content: `# Essential Home Equipment
 
 Build your home coffee setup with these fundamentals.
 
@@ -423,12 +378,12 @@ Start with one method and master it:
 2. Add scale for consistency
 3. Upgrade kettle for pour over
 4. Consider espresso machine later`,
-              readTime: 5
-            },
-            {
-              id: 'espresso-machines',
-              title: 'Espresso Machine Guide',
-              content: `# Espresso Machine Guide
+        readTime: 5
+      },
+      {
+        id: 'espresso-machines',
+        title: 'Espresso Machine Guide',
+        content: `# Espresso Machine Guide
 
 Espresso at home requires significant investment but rewards with café-quality drinks.
 
@@ -478,20 +433,20 @@ Espresso at home requires significant investment but rewards with café-quality 
 ## Don't Forget the Grinder!
 
 An espresso-capable grinder is essential. Budget at least as much for the grinder as the machine.`,
-              readTime: 5
-            }
-          ]
-},
-{
-  id: 'home-setup',
+        readTime: 5
+      }
+    ]
+  },
+  {
+    id: 'home-setup',
     title: 'Home Coffee Station',
-      description: 'Create your perfect brewing corner',
-        emoji: '🏠',
-          articles: [
-            {
-              id: 'setting-up-station',
-              title: 'Setting Up Your Station',
-              content: `# Setting Up Your Home Coffee Station
+    description: 'Create your perfect brewing corner',
+    emoji: '🏠',
+    articles: [
+      {
+        id: 'setting-up-station',
+        title: 'Setting Up Your Station',
+        content: `# Setting Up Your Home Coffee Station
 
 Let's build a coffee corner that makes you excited to brew every morning.
 
@@ -543,12 +498,12 @@ Add personal touches:
 **Pro tip**: Keep your most-used method front and center. Rotate seasonal brewers (cold brew in summer, moka pot in winter) to keep things interesting.
 
 Your coffee station should feel inviting, not intimidating. Start simple and add equipment as your skills grow.`,
-              readTime: 5
-            },
-            {
-              id: 'buying-beans',
-              title: 'Buying & Storing Beans',
-              content: `# Buying & Storing Beans
+        readTime: 5
+      },
+      {
+        id: 'buying-beans',
+        title: 'Buying & Storing Beans',
+        content: `# Buying & Storing Beans
 
 Get the most from your coffee with proper selection and storage.
 
@@ -604,10 +559,10 @@ Get the most from your coffee with proper selection and storage.
 - **Days 4-14**: Peak flavor window
 - **Days 15-30**: Still good, declining
 - **30+ days**: Noticeably stale`,
-              readTime: 5
-            }
-          ]
-}
+        readTime: 5
+      }
+    ]
+  }
 ];
 
 export const getCategoryById = (id: string): LearningCategory | undefined => {
