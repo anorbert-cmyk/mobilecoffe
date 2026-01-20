@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet, Pressable, Dimensions, Platform } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Pressable, Dimensions, Platform, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring, interpolate, useAnimatedScrollHandler } from 'react-native-reanimated';
 import { Image } from 'expo-image';
@@ -10,6 +10,7 @@ import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
 import { learningCategories, LearningCategory } from '@/data/learning';
+import { courses, Course } from '@/data/courses';
 
 const { width } = Dimensions.get('window');
 const SPACING = 20;
@@ -186,7 +187,36 @@ export default function LearnCoffeeScreen() {
               </BlurView>
             </View>
 
-            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Explore Courses</Text>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Video Courses</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: SPACING, gap: 16 }} style={{ marginBottom: 24 }}>
+              {courses.map((course, idx) => (
+                <Pressable
+                  key={course.id}
+                  onPress={() => {
+                    if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push(`/courses/${course.id}` as any);
+                  }}
+                  style={[styles.courseCard, { backgroundColor: colors.surface }]}
+                >
+                  <Image source={course.thumbnail} style={styles.courseThumbnail} contentFit="cover" />
+                  <View style={styles.courseContent}>
+                    <View style={[styles.levelBadge, { backgroundColor: course.level === 'beginner' ? '#4CAF50' : course.level === 'intermediate' ? '#FF9800' : '#F44336' }]}>
+                      <Text style={styles.levelText}>{course.level.toUpperCase()}</Text>
+                    </View>
+                    <Text style={[styles.courseTitle, { color: colors.foreground }]} numberOfLines={2}>{course.title}</Text>
+                    <Text style={[styles.courseSubtitle, { color: colors.muted }]} numberOfLines={1}>{course.subtitle}</Text>
+                    <View style={styles.courseMetaRow}>
+                      <IconSymbol name="play.circle.fill" size={14} color={colors.primary} />
+                      <Text style={[styles.courseMeta, { color: colors.muted }]}>{course.totalDuration}min</Text>
+                      <IconSymbol name="star.fill" size={14} color="#FFB800" />
+                      <Text style={[styles.courseMeta, { color: colors.muted }]}>{course.rating}</Text>
+                    </View>
+                  </View>
+                </Pressable>
+              ))}
+            </ScrollView>
+
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Explore Articles</Text>
           </View>
         }
       />
@@ -337,10 +367,50 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   cardDescription: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 15,
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 14,
     lineHeight: 20,
-    fontWeight: '500',
-    maxWidth: '85%',
+  },
+  courseCard: {
+    width: 200,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  courseThumbnail: {
+    width: '100%',
+    height: 110,
+  },
+  courseContent: {
+    padding: 12,
+    gap: 4,
+  },
+  levelBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginBottom: 4,
+  },
+  levelText: {
+    color: '#FFF',
+    fontSize: 9,
+    fontWeight: '700',
+  },
+  courseTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  courseSubtitle: {
+    fontSize: 12,
+  },
+  courseMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 6,
+  },
+  courseMeta: {
+    fontSize: 11,
+    marginRight: 8,
   },
 });
