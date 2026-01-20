@@ -1,15 +1,20 @@
-import { View, Text, StyleSheet, ScrollView, RefreshControl, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Dimensions, Platform, ScrollView, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
+import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring, interpolate, useAnimatedScrollHandler } from 'react-native-reanimated';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
+
 import { useColors } from '@/hooks/use-colors';
 import { trpc } from '@/lib/trpc';
 import { Icon, IconName } from '@/components/ui/app-icons';
-import { GlassPanel } from '@/components/ui/glass-panel';
-import { Pressable } from 'react-native';
-import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
-import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
+const SPACING = 20;
+const CARD_HEIGHT = 180;
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 // Helper: Dynamic Greeting
 function getGreeting(): string {
@@ -19,9 +24,67 @@ function getGreeting(): string {
     return 'Good evening';
 }
 
+// Action Card Component (Learn-style)
+function ActionCard({
+    title,
+    subtitle,
+    icon,
+    color,
+    index,
+    onPress
+}: {
+    title: string;
+    subtitle: string;
+    icon: IconName;
+    color: string;
+    index: number;
+    onPress: () => void;
+}) {
+    const scale = useSharedValue(1);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
+
+    return (
+        <Animated.View entering={FadeInDown.delay(300 + index * 100).springify().damping(15)} style={{ marginBottom: 16 }}>
+            <AnimatedPressable
+                onPress={() => {
+                    if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    onPress();
+                }}
+                onPressIn={() => { scale.value = withSpring(0.97); }}
+                onPressOut={() => { scale.value = withSpring(1); }}
+                style={[styles.actionCard, animatedStyle]}
+            >
+                <LinearGradient
+                    colors={[color + '30', color + '10', 'transparent']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.actionCardGradient}
+                >
+                    <View style={styles.actionCardContent}>
+                        <View style={[styles.actionCardIcon, { backgroundColor: color + '40' }]}>
+                            <Icon name={icon} size={28} color={color} />
+                        </View>
+                        <View style={styles.actionCardText}>
+                            <Text style={styles.actionCardTitle}>{title}</Text>
+                            <Text style={styles.actionCardSubtitle}>{subtitle}</Text>
+                        </View>
+                        <BlurView intensity={30} style={styles.chevronBadge}>
+                            <Icon name="Forward" size={18} color="#FFF" />
+                        </BlurView>
+                    </View>
+                </LinearGradient>
+            </AnimatedPressable>
+        </Animated.View>
+    );
+}
+
 export default function DashboardOverview() {
     const colors = useColors();
     const router = useRouter();
+    const scrollY = useSharedValue(0);
 
     const { data: apiBusiness, isLoading, refetch } = trpc.business.getMine.useQuery();
     const utils = trpc.useUtils();
@@ -31,321 +94,315 @@ export default function DashboardOverview() {
     const upgradeToPremium = trpc.business.upgradeToPremium.useMutation({
         onSuccess: async () => {
             await utils.business.getMine.invalidate();
-            alert("Upgraded to Premium (Mock)!");
+            alert("Upgraded to Premium!");
         }
     });
 
-    const CONTENT_PADDING_BOTTOM = 120; // For floating tab bar
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            scrollY.value = event.contentOffset.y;
+        },
+    });
 
-    // Bento Grid Stat Cards Data
-    const STATS: { label: string; value: string | number; icon: IconName; trend?: string; color: string }[] = [
-        { label: 'Views', value: '1.2K', icon: 'Star', trend: '+12%', color: '#8B5CF6' },
-        { label: 'Orders', value: 48, icon: 'Coffee', trend: '+5%', color: '#D97706' },
-        { label: 'Applied', value: 12, icon: 'User', trend: '+2', color: '#10B981' },
+    const heroImageStyle = useAnimatedStyle(() => {
+        return {
+            transform: [
+                {
+                    translateY: interpolate(
+                        scrollY.value,
+                        [-200, 0, 200],
+                        [-60, 0, 60]
+                    ),
+                },
+                {
+                    scale: interpolate(
+                        scrollY.value,
+                        [-200, 0],
+                        [1.4, 1],
+                        'clamp'
+                    )
+                }
+            ],
+        };
+    });
+
+    const STATS = [
+        { label: 'Views', value: '1.2K', icon: 'Star' as IconName },
+        { label: 'Orders', value: '48', icon: 'Coffee' as IconName },
+        { label: 'Jobs', value: '3', icon: 'Jobs' as IconName },
     ];
 
-    const QUICK_ACTIONS: { title: string; icon: IconName; route: string; color: string }[] = [
-        { title: 'Post Job', icon: 'Plus', route: '/b2b/dashboard/jobs/add', color: '#10B981' },
-        { title: 'Add Product', icon: 'Coffee', route: '/b2b/dashboard/products', color: '#D97706' },
+    const ACTIONS = [
+        { title: 'Post a Job', subtitle: 'Find baristas & staff', icon: 'Plus' as IconName, color: '#10B981', route: '/b2b/dashboard/jobs/add' },
+        { title: 'Manage Menu', subtitle: 'Add or edit products', icon: 'Coffee' as IconName, color: '#D97706', route: '/b2b/dashboard/products' },
+        { title: 'View Analytics', subtitle: 'Track your performance', icon: 'Star' as IconName, color: '#8B5CF6', route: '/b2b/dashboard/events' },
     ];
 
     return (
-        <ScrollView
-            style={[styles.container, { backgroundColor: colors.background }]}
-            contentContainerStyle={{ paddingBottom: CONTENT_PADDING_BOTTOM, paddingHorizontal: 16, paddingTop: 8 }}
-            showsVerticalScrollIndicator={false}
-            refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.foreground} />}
-        >
-            {/* Greeting Header */}
-            <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.header}>
-                <View>
-                    <Text style={[styles.greeting, { color: colors.muted }]}>{getGreeting()}</Text>
-                    <Text style={[styles.businessName, { color: colors.foreground }]}>
-                        {apiBusiness?.name || 'Demo Cafe'}
-                    </Text>
-                </View>
-                <Pressable
-                    onPress={() => {
-                        if (apiBusiness?.id && !isPremium) {
-                            upgradeToPremium.mutate({ businessId: apiBusiness.id });
-                        }
-                    }}
-                    style={[styles.statusBadge, { backgroundColor: isPremium ? '#10B981' : '#D97706' }]}
-                >
-                    <Icon name={isPremium ? 'Check' : 'Star'} size={14} color="#FFF" />
-                    <Text style={styles.badgeText}>{isPremium ? 'Premium' : 'Upgrade'}</Text>
-                </Pressable>
-            </Animated.View>
-
-            {/* Bento Grid: Stats */}
-            <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.bentoGrid}>
-                {/* Main Stat (Larger) */}
-                <Pressable style={({ pressed }) => [styles.bentoLarge, pressed && styles.pressed]}>
+        <View style={[styles.screen, { backgroundColor: colors.background }]}>
+            <Animated.ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
+                refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#FFF" />}
+            >
+                {/* Hero Section */}
+                <View style={styles.heroContainer}>
+                    <Animated.Image
+                        source={require('@/assets/images/learn_hero.png')}
+                        style={[styles.heroImage, heroImageStyle]}
+                    />
                     <LinearGradient
-                        colors={['#8B5CF620', '#8B5CF605']}
-                        style={styles.bentoGradient}
-                    >
-                        <View style={[styles.bentoIconBox, { backgroundColor: '#8B5CF630' }]}>
-                            <Icon name="Star" size={28} color="#8B5CF6" />
-                        </View>
-                        <View style={styles.bentoTextBlock}>
-                            <Text style={[styles.bentoValue, { color: colors.foreground }]}>1.2K</Text>
-                            <Text style={[styles.bentoLabel, { color: colors.muted }]}>Total Views</Text>
-                        </View>
-                        <View style={styles.bentoTrendBadge}>
-                            <Text style={styles.bentoTrendText}>+12%</Text>
-                        </View>
-                    </LinearGradient>
-                </Pressable>
-
-                {/* Small Stats (2 Column) */}
-                <View style={styles.bentoSmallColumn}>
-                    {STATS.slice(1).map((stat, i) => (
-                        <Pressable
-                            key={i}
-                            style={({ pressed }) => [
-                                styles.bentoSmall,
-                                { backgroundColor: stat.color + '10' },
-                                pressed && styles.pressed
-                            ]}
-                        >
-                            <View style={[styles.bentoSmallIcon, { backgroundColor: stat.color + '30' }]}>
-                                <Icon name={stat.icon} size={20} color={stat.color} />
-                            </View>
-                            <Text style={[styles.bentoSmallValue, { color: colors.foreground }]}>{stat.value}</Text>
-                            <Text style={[styles.bentoSmallLabel, { color: colors.muted }]}>{stat.label}</Text>
-                            {stat.trend && (
-                                <Text style={[styles.bentoSmallTrend, { color: stat.color }]}>{stat.trend}</Text>
-                            )}
-                        </Pressable>
-                    ))}
-                </View>
-            </Animated.View>
-
-            {/* Quick Actions */}
-            <Animated.View entering={FadeInDown.delay(400).springify()}>
-                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Quick Actions</Text>
-                <View style={styles.actionsRow}>
-                    {QUICK_ACTIONS.map((action, i) => (
-                        <Pressable
-                            key={i}
-                            onPress={() => router.push(action.route as any)}
-                            style={({ pressed }) => [
-                                styles.actionBtn,
-                                { backgroundColor: colors.surface, borderColor: colors.border },
-                                pressed && styles.pressed
-                            ]}
-                        >
-                            <View style={[styles.actionIcon, { backgroundColor: action.color + '20' }]}>
-                                <Icon name={action.icon} size={22} color={action.color} />
-                            </View>
-                            <Text style={[styles.actionLabel, { color: colors.foreground }]}>{action.title}</Text>
-                            <Icon name="Forward" size={18} color={colors.muted} />
-                        </Pressable>
-                    ))}
-                </View>
-            </Animated.View>
-
-            {/* Insight Card */}
-            <Animated.View entering={FadeInDown.delay(500).springify()}>
-                <GlassPanel style={styles.insightCard}>
-                    <View style={styles.insightHeader}>
-                        <Icon name="Info" size={20} color={colors.primary} />
-                        <Text style={[styles.insightTitle, { color: colors.foreground }]}>Business Tip</Text>
+                        colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.5)', colors.background]}
+                        style={styles.heroGradient}
+                        locations={[0, 0.5, 1]}
+                    />
+                    <View style={styles.heroContent}>
+                        <Animated.Text entering={FadeInDown.delay(100).springify()} style={styles.heroEyebrow}>
+                            {getGreeting().toUpperCase()}
+                        </Animated.Text>
+                        <Animated.Text entering={FadeInDown.delay(200).springify()} style={styles.heroTitle}>
+                            {apiBusiness?.name || 'Your Business'}
+                        </Animated.Text>
+                        {!isPremium && (
+                            <Animated.View entering={FadeInDown.delay(300).springify()}>
+                                <Pressable
+                                    onPress={() => {
+                                        if (apiBusiness?.id) {
+                                            upgradeToPremium.mutate({ businessId: apiBusiness.id });
+                                        }
+                                    }}
+                                    style={styles.upgradeBtn}
+                                >
+                                    <Icon name="Star" size={16} color="#FFF" />
+                                    <Text style={styles.upgradeText}>Upgrade to Premium</Text>
+                                </Pressable>
+                            </Animated.View>
+                        )}
                     </View>
-                    <Text style={[styles.insightText, { color: colors.muted }]}>
-                        Your cafe profile is 85% complete. Adding more photos can increase engagement by up to 40%.
-                    </Text>
-                    <Pressable style={[styles.insightCta, { backgroundColor: colors.primary + '20' }]}>
-                        <Text style={[styles.insightCtaText, { color: colors.primary }]}>Complete Profile</Text>
-                    </Pressable>
-                </GlassPanel>
-            </Animated.View>
-        </ScrollView>
+                </View>
+
+                {/* Stats Row */}
+                <View style={styles.statsRow}>
+                    {STATS.map((stat, i) => (
+                        <BlurView
+                            key={i}
+                            intensity={Platform.OS === 'ios' ? 25 : 0}
+                            style={[styles.statItem, { backgroundColor: Platform.OS === 'android' ? colors.surface : undefined }]}
+                        >
+                            <Icon name={stat.icon} size={20} color={colors.primary} />
+                            <View>
+                                <Text style={[styles.statValue, { color: colors.foreground }]}>{stat.value}</Text>
+                                <Text style={[styles.statLabel, { color: colors.muted }]}>{stat.label}</Text>
+                            </View>
+                        </BlurView>
+                    ))}
+                </View>
+
+                {/* Section Title */}
+                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Quick Actions</Text>
+
+                {/* Action Cards */}
+                {ACTIONS.map((action, i) => (
+                    <ActionCard
+                        key={i}
+                        title={action.title}
+                        subtitle={action.subtitle}
+                        icon={action.icon}
+                        color={action.color}
+                        index={i}
+                        onPress={() => router.push(action.route as any)}
+                    />
+                ))}
+
+                {/* Tip Card */}
+                <Animated.View entering={FadeInDown.delay(700).springify()}>
+                    <BlurView intensity={Platform.OS === 'ios' ? 20 : 0} style={[styles.tipCard, { backgroundColor: Platform.OS === 'android' ? colors.surface : undefined }]}>
+                        <View style={styles.tipHeader}>
+                            <Icon name="Info" size={18} color={colors.primary} />
+                            <Text style={[styles.tipTitle, { color: colors.foreground }]}>Business Tip</Text>
+                        </View>
+                        <Text style={[styles.tipText, { color: colors.muted }]}>
+                            Complete your cafe profile to attract more customers and rank higher in search.
+                        </Text>
+                    </BlurView>
+                </Animated.View>
+
+            </Animated.ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    screen: {
         flex: 1,
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
-        paddingTop: 4,
+    scrollContent: {
+        paddingBottom: 140,
     },
-    greeting: {
-        fontSize: 14,
-        fontWeight: '500',
-    },
-    businessName: {
-        fontSize: 28,
-        fontWeight: '800',
-        letterSpacing: -0.5,
-        marginTop: 2,
-    },
-    statusBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-        borderRadius: 20,
-        gap: 6,
-    },
-    badgeText: {
-        color: '#FFF',
-        fontWeight: '700',
-        fontSize: 12,
-    },
-    // Bento Grid
-    bentoGrid: {
-        flexDirection: 'row',
-        gap: 12,
-        marginBottom: 24,
-    },
-    bentoLarge: {
-        flex: 1.2,
-        borderRadius: 24,
+    // Hero
+    heroContainer: {
+        height: 320,
+        width: '100%',
         overflow: 'hidden',
+        marginBottom: -30,
+        justifyContent: 'flex-end',
     },
-    bentoGradient: {
-        padding: 20,
-        minHeight: 180,
-        justifyContent: 'space-between',
-        borderRadius: 24,
+    heroImage: {
+        ...StyleSheet.absoluteFillObject,
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
     },
-    bentoIconBox: {
-        width: 52,
-        height: 52,
-        borderRadius: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
+    heroGradient: {
+        ...StyleSheet.absoluteFillObject,
     },
-    bentoTextBlock: {
-        marginTop: 12,
+    heroContent: {
+        padding: 24,
+        paddingBottom: 60,
     },
-    bentoValue: {
-        fontSize: 36,
-        fontWeight: '900',
-        letterSpacing: -1,
-    },
-    bentoLabel: {
-        fontSize: 14,
-        fontWeight: '500',
-        marginTop: 2,
-    },
-    bentoTrendBadge: {
-        position: 'absolute',
-        top: 16,
-        right: 16,
-        backgroundColor: '#10B98120',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 8,
-    },
-    bentoTrendText: {
-        color: '#10B981',
-        fontWeight: '700',
+    heroEyebrow: {
+        color: '#D97706',
         fontSize: 12,
-    },
-    bentoSmallColumn: {
-        flex: 1,
-        gap: 12,
-    },
-    bentoSmall: {
-        flex: 1,
-        borderRadius: 20,
-        padding: 14,
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-    },
-    bentoSmallIcon: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
+        fontWeight: '700',
+        letterSpacing: 2,
         marginBottom: 8,
+        textShadowColor: 'rgba(0,0,0,0.5)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 4,
     },
-    bentoSmallValue: {
-        fontSize: 22,
+    heroTitle: {
+        color: '#FFF',
+        fontSize: 36,
         fontWeight: '800',
+        lineHeight: 42,
+        textShadowColor: 'rgba(0,0,0,0.5)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 8,
+        marginBottom: 16,
     },
-    bentoSmallLabel: {
-        fontSize: 12,
-        fontWeight: '500',
-        marginTop: 2,
-    },
-    bentoSmallTrend: {
-        fontSize: 11,
-        fontWeight: '700',
-        marginTop: 6,
-    },
-    pressed: {
-        opacity: 0.85,
-        transform: [{ scale: 0.98 }],
-    },
-    // Section
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: '700',
-        marginBottom: 14,
-    },
-    actionsRow: {
-        gap: 12,
-        marginBottom: 24,
-    },
-    actionBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 14,
-        paddingHorizontal: 16,
-        borderRadius: 16,
-        borderWidth: 1,
-        gap: 12,
-    },
-    actionIcon: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    actionLabel: {
-        flex: 1,
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    // Insight Card
-    insightCard: {
-        padding: 18,
-        borderRadius: 20,
-    },
-    insightHeader: {
+    upgradeBtn: {
+        alignSelf: 'flex-start',
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        marginBottom: 10,
+        backgroundColor: '#D97706',
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 24,
     },
-    insightTitle: {
+    upgradeText: {
+        color: '#FFF',
+        fontWeight: '700',
+        fontSize: 14,
+    },
+    // Stats
+    statsRow: {
+        flexDirection: 'row',
+        paddingHorizontal: SPACING,
+        gap: 12,
+        marginBottom: 28,
+    },
+    statItem: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        padding: 14,
+        borderRadius: 16,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    statValue: {
+        fontSize: 18,
+        fontWeight: '700',
+    },
+    statLabel: {
+        fontSize: 11,
+    },
+    // Section
+    sectionTitle: {
+        fontSize: 22,
+        fontWeight: '700',
+        paddingHorizontal: SPACING,
+        marginBottom: 16,
+    },
+    // Action Cards
+    actionCard: {
+        marginHorizontal: SPACING,
+        height: CARD_HEIGHT,
+        borderRadius: 24,
+        overflow: 'hidden',
+        backgroundColor: '#1A1A1A',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+        elevation: 10,
+    },
+    actionCardGradient: {
+        flex: 1,
+        padding: 20,
+        justifyContent: 'center',
+    },
+    actionCardContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    actionCardIcon: {
+        width: 56,
+        height: 56,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    actionCardText: {
+        flex: 1,
+        marginLeft: 16,
+    },
+    actionCardTitle: {
+        color: '#FFF',
+        fontSize: 20,
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    actionCardSubtitle: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 14,
+    },
+    chevronBadge: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        backgroundColor: 'rgba(255,255,255,0.15)',
+    },
+    // Tip
+    tipCard: {
+        marginHorizontal: SPACING,
+        marginTop: 8,
+        padding: 18,
+        borderRadius: 20,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    tipHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 8,
+    },
+    tipTitle: {
         fontSize: 15,
         fontWeight: '700',
     },
-    insightText: {
+    tipText: {
         fontSize: 14,
         lineHeight: 20,
-        marginBottom: 14,
-    },
-    insightCta: {
-        alignSelf: 'flex-start',
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-        borderRadius: 10,
-    },
-    insightCtaText: {
-        fontWeight: '700',
-        fontSize: 13,
     },
 });
