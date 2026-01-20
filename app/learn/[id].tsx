@@ -107,7 +107,10 @@ export default function LearnCategoryScreen() {
   }
 
   if (selectedArticle) {
-    const heroImage = articleHeroImages[category.id] || require('@/assets/images/espresso.png');
+    // Try to load article specific image, fallback to category image
+    // Note: In a real app we'd map these dynamically or check existence. 
+    // For now we use the category image as the base, but structure allows specific ones.
+    const heroImage = articleHeroImages[selectedArticle.id] || articleHeroImages[category.id] || require('@/assets/images/espresso.png');
 
     return (
       <>

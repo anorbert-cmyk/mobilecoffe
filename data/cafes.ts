@@ -116,7 +116,7 @@ export const demoCafes: Cafe[] = [
         name: 'Ethiopia Yirgacheffe',
         price: 4900,
         description: 'Floral and citrusy notes with a tea-like body. Light roast, perfect for filter coffee.',
-        imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&q=80', // Fallback, will use asset in UI
+        imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&q=80',
         category: 'beans',
         weight: '250g'
       },
@@ -188,17 +188,17 @@ export const demoCafes: Cafe[] = [
       {
         name: 'Filter & Cold',
         items: [
-          { name: 'V60 Pour Over', price: 990, description: 'Single origin, brewed to order', isPopular: true },
-          { name: 'Cold Brew', price: 890, description: '16-hour cold extraction' },
-          { name: 'Iced Latte', price: 990, description: 'Espresso over ice with cold milk' },
+          { name: 'V60 Pour Over', price: 990, description: 'Single origin, brewed to order', isPopular: true, imageUrl: require('@/assets/images/menu/v60_pour_over.png') },
+          { name: 'Cold Brew', price: 890, description: '16-hour cold extraction', imageUrl: require('@/assets/images/menu/cold_brew.png') },
+          { name: 'Iced Latte', price: 990, description: 'Espresso over ice with cold milk', imageUrl: require('@/assets/images/menu/iced_latte.png') },
         ]
       },
       {
         name: 'Non-Coffee',
         items: [
-          { name: 'Matcha Latte', price: 890, description: 'Ceremonial grade Uji matcha', isVegan: true },
-          { name: 'Hot Chocolate', price: 790, description: '70% Valrhona chocolate' },
-          { name: 'Chai Latte', price: 790, description: 'House-made spice blend' },
+          { name: 'Matcha Latte', price: 890, description: 'Ceremonial grade Uji matcha', isVegan: true, imageUrl: require('@/assets/images/menu/matcha_latte.png') },
+          { name: 'Hot Chocolate', price: 790, description: '70% Valrhona chocolate', imageUrl: require('@/assets/images/menu/hot_chocolate.png') },
+          { name: 'Chai Latte', price: 790, description: 'House-made spice blend', imageUrl: require('@/assets/images/menu/chai_latte.png') },
         ]
       }
     ],
@@ -280,10 +280,10 @@ export const demoCafes: Cafe[] = [
       {
         name: 'All-Day Brunch',
         items: [
-          { name: 'Avocado Toast', price: 2490, description: 'Sourdough, smashed avo, poached eggs, chili flakes', isPopular: true, isVegan: false },
-          { name: 'Eggs Benedict', price: 2890, description: 'English muffin, ham, hollandaise', isPopular: true },
-          { name: 'Acai Bowl', price: 2290, description: 'Frozen acai, granola, banana, berries', isVegan: true },
-          { name: 'Fluffy Pancakes', price: 1990, description: 'Stack of 3 with maple syrup and berries' },
+          { name: 'Avocado Toast', price: 2490, description: 'Sourdough, smashed avo, poached eggs, chili flakes', isPopular: true, isVegan: false, imageUrl: require('@/assets/images/menu/avocado_toast.png') },
+          { name: 'Eggs Benedict', price: 2890, description: 'English muffin, ham, hollandaise', isPopular: true, imageUrl: require('@/assets/images/menu/eggs_benedict.png') },
+          { name: 'Acai Bowl', price: 2290, description: 'Frozen acai, granola, banana, berries', isVegan: true, imageUrl: require('@/assets/images/menu/acai_bowl.png') },
+          { name: 'Fluffy Pancakes', price: 1990, description: 'Stack of 3 with maple syrup and berries', imageUrl: require('@/assets/images/menu/pancakes.png') },
           { name: 'Shakshuka', price: 2190, description: 'Eggs poached in spiced tomato sauce, feta, pita' },
         ]
       },
