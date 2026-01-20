@@ -28,6 +28,7 @@ import { ReadingProgressProvider } from '@/lib/reading-progress/reading-progress
 import { MyEquipmentProvider } from '@/lib/equipment/my-equipment-provider';
 import { NotificationPreferencesProvider } from '@/lib/notifications/notification-preferences-provider';
 import { useColors } from "@/hooks/use-colors";
+import { AuthProvider } from "@/src/features/auth";
 
 const DEFAULT_WEB_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 };
 const DEFAULT_WEB_FRAME: Rect = { x: 0, y: 0, width: 0, height: 0 };
@@ -38,14 +39,14 @@ export const unstable_settings = {
 
 function AppStack() {
   const colors = useColors();
-  
+
   // Apple HIG compliant header style
   const defaultHeaderOptions = {
     headerShown: true,
     headerBackTitle: "Back",
     headerBackTitleVisible: true,
     headerTintColor: colors.primary,
-    headerStyle: { 
+    headerStyle: {
       backgroundColor: colors.background,
     },
     headerTitleStyle: {
@@ -62,97 +63,97 @@ function AppStack() {
 
   return (
     <>
-      <Stack 
-        screenOptions={{ 
+      <Stack
+        screenOptions={{
           ...defaultHeaderOptions,
           headerShown: false, // Default to hidden, screens opt-in
         }}
       >
         {/* Tab navigator - no header */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        
+
         {/* Onboarding - no back gesture */}
-        <Stack.Screen 
-          name="onboarding/index" 
-          options={{ 
+        <Stack.Screen
+          name="onboarding/index"
+          options={{
             headerShown: false,
             gestureEnabled: false,
-          }} 
+          }}
         />
-        
+
         {/* OAuth callback - no header */}
         <Stack.Screen name="oauth/callback" options={{ headerShown: false }} />
-        
+
         {/* Coffee detail - with header */}
-        <Stack.Screen 
-          name="coffee/[id]" 
+        <Stack.Screen
+          name="coffee/[id]"
           options={{
             ...defaultHeaderOptions,
             headerShown: true,
             headerTransparent: true,
             headerTitle: "",
             headerStyle: { backgroundColor: 'transparent' },
-          }} 
+          }}
         />
-        
+
         {/* Machine detail - with header */}
-        <Stack.Screen 
-          name="machine/[id]" 
+        <Stack.Screen
+          name="machine/[id]"
           options={{
             ...defaultHeaderOptions,
             headerShown: true,
-          }} 
+          }}
         />
-        
+
         {/* Grinder detail - with header */}
-        <Stack.Screen 
-          name="grinder/[id]" 
+        <Stack.Screen
+          name="grinder/[id]"
           options={{
             ...defaultHeaderOptions,
             headerShown: true,
-          }} 
+          }}
         />
-        
+
         {/* Learn article/category detail - with header */}
-        <Stack.Screen 
-          name="learn/[id]" 
+        <Stack.Screen
+          name="learn/[id]"
           options={{
             ...defaultHeaderOptions,
             headerShown: true,
-          }} 
+          }}
         />
-        
+
         {/* Equipment wizard - with header and back */}
-        <Stack.Screen 
-          name="equipment-wizard" 
+        <Stack.Screen
+          name="equipment-wizard"
           options={{
             ...defaultHeaderOptions,
             headerShown: true,
             headerTitle: "Equipment Finder",
             presentation: 'card',
-          }} 
+          }}
         />
-        
+
         {/* Recommendations - with header and back */}
-        <Stack.Screen 
-          name="recommendations" 
+        <Stack.Screen
+          name="recommendations"
           options={{
             ...defaultHeaderOptions,
             headerShown: true,
             headerTitle: "Your Recommendations",
-          }} 
+          }}
         />
-        
+
         {/* Profile settings - with header */}
-        <Stack.Screen 
-          name="profile" 
+        <Stack.Screen
+          name="profile"
           options={{
             ...defaultHeaderOptions,
             headerShown: true,
             headerTitle: "Profile Settings",
-          }} 
+          }}
         />
-        
+
         {/* App index (onboarding check) - no header */}
         <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack>
@@ -215,29 +216,31 @@ export default function RootLayout() {
 
   const content = (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SubscriptionProvider>
-        <ComparisonProvider>
-          <FavoritesProvider>
-            <JournalProvider>
-              <CourseProgressProvider>
-                <ReadingProgressProvider>
-                  <MyEquipmentProvider>
-                    <NotificationPreferencesProvider>
-                      <UserProfileProvider>
-          <trpc.Provider client={trpcClient} queryClient={queryClient}>
-            <QueryClientProvider client={queryClient}>
-              <AppStack />
-            </QueryClientProvider>
-          </trpc.Provider>
-                      </UserProfileProvider>
-                    </NotificationPreferencesProvider>
-                  </MyEquipmentProvider>
-                </ReadingProgressProvider>
-              </CourseProgressProvider>
-            </JournalProvider>
-          </FavoritesProvider>
-        </ComparisonProvider>
-      </SubscriptionProvider>
+      <AuthProvider>
+        <SubscriptionProvider>
+          <ComparisonProvider>
+            <FavoritesProvider>
+              <JournalProvider>
+                <CourseProgressProvider>
+                  <ReadingProgressProvider>
+                    <MyEquipmentProvider>
+                      <NotificationPreferencesProvider>
+                        <UserProfileProvider>
+                          <trpc.Provider client={trpcClient} queryClient={queryClient}>
+                            <QueryClientProvider client={queryClient}>
+                              <AppStack />
+                            </QueryClientProvider>
+                          </trpc.Provider>
+                        </UserProfileProvider>
+                      </NotificationPreferencesProvider>
+                    </MyEquipmentProvider>
+                  </ReadingProgressProvider>
+                </CourseProgressProvider>
+              </JournalProvider>
+            </FavoritesProvider>
+          </ComparisonProvider>
+        </SubscriptionProvider>
+      </AuthProvider>
     </GestureHandlerRootView>
   );
 
