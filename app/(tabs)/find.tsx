@@ -19,6 +19,7 @@ import { perplexityService } from "@/lib/perplexity/perplexity-service";
 interface CafeWithDistance extends Cafe {
   distance: number;
   beansAvailable?: string[]; // Bean IDs available at this cafe
+  matchScore?: number;
 }
 
 type BeanFilter = {
@@ -104,10 +105,11 @@ export default function FindCoffeeScreen() {
       menu: [],
       events: [],
       jobs: [],
+      matchScore: Math.floor(Math.random() * 20) + 80, // Mock match score
     }));
 
     // Merge with demo cafes
-    const combined = [...mappedRemote, ...demoCafes];
+    const combined = [...mappedRemote, ...demoCafes.map(c => ({ ...c, matchScore: Math.floor(Math.random() * 20) + 80 }))];
 
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -299,12 +301,43 @@ export default function FindCoffeeScreen() {
             </View>
 
             {/* Amenities Icons - Prominent */}
+            {/* Amenities Chips - Premium Design */}
             <View style={styles.amenitiesRow}>
-              {item.amenities?.wifi && <IconSymbol name="wifi" size={16} color={colors.primary} style={{ marginRight: 10 }} />}
-              {item.amenities?.dogFriendly && <IconSymbol name="pawprint.fill" size={16} color={colors.primary} style={{ marginRight: 10 }} />}
-              {item.amenities?.cardPayment && <IconSymbol name="creditcard.fill" size={16} color={colors.primary} style={{ marginRight: 10 }} />}
-              {item.amenities?.terrace && <IconSymbol name="sun.max.fill" size={16} color={colors.primary} style={{ marginRight: 10 }} />}
-              {item.amenities?.laptopFriendly && <IconSymbol name="laptopcomputer" size={16} color={colors.primary} style={{ marginRight: 10 }} />}
+              {/* Primary Chips (Status) */}
+              {item.matchScore !== undefined && item.matchScore > 85 && (
+                <View style={[styles.chip, { backgroundColor: colors.primary }]}>
+                  <IconSymbol name="star.fill" size={10} color="#FFF" />
+                  <Text style={[styles.chipText, { color: '#FFF' }]}>Top Match</Text>
+                </View>
+              )}
+
+              {/* Feature Chips */}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
+                {item.amenities?.wifi && (
+                  <View style={[styles.chip, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
+                    <IconSymbol name="wifi" size={10} color={colors.foreground} />
+                    <Text style={[styles.chipText, { color: colors.foreground }]}>Fast WiFi</Text>
+                  </View>
+                )}
+                {item.amenities?.dogFriendly && (
+                  <View style={[styles.chip, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
+                    <IconSymbol name="pawprint.fill" size={10} color={colors.foreground} />
+                    <Text style={[styles.chipText, { color: colors.foreground }]}>Dog Friendly</Text>
+                  </View>
+                )}
+                {item.amenities?.laptopFriendly && (
+                  <View style={[styles.chip, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
+                    <IconSymbol name="laptopcomputer" size={10} color={colors.foreground} />
+                    <Text style={[styles.chipText, { color: colors.foreground }]}>Work Ready</Text>
+                  </View>
+                )}
+                {item.amenities?.terrace && (
+                  <View style={[styles.chip, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
+                    <IconSymbol name="sun.max.fill" size={10} color={colors.foreground} />
+                    <Text style={[styles.chipText, { color: colors.foreground }]}>Terrace</Text>
+                  </View>
+                )}
+              </ScrollView>
             </View>
 
             {/* Bottom: Location & Distance */}
@@ -609,9 +642,21 @@ const styles = StyleSheet.create({
   emptyDescription: { fontSize: 15, textAlign: 'center' },
   amenitiesRow: {
     flexDirection: 'row',
-    marginTop: 8,
+    marginBottom: 12,
     alignItems: 'center',
-    marginBottom: 8,
+    gap: 8,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  chipText: {
+    fontSize: 11,
+    fontWeight: '600',
   },
   locationRow: {
     flexDirection: 'row',
