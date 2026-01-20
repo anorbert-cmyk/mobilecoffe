@@ -206,6 +206,7 @@ export default function CafeDetailScreen() {
 
     const renderTabButton = (tab: Tab, label: string) => (
         <Pressable
+            key={tab}
             onPress={() => {
                 triggerHaptic();
                 setActiveTab(tab);

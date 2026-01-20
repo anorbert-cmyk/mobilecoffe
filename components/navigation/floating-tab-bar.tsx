@@ -31,40 +31,48 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
                 ]}
             >
                 <View style={styles.tabsRow}>
-                    {state.routes.map((route, index) => {
-                        const { options } = descriptors[route.key];
-                        const isFocused = state.index === index;
+                    {state.routes
+                        .filter((route) => {
+                            // Filter out routes where href is null (hidden from tab bar)
+                            const { options } = descriptors[route.key];
+                            // Expo Router adds href to options, but it's not in the base types
+                            return (options as any).href !== null;
+                        })
+                        .map((route, index) => {
+                            const { options } = descriptors[route.key];
+                            // Find actual index in original state for focus detection
+                            const actualIndex = state.routes.findIndex(r => r.key === route.key);
+                            const isFocused = state.index === actualIndex;
 
-                        const onPress = () => {
-                            const event = navigation.emit({
-                                type: 'tabPress',
-                                target: route.key,
-                                canPreventDefault: true,
-                            });
+                            const onPress = () => {
+                                const event = navigation.emit({
+                                    type: 'tabPress',
+                                    target: route.key,
+                                    canPreventDefault: true,
+                                });
 
-                            if (!isFocused && !event.defaultPrevented) {
-                                navigation.navigate(route.name);
-                            }
-                        };
+                                if (!isFocused && !event.defaultPrevented) {
+                                    navigation.navigate(route.name);
+                                }
+                            };
 
-                        // Map route names to icons using SF Symbols
-                        let iconName: IconSymbolName = 'house.fill';
-                        if (route.name === 'index') iconName = 'house.fill';
-                        // Jobs removed
-                        if (route.name === 'products') iconName = 'cup.and.saucer.fill'; // Menu
+                            // Map route names to icons using SF Symbols
+                            let iconName: IconSymbolName = 'house.fill';
+                            if (route.name === 'index') iconName = 'house.fill';
+                            if (route.name === 'products') iconName = 'cup.and.saucer.fill'; // Menu
 
-                        return (
-                            <TabItem
-                                key={route.key}
-                                isFocused={isFocused}
-                                onPress={onPress}
-                                iconName={iconName}
-                                label={options.title || route.name}
-                                activeColor={colors.primary}
-                                inactiveColor={colors.muted}
-                            />
-                        );
-                    })}
+                            return (
+                                <TabItem
+                                    key={route.key}
+                                    isFocused={isFocused}
+                                    onPress={onPress}
+                                    iconName={iconName}
+                                    label={options.title || route.name}
+                                    activeColor={colors.primary}
+                                    inactiveColor={colors.muted}
+                                />
+                            );
+                        })}
                 </View>
             </BlurView>
         </View>
