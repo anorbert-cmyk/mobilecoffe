@@ -1,154 +1,166 @@
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ScreenContainer } from '@/components/screen-container';
-import { PremiumButton } from '@/components/ui/premium-button';
 import { useColors } from '@/hooks/use-colors';
 import { trpc } from '@/lib/trpc';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Icon } from '@/components/ui/app-icons';
+import { GlassPanel } from '@/components/ui/glass-panel';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function JobList() {
     const router = useRouter();
     const colors = useColors();
+    const { data: jobs, isLoading } = trpc.job.listMine.useQuery();
 
-    const { data: jobs, isLoading, refetch } = trpc.job.listMine.useQuery();
+    const CONTENT_PADDING_BOTTOM = 100;
 
-    const renderItem = ({ item }: { item: any }) => (
-        <View style={[styles.card, { backgroundColor: '#1c1917', borderColor: colors.border }]}>
-            <View style={styles.cardHeader}>
-                <Text style={[styles.cardTitle, { color: colors.foreground }]}>{item.title}</Text>
-                <View style={[styles.badge, { backgroundColor: item.status === 'active' ? '#10b981' : colors.muted }]}>
-                    <Text style={styles.badgeText}>{item.status}</Text>
+    const renderItem = ({ item, index }: { item: any, index: number }) => (
+        <Animated.View entering={FadeInDown.delay(index * 100)}>
+            <GlassPanel style={styles.card}>
+                <View style={styles.cardHeader}>
+                    <View style={{ flex: 1 }}>
+                        <Text style={[styles.jobTitle, { color: colors.foreground }]}>{item.title}</Text>
+                        <Text style={[styles.jobType, { color: colors.muted }]}>{item.contractType}</Text>
+                    </View>
+                    <View style={[
+                        styles.statusBadge,
+                        { backgroundColor: item.status === 'active' ? '#10B98120' : '#6B728020' }
+                    ]}>
+                        <Text style={[
+                            styles.statusText,
+                            { color: item.status === 'active' ? '#10B981' : '#6B7280' }
+                        ]}>
+                            {item.status}
+                        </Text>
+                    </View>
                 </View>
-            </View>
-            <Text style={[styles.cardType, { color: colors.muted }]}>{item.contractType}</Text>
-            <Text numberOfLines={2} style={[styles.cardDesc, { color: colors.muted }]}>
-                {item.description}
-            </Text>
 
-            <View style={styles.cardFooter}>
-                <Text style={{ color: colors.muted }}>
-                    {item.views} views
-                </Text>
-                <PremiumButton
-                    variant="ghost"
-                    size="sm"
-                    onPress={() => router.push(`/b2b/edit-job?id=${item.id}` as any)}
-                >
-                    Edit
-                </PremiumButton>
-            </View>
-        </View>
+                <View style={styles.cardFooter}>
+                    <View style={styles.statRow}>
+                        <Icon name="User" size={14} color={colors.muted} />
+                        <Text style={[styles.statText, { color: colors.muted }]}>{item.views || 0} views</Text>
+                    </View>
+
+                    <Pressable
+                        onPress={() => router.push(`/b2b/edit-job?id=${item.id}` as any)}
+                        style={({ pressed }) => [
+                            styles.editBtn,
+                            { backgroundColor: colors.surface, opacity: pressed ? 0.7 : 1 }
+                        ]}
+                    >
+                        <Icon name="Settings" size={14} color={colors.foreground} />
+                        <Text style={[styles.btnText, { color: colors.foreground }]}>Edit</Text>
+                    </Pressable>
+                </View>
+            </GlassPanel>
+        </Animated.View>
     );
 
     return (
-        <ScreenContainer>
-            <View style={styles.header}>
-                <Text style={[styles.title, { color: colors.foreground }]}>My Job Posts</Text>
-                <PremiumButton
-                    variant="primary"
-                    onPress={() => router.push('/b2b/dashboard/jobs/add' as any)}
-                    leftIcon={<IconSymbol name="plus" size={20} color="white" />}
-                >
-                    Add Job
-                </PremiumButton>
-            </View>
-
-            {isLoading ? (
-                <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 50 }} />
-            ) : jobs && jobs.length > 0 ? (
-                <FlatList
-                    data={jobs}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => String(item.id)}
-                    contentContainerStyle={styles.list}
-                    onRefresh={refetch}
-                    refreshing={isLoading}
-                />
-            ) : (
-                <View style={styles.emptyContainer}>
-                    <IconSymbol name="briefcase" size={64} color={colors.muted} />
-                    <Text style={[styles.emptyText, { color: colors.muted }]}>No job posts yet.</Text>
-                    <PremiumButton
-                        variant="secondary"
-                        onPress={() => router.push('/b2b/dashboard/jobs/add' as any)}
-                        style={{ marginTop: 16 }}
-                    >
-                        Create First Job
-                    </PremiumButton>
-                </View>
-            )}
-        </ScreenContainer>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <FlatList
+                data={jobs || []}
+                renderItem={renderItem}
+                contentContainerStyle={{ padding: 20, paddingBottom: CONTENT_PADDING_BOTTOM, gap: 16 }}
+                ListHeaderComponent={
+                    <View style={styles.header}>
+                        <Text style={[styles.subtitle, { color: colors.muted }]}>Manage your active listings</Text>
+                        <Pressable
+                            onPress={() => router.push('/b2b/dashboard/jobs/add' as any)}
+                            style={[styles.addBtn, { backgroundColor: colors.primary }]}
+                        >
+                            <Icon name="Plus" size={20} color="#FFF" />
+                            <Text style={styles.addBtnText}>Post Job</Text>
+                        </Pressable>
+                    </View>
+                }
+            />
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
     header: {
-        padding: 24,
+        marginBottom: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
+    subtitle: {
+        fontSize: 14,
     },
-    list: {
-        padding: 24,
-        paddingTop: 0,
+    addBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 20,
+        gap: 6,
+    },
+    addBtnText: {
+        color: '#FFF',
+        fontWeight: '700',
+        fontSize: 14,
     },
     card: {
-        borderWidth: 1,
-        borderRadius: 16,
         padding: 16,
-        marginBottom: 16,
+        borderRadius: 16,
     },
     cardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
+        alignItems: 'flex-start',
+        marginBottom: 12,
     },
-    cardTitle: {
-        fontSize: 18,
-        fontWeight: '600',
+    jobTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        marginBottom: 4,
     },
-    badge: {
+    jobType: {
+        fontSize: 12,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    statusBadge: {
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 8,
+        borderRadius: 12,
     },
-    badgeText: {
-        color: 'white',
-        fontSize: 12,
-        fontWeight: 'bold',
-        textTransform: 'capitalize',
-    },
-    cardType: {
-        fontSize: 14,
-        marginBottom: 8,
-        textTransform: 'capitalize',
-    },
-    cardDesc: {
-        fontSize: 14,
-        marginBottom: 16,
+    statusText: {
+        fontSize: 10,
+        fontWeight: '700',
+        textTransform: 'uppercase',
     },
     cardFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(255,255,255,0.1)',
+        marginTop: 12,
         paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(150,150,150,0.1)',
     },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
+    statRow: {
+        flexDirection: 'row',
         alignItems: 'center',
-        padding: 32,
+        gap: 6,
     },
-    emptyText: {
-        fontSize: 16,
-        marginTop: 16,
-        textAlign: 'center',
+    statText: {
+        fontSize: 12,
     },
+    editBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+        gap: 6,
+    },
+    btnText: {
+        fontSize: 12,
+        fontWeight: '600',
+    }
 });

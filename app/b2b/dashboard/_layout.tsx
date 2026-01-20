@@ -1,57 +1,57 @@
 import { Tabs } from 'expo-router';
 import { useColors } from '@/hooks/use-colors';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Platform } from 'react-native';
+import { FloatingTabBar } from '@/components/navigation/floating-tab-bar';
+import { View } from 'react-native';
 
 export default function DashboardLayout() {
     const colors = useColors();
 
     return (
         <Tabs
+            tabBar={(props) => <FloatingTabBar {...props} />}
             screenOptions={{
                 headerShown: true,
-                tabBarActiveTintColor: colors.primary,
-                tabBarInactiveTintColor: colors.muted,
-                tabBarStyle: {
-                    backgroundColor: colors.background,
-                    borderTopColor: colors.border,
-                    height: Platform.OS === 'ios' ? 88 : 60,
-                    paddingBottom: Platform.OS === 'ios' ? 28 : 8,
-                },
                 headerStyle: {
                     backgroundColor: colors.background,
+                    // Remove bottom border for cleaner look
+                    shadowOpacity: 0,
+                    elevation: 0,
+                    borderBottomWidth: 0,
                 },
                 headerTitleStyle: {
                     color: colors.foreground,
+                    fontSize: 28,
+                    fontWeight: '800', // Modern bold headers
+                    fontFamily: 'Inter_900Black', // Assuming Inter is available
                 },
+                headerTitleAlign: 'left', // More like iOS Large Title
+                headerLeftContainerStyle: { paddingLeft: 20 },
+                // Add padding to content bottom so it's not hidden by floating bar
+                sceneStyle: { backgroundColor: colors.background },
             }}
         >
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: 'Overview',
-                    tabBarIcon: ({ color }) => <IconSymbol name="chart.bar.fill" size={24} color={color} />,
+                    title: 'Dashboard',
                 }}
             />
             <Tabs.Screen
                 name="products"
                 options={{
                     title: 'Products',
-                    tabBarIcon: ({ color }) => <IconSymbol name="cup.and.saucer.fill" size={24} color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="jobs"
                 options={{
                     title: 'Jobs',
-                    tabBarIcon: ({ color }) => <IconSymbol name="briefcase.fill" size={24} color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="subscription"
                 options={{
                     title: 'Plan',
-                    tabBarIcon: ({ color }) => <IconSymbol name="creditcard.fill" size={24} color={color} />,
                 }}
             />
         </Tabs>

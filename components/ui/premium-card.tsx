@@ -1,10 +1,9 @@
 import { View, Pressable, StyleSheet, ViewStyle } from 'react-native';
-import Animated, { 
-  useAnimatedStyle, 
-  useSharedValue, 
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
   withSpring,
   withTiming,
-  interpolate,
 } from 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { cn } from '@/lib/utils';
@@ -24,9 +23,9 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
  * Premium card component with iOS 26 inspired design
  * Features subtle shadows, smooth animations, and glass-like appearance
  */
-export function PremiumCard({ 
-  children, 
-  className, 
+export function PremiumCard({
+  children,
+  className,
   onPress,
   style,
   elevated = false,
