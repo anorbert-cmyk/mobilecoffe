@@ -178,11 +178,11 @@ export const demoCafes: Cafe[] = [
       {
         name: 'Espresso Drinks',
         items: [
-          { name: 'Espresso', price: 590, description: 'Double shot, 18g in, 36g out', isPopular: true },
-          { name: 'Flat White', price: 890, description: 'Double ristretto with velvety steamed milk', isPopular: true },
-          { name: 'Cortado', price: 690, description: 'Equal parts espresso and steamed milk' },
-          { name: 'Cappuccino', price: 790, description: 'Classic Italian ratio with microfoam' },
-          { name: 'Latte', price: 890, description: 'Smooth and milky with latte art' },
+          { name: 'Espresso', price: 590, description: 'Double shot, 18g in, 36g out', isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=400&q=80' },
+          { name: 'Flat White', price: 890, description: 'Double ristretto with velvety steamed milk', isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1577968897966-3d4325b36b61?w=400&q=80' },
+          { name: 'Cortado', price: 690, description: 'Equal parts espresso and steamed milk', imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80' },
+          { name: 'Cappuccino', price: 790, description: 'Classic Italian ratio with microfoam', imageUrl: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400&q=80' },
+          { name: 'Latte', price: 890, description: 'Smooth and milky with latte art', imageUrl: 'https://images.unsplash.com/photo-1534778101976-62847782c213?w=400&q=80' },
         ]
       },
       {
@@ -284,25 +284,25 @@ export const demoCafes: Cafe[] = [
           { name: 'Eggs Benedict', price: 2890, description: 'English muffin, ham, hollandaise', isPopular: true, imageUrl: require('@/assets/images/menu/eggs_benedict.png') },
           { name: 'Acai Bowl', price: 2290, description: 'Frozen acai, granola, banana, berries', isVegan: true, imageUrl: require('@/assets/images/menu/acai_bowl.png') },
           { name: 'Fluffy Pancakes', price: 1990, description: 'Stack of 3 with maple syrup and berries', imageUrl: require('@/assets/images/menu/pancakes.png') },
-          { name: 'Shakshuka', price: 2190, description: 'Eggs poached in spiced tomato sauce, feta, pita' },
+          { name: 'Shakshuka', price: 2190, description: 'Eggs poached in spiced tomato sauce, feta, pita', imageUrl: 'https://images.unsplash.com/photo-1590412200988-a436970781fa?w=400&q=80' },
         ]
       },
       {
         name: 'Coffee',
         items: [
-          { name: 'Espresso', price: 490, isPopular: true },
-          { name: 'Flat White', price: 790 },
-          { name: 'Oat Latte', price: 890, isVegan: true, isPopular: true },
-          { name: 'Matcha Latte', price: 890, isVegan: true },
-          { name: 'Cold Brew', price: 790 },
+          { name: 'Espresso', price: 490, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=400&q=80' },
+          { name: 'Flat White', price: 790, imageUrl: 'https://images.unsplash.com/photo-1577968897966-3d4325b36b61?w=400&q=80' },
+          { name: 'Oat Latte', price: 890, isVegan: true, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=400&q=80' },
+          { name: 'Matcha Latte', price: 890, isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=400&q=80' },
+          { name: 'Cold Brew', price: 790, imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80' },
         ]
       },
       {
         name: 'Fresh Juices',
         items: [
-          { name: 'Green Detox', price: 1290, description: 'Spinach, apple, ginger, lemon', isVegan: true },
-          { name: 'Orange Carrot', price: 990, isVegan: true },
-          { name: 'Beetroot Power', price: 1190, isVegan: true },
+          { name: 'Green Detox', price: 1290, description: 'Spinach, apple, ginger, lemon', isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=400&q=80' },
+          { name: 'Orange Carrot', price: 990, isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=400&q=80' },
+          { name: 'Beetroot Power', price: 1190, isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?w=400&q=80' },
         ]
       }
     ],
@@ -381,27 +381,27 @@ export const demoCafes: Cafe[] = [
       {
         name: 'Espresso Bar',
         items: [
-          { name: 'Espresso (House Blend)', price: 590 },
-          { name: 'Espresso (Single Origin)', price: 790, isPopular: true },
-          { name: 'Cappuccino', price: 790 },
-          { name: 'Flat White', price: 890, isPopular: true },
+          { name: 'Espresso (House Blend)', price: 590, imageUrl: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=400&q=80' },
+          { name: 'Espresso (Single Origin)', price: 790, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80' },
+          { name: 'Cappuccino', price: 790, imageUrl: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400&q=80' },
+          { name: 'Flat White', price: 890, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1577968897966-3d4325b36b61?w=400&q=80' },
         ]
       },
       {
         name: 'Brew Bar',
         items: [
-          { name: 'V60', price: 990, description: 'Choose from 3 single origins' },
-          { name: 'AeroPress', price: 890 },
-          { name: 'Chemex (2 cups)', price: 1490, isPopular: true },
-          { name: 'Cold Drip', price: 1190, description: '8-hour slow drip' },
+          { name: 'V60', price: 990, description: 'Choose from 3 single origins', imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80' },
+          { name: 'AeroPress', price: 890, imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=80' },
+          { name: 'Chemex (2 cups)', price: 1490, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=400&q=80' },
+          { name: 'Cold Drip', price: 1190, description: '8-hour slow drip', imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80' },
         ]
       },
       {
         name: 'Retail',
         items: [
-          { name: 'House Blend (250g)', price: 3900 },
-          { name: 'Single Origin (250g)', price: 4900 },
-          { name: 'Filter Roast (250g)', price: 4500 },
+          { name: 'House Blend (250g)', price: 3900, imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&q=80' },
+          { name: 'Single Origin (250g)', price: 4900, imageUrl: 'https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?w=400&q=80' },
+          { name: 'Filter Roast (250g)', price: 4500, imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80' },
         ]
       }
     ],
@@ -473,20 +473,20 @@ export const demoCafes: Cafe[] = [
       {
         name: 'Brekkie',
         items: [
-          { name: 'Big Aussie', price: 3290, description: 'Eggs, bacon, sausage, beans, mushrooms, toast', isPopular: true },
-          { name: 'Smashed Avo', price: 2290, description: 'Sourdough, feta, dukkah, poached eggs', isPopular: true },
-          { name: 'Banana Bread', price: 1290, description: 'House-made with mascarpone and berries' },
-          { name: 'Granola Bowl', price: 1690, description: 'Greek yogurt, honey, seasonal fruit', isVegan: false },
+          { name: 'Big Aussie', price: 3290, description: 'Eggs, bacon, sausage, beans, mushrooms, toast', isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&q=80' },
+          { name: 'Smashed Avo', price: 2290, description: 'Sourdough, feta, dukkah, poached eggs', isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1541442170174-6767e96dc6fb?w=400&q=80' },
+          { name: 'Banana Bread', price: 1290, description: 'House-made with mascarpone and berries', imageUrl: 'https://images.unsplash.com/photo-1572383672419-ab35444a6934?w=400&q=80' },
+          { name: 'Granola Bowl', price: 1690, description: 'Greek yogurt, honey, seasonal fruit', isVegan: false, imageUrl: 'https://images.unsplash.com/photo-1525351326368-efbb5cb6814d?w=400&q=80' },
         ]
       },
       {
         name: 'Coffee & Drinks',
         items: [
-          { name: 'Flat White', price: 790, isPopular: true },
-          { name: 'Long Black', price: 590 },
-          { name: 'Magic', price: 790, description: 'Double ristretto, less milk than flat white' },
-          { name: 'Iced Long Black', price: 690 },
-          { name: 'Fresh OJ', price: 890 },
+          { name: 'Flat White', price: 790, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1577968897966-3d4325b36b61?w=400&q=80' },
+          { name: 'Long Black', price: 590, imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80' },
+          { name: 'Magic', price: 790, description: 'Double ristretto, less milk than flat white', imageUrl: 'https://images.unsplash.com/photo-1512568400610-62da28bc8a13?w=400&q=80' },
+          { name: 'Iced Long Black', price: 690, imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80' },
+          { name: 'Fresh OJ', price: 890, imageUrl: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=400&q=80' },
         ]
       }
     ],
@@ -547,26 +547,26 @@ export const demoCafes: Cafe[] = [
       {
         name: 'Coffee',
         items: [
-          { name: 'V60 Pour Over', price: 890, isPopular: true },
-          { name: 'Oat Latte', price: 890, isVegan: true },
-          { name: 'Matcha Latte', price: 990, isVegan: true, isPopular: true },
-          { name: 'Golden Latte', price: 990, description: 'Turmeric, ginger, oat milk', isVegan: true },
+          { name: 'V60 Pour Over', price: 890, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80' },
+          { name: 'Oat Latte', price: 890, isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=400&q=80' },
+          { name: 'Matcha Latte', price: 990, isVegan: true, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=400&q=80' },
+          { name: 'Golden Latte', price: 990, description: 'Turmeric, ginger, oat milk', isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1587734005433-6b47be4bf3b0?w=400&q=80' },
         ]
       },
       {
         name: 'Vegan Treats',
         items: [
-          { name: 'Raw Cheesecake', price: 1490, description: 'Cashew-based, seasonal fruit', isVegan: true, isPopular: true },
-          { name: 'Brownie', price: 890, description: 'Gluten-free, tahini drizzle', isVegan: true },
-          { name: 'Energy Balls (3pc)', price: 690, description: 'Date, oat, cacao', isVegan: true },
+          { name: 'Raw Cheesecake', price: 1490, description: 'Cashew-based, seasonal fruit', isVegan: true, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1567327613485-fbc7bf196198?w=400&q=80' },
+          { name: 'Brownie', price: 890, description: 'Gluten-free, tahini drizzle', isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=400&q=80' },
+          { name: 'Energy Balls (3pc)', price: 690, description: 'Date, oat, cacao', isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1604152135912-04a022e23696?w=400&q=80' },
         ]
       },
       {
         name: 'Organic Teas',
         items: [
-          { name: 'Sencha', price: 690, isVegan: true },
-          { name: 'Chamomile', price: 590, isVegan: true },
-          { name: 'Chai (Homemade)', price: 790, description: 'Spiced with oat milk', isVegan: true },
+          { name: 'Sencha', price: 690, isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1556679343-c1917e0f46a6?w=400&q=80' },
+          { name: 'Chamomile', price: 590, isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400&q=80' },
+          { name: 'Chai (Homemade)', price: 790, description: 'Spiced with oat milk', isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1571934811356-5cc061b6821f?w=400&q=80' },
         ]
       }
     ],
@@ -617,18 +617,18 @@ export const demoCafes: Cafe[] = [
       {
         name: 'Espresso Bar',
         items: [
-          { name: 'Espresso', price: 490, isPopular: true },
-          { name: 'Doppio', price: 690 },
-          { name: 'Cortado', price: 590, isPopular: true },
-          { name: 'Macchiato', price: 490 },
-          { name: 'Flat White', price: 790 },
+          { name: 'Espresso', price: 490, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=400&q=80' },
+          { name: 'Doppio', price: 690, imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80' },
+          { name: 'Cortado', price: 590, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80' },
+          { name: 'Macchiato', price: 490, imageUrl: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=400&q=80' },
+          { name: 'Flat White', price: 790, imageUrl: 'https://images.unsplash.com/photo-1577968897966-3d4325b36b61?w=400&q=80' },
         ]
       },
       {
         name: 'Single Origins (Rotating)',
         items: [
-          { name: 'Origin of the Week', price: 690, description: 'Ask barista for details', isPopular: true },
-          { name: 'V60 (Single Origin)', price: 990 },
+          { name: 'Origin of the Week', price: 690, description: 'Ask barista for details', isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&q=80' },
+          { name: 'V60 (Single Origin)', price: 990, imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80' },
         ]
       }
     ],
@@ -681,19 +681,19 @@ export const demoCafes: Cafe[] = [
       {
         name: 'Coffee',
         items: [
-          { name: 'Batch Brew', price: 490, description: 'Unlimited refills for 2 hours', isPopular: true },
-          { name: 'Espresso', price: 490 },
-          { name: 'Oat Latte', price: 790, isVegan: true, isPopular: true },
-          { name: 'Cold Brew', price: 690 },
-          { name: 'Affogato', price: 890, description: 'Espresso over vanilla gelato' },
+          { name: 'Batch Brew', price: 490, description: 'Unlimited refills for 2 hours', isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80' },
+          { name: 'Espresso', price: 490, imageUrl: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=400&q=80' },
+          { name: 'Oat Latte', price: 790, isVegan: true, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=400&q=80' },
+          { name: 'Cold Brew', price: 690, imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80' },
+          { name: 'Affogato', price: 890, description: 'Espresso over vanilla gelato', imageUrl: 'https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?w=400&q=80' },
         ]
       },
       {
         name: 'Light Bites',
         items: [
-          { name: 'Croissant', price: 590 },
-          { name: 'Energy Bar', price: 490, isVegan: true },
-          { name: 'Yogurt Parfait', price: 890 },
+          { name: 'Croissant', price: 590, imageUrl: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&q=80' },
+          { name: 'Energy Bar', price: 490, isVegan: true, imageUrl: 'https://images.unsplash.com/photo-1622484212850-eb596d769edc?w=400&q=80' },
+          { name: 'Yogurt Parfait', price: 890, imageUrl: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&q=80' },
         ]
       }
     ],
@@ -755,27 +755,27 @@ export const demoCafes: Cafe[] = [
       {
         name: 'Day Menu',
         items: [
-          { name: 'Eggs Your Way', price: 1890, description: 'Scrambled, poached, or fried. With toast.' },
-          { name: 'Cheese Plate', price: 2490, description: 'Hungarian and French cheeses, honey, walnuts', isPopular: true },
-          { name: 'Soup of the Day', price: 1290 },
-          { name: 'Club Sandwich', price: 2190 },
+          { name: 'Eggs Your Way', price: 1890, description: 'Scrambled, poached, or fried. With toast.', imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80' },
+          { name: 'Cheese Plate', price: 2490, description: 'Hungarian and French cheeses, honey, walnuts', isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1452195100486-9cc805987862?w=400&q=80' },
+          { name: 'Soup of the Day', price: 1290, imageUrl: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80' },
+          { name: 'Club Sandwich', price: 2190, imageUrl: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&q=80' },
         ]
       },
       {
         name: 'Coffee & Tea',
         items: [
-          { name: 'Espresso', price: 490 },
-          { name: 'Latte', price: 690 },
-          { name: 'Lungo', price: 590 },
-          { name: 'Teapot (500ml)', price: 890 },
+          { name: 'Espresso', price: 490, imageUrl: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=400&q=80' },
+          { name: 'Latte', price: 690, imageUrl: 'https://images.unsplash.com/photo-1534778101976-62847782c213?w=400&q=80' },
+          { name: 'Lungo', price: 590, imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80' },
+          { name: 'Teapot (500ml)', price: 890, imageUrl: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&q=80' },
         ]
       },
       {
         name: 'Natural Wines',
         items: [
-          { name: 'Orange Wine (glass)', price: 1490, description: 'Rotating selection' },
-          { name: 'Red (glass)', price: 1290 },
-          { name: 'White (glass)', price: 1190 },
+          { name: 'Orange Wine (glass)', price: 1490, description: 'Rotating selection', imageUrl: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&q=80' },
+          { name: 'Red (glass)', price: 1290, imageUrl: 'https://images.unsplash.com/photo-1568213816046-0a6d6e7c9a3c?w=400&q=80' },
+          { name: 'White (glass)', price: 1190, imageUrl: 'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400&q=80' },
         ]
       }
     ],
