@@ -1,7 +1,6 @@
 import { Tabs } from 'expo-router';
 import { useColors } from '@/hooks/use-colors';
 import { FloatingTabBar } from '@/components/navigation/floating-tab-bar';
-import { View } from 'react-native';
 
 export default function DashboardLayout() {
     const colors = useColors();
@@ -13,7 +12,6 @@ export default function DashboardLayout() {
                 headerShown: true,
                 headerStyle: {
                     backgroundColor: colors.background,
-                    // Remove bottom border for cleaner look
                     shadowOpacity: 0,
                     elevation: 0,
                     borderBottomWidth: 0,
@@ -21,28 +19,43 @@ export default function DashboardLayout() {
                 headerTitleStyle: {
                     color: colors.foreground,
                     fontSize: 28,
-                    fontWeight: '800', // Modern bold headers
-                    fontFamily: 'Inter_900Black', // Assuming Inter is available
+                    fontWeight: '800',
                 },
-                headerTitleAlign: 'left', // More like iOS Large Title
+                headerTitleAlign: 'left',
                 headerLeftContainerStyle: { paddingLeft: 20 },
-                // Add padding to content bottom so it's not hidden by floating bar
                 sceneStyle: { backgroundColor: colors.background },
             }}
         >
+            {/* Visible Tabs */}
             <Tabs.Screen
                 name="index"
                 options={{
                     title: 'Dashboard',
                 }}
             />
-
             <Tabs.Screen
                 name="products"
                 options={{
                     title: 'Menu',
                 }}
             />
+
+            {/* Hidden Screens (still navigable, but not in tab bar) */}
+            <Tabs.Screen
+                name="events"
+                options={{
+                    href: null,
+                    title: 'Events',
+                }}
+            />
+            <Tabs.Screen
+                name="subscription"
+                options={{
+                    href: null,
+                    title: 'Subscription',
+                }}
+            />
+            {/* jobs folder is auto-handled as nested stack */}
         </Tabs>
     );
 }
