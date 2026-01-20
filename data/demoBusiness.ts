@@ -44,6 +44,7 @@ export const demoBusiness = {
             flavorNotes: ['Jasmine', 'Citrus', 'Black Tea'],
             weight: 250,
             isAvailable: true,
+            images: [require('@/assets/images/products/coffee_yirgacheffe.png')],
         },
         {
             id: 2,
@@ -56,6 +57,8 @@ export const demoBusiness = {
             flavorNotes: ['Chocolate', 'Walnut', 'Caramel'],
             weight: 250,
             isAvailable: true,
+            // Reusing image for demo clarity, ideally would have distinct image
+            images: [require('@/assets/images/products/coffee_yirgacheffe.png')],
         },
         {
             id: 3,
@@ -77,15 +80,18 @@ export const demoBusiness = {
             currency: 'HUF',
             description: 'Kerámiaverzió, fehér',
             isAvailable: true,
+            images: [require('@/assets/images/products/equipment_v60.png')],
         },
         {
             id: 5,
-            name: 'Timemore C2 Kéziőrlő',
-            type: 'equipment',
-            price: 32000,
+            name: 'Kerámia Cappuccino Csésze',
+            // Changed from equipment (TIMEMORE C2) to accessory (CUP) to match generated image
+            type: 'accessory',
+            price: 4500,
             currency: 'HUF',
-            description: 'Kiváló minőségű kézi kávéőrlő',
+            description: 'Kézzel készült kerámia, 200ml',
             isAvailable: true,
+            images: [require('@/assets/images/products/accessory_cup.png')],
         },
     ],
     events: [

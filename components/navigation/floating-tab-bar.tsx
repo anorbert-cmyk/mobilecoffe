@@ -91,7 +91,8 @@ function TabItem({
     const opacity = useSharedValue(0.6);
 
     useEffect(() => {
-        scale.value = withSpring(isFocused ? 1.1 : 1, { damping: 15 });
+        // Smooth timing instead of bouncy spring
+        scale.value = withTiming(isFocused ? 1.1 : 1, { duration: 200 });
         opacity.value = withTiming(isFocused ? 1 : 0.6, { duration: 200 });
     }, [isFocused]);
 

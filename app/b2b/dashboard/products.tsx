@@ -103,11 +103,10 @@ function ProductCard({ item, index, onEdit, onDelete }: {
                 onPressOut={() => { scale.value = withSpring(1); }}
                 style={[styles.productCard, animatedStyle, { backgroundColor: colors.surface }]}
             >
-                {/* Image or Gradient Placeholder */}
                 <View style={styles.productImageContainer}>
                     {hasImage ? (
                         <Image
-                            source={{ uri: item.images[0] }}
+                            source={typeof item.images[0] === 'string' ? { uri: item.images[0] } : item.images[0]}
                             style={styles.productImage}
                             contentFit="cover"
                             transition={300}

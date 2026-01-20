@@ -250,14 +250,7 @@ export function DashboardScreen() {
                     </View>
                 </View>
 
-                {/* ============ STATS BENTO GRID ============ */}
-                <View style={styles.statsGrid}>
-                    {STATS.map((stat, i) => (
-                        <StatCard key={stat.label} {...stat} index={i} />
-                    ))}
-                </View>
-
-                {/* ============ QUICK ACTIONS ============ */}
+                {/* ============ QUICK ACTIONS (PRIORITY) ============ */}
                 <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Quick Actions</Text>
                 <ScrollView
                     horizontal
@@ -265,7 +258,7 @@ export function DashboardScreen() {
                     contentContainerStyle={styles.actionsScroll}
                 >
                     {ACTIONS.map((action, i) => (
-                        <Animated.View key={action.title} entering={FadeInDown.delay(500 + i * 100).springify()}>
+                        <Animated.View key={action.title} entering={FadeInDown.delay(300 + i * 100).springify()}>
                             <QuickActionCard
                                 {...action}
                                 onPress={() => {
@@ -276,6 +269,14 @@ export function DashboardScreen() {
                         </Animated.View>
                     ))}
                 </ScrollView>
+
+                {/* ============ STATS BENTO GRID ============ */}
+                <Text style={[styles.sectionTitle, { color: colors.foreground, marginTop: 8 }]}>Performance</Text>
+                <View style={styles.statsGrid}>
+                    {STATS.map((stat, i) => (
+                        <StatCard key={stat.label} {...stat} index={i} />
+                    ))}
+                </View>
 
                 {/* ============ RECENT ACTIVITY ============ */}
                 <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Recent Activity</Text>
