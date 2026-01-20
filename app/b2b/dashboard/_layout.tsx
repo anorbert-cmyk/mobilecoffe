@@ -55,7 +55,20 @@ export default function DashboardLayout() {
                     title: 'Subscription',
                 }}
             />
-            {/* jobs folder is auto-handled as nested stack */}
+            <Tabs.Screen
+                name="jobs/index"
+                options={{
+                    href: null,
+                    title: 'Jobs',
+                }}
+            />
+            <Tabs.Screen
+                name="jobs/add"
+                options={{
+                    href: null,
+                    title: 'Add Job',
+                }}
+            />
         </Tabs>
     );
 }
