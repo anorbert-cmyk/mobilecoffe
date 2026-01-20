@@ -33,14 +33,13 @@ export default function AddJobScreen() {
     const handleSubmit = () => {
         if (!business) return;
         createJob.mutate({
-            businessId: business.id,
             title: formData.title,
             description: formData.description,
             netSalaryMin: parseInt(formData.netSalaryMin),
             netSalaryMax: parseInt(formData.netSalaryMax),
-            contractType: formData.contractType as any,
+            contractType: formData.contractType as "full-time" | "part-time" | "contract" | "internship" | "seasonal",
             workingHours: formData.workingHours,
-            startDate: new Date(), // Default to now
+            startDate: new Date().toISOString(),
             contactEmail: formData.contactEmail || business.email,
         });
     };

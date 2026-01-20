@@ -15,8 +15,15 @@ export default function RegisterBusiness() {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        type: 'cafe' as const,
+        type: 'cafe' as 'cafe' | 'roaster' | 'both' | 'equipment_seller',
         phone: '',
+        taxNumber: '',
+        address: {
+            street: '',
+            city: '',
+            postalCode: '',
+            country: '',
+        }
     });
 
     const createBusiness = trpc.business.create.useMutation({
@@ -56,6 +63,22 @@ export default function RegisterBusiness() {
                 </View>
 
                 <View style={styles.formGroup}>
+                    <Text style={[styles.label, { color: colors.foreground }]}>Business Type</Text>
+                    <View style={styles.typeContainer}>
+                        {(['cafe', 'roaster', 'both', 'equipment_seller'] as const).map((type) => (
+                            <PremiumButton
+                                key={type}
+                                variant={formData.type === type ? 'primary' : 'ghost'}
+                                onPress={() => setFormData(prev => ({ ...prev, type }))}
+                                style={styles.typeButton}
+                            >
+                                {type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')}
+                            </PremiumButton>
+                        ))}
+                    </View>
+                </View>
+
+                <View style={styles.formGroup}>
                     <Text style={[styles.label, { color: colors.foreground }]}>Business Email</Text>
                     <TextInput
                         style={[styles.input, { color: colors.foreground, borderColor: colors.border }]}
@@ -77,6 +100,39 @@ export default function RegisterBusiness() {
                         value={formData.phone}
                         keyboardType="phone-pad"
                         onChangeText={(t) => setFormData(prev => ({ ...prev, phone: t }))}
+                    />
+                </View>
+
+                <View style={styles.formGroup}>
+                    <Text style={[styles.label, { color: colors.foreground }]}>Tax Number (Optional)</Text>
+                    <TextInput
+                        style={[styles.input, { color: colors.foreground, borderColor: colors.border }]}
+                        placeholder="12345678-1-42"
+                        placeholderTextColor={colors.muted}
+                        value={formData.taxNumber}
+                        onChangeText={(t) => setFormData(prev => ({ ...prev, taxNumber: t }))}
+                    />
+                </View>
+
+                <View style={styles.formGroup}>
+                    <Text style={[styles.label, { color: colors.foreground }]}>City</Text>
+                    <TextInput
+                        style={[styles.input, { color: colors.foreground, borderColor: colors.border }]}
+                        placeholder="Budapest"
+                        placeholderTextColor={colors.muted}
+                        value={formData.address?.city || ''}
+                        onChangeText={(t) => setFormData(prev => ({ ...prev, address: { ...prev.address, city: t } }))}
+                    />
+                </View>
+
+                <View style={styles.formGroup}>
+                    <Text style={[styles.label, { color: colors.foreground }]}>Street Address</Text>
+                    <TextInput
+                        style={[styles.input, { color: colors.foreground, borderColor: colors.border }]}
+                        placeholder="Kossuth Lajos utca 1."
+                        placeholderTextColor={colors.muted}
+                        value={formData.address?.street || ''}
+                        onChangeText={(t) => setFormData(prev => ({ ...prev, address: { ...prev.address, street: t } }))}
                     />
                 </View>
 
@@ -119,4 +175,13 @@ const styles = StyleSheet.create({
         padding: 16,
         fontSize: 16,
     },
+    typeContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+    },
+    typeButton: {
+        flex: 1,
+        minWidth: '45%',
+    }
 });

@@ -12,6 +12,13 @@ export const businessRouter = router({
             type: z.enum(["cafe", "roaster", "both", "equipment_seller"]),
             email: z.string().email(),
             phone: z.string().optional(),
+            taxNumber: z.string().optional(),
+            address: z.object({
+                street: z.string().optional(),
+                city: z.string().optional(),
+                postalCode: z.string().optional(),
+                country: z.string().optional(),
+            }).optional(),
         }))
         .mutation(async ({ ctx, input }) => {
             const db = await getDb();

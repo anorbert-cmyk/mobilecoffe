@@ -8,14 +8,13 @@ import { TRPCError } from "@trpc/server";
 export const jobRouter = router({
     create: protectedProcedure
         .input(z.object({
-            businessId: z.number(),
             title: z.string(),
             description: z.string(),
-            netSalaryMin: z.number(),
-            netSalaryMax: z.number(),
+            netSalaryMin: z.number().optional(),
+            netSalaryMax: z.number().optional(),
             contractType: z.enum(["full-time", "part-time", "contract", "internship", "seasonal"]),
-            workingHours: z.string(),
-            startDate: z.string().or(z.date()).transform(val => new Date(val)),
+            workingHours: z.string().optional(),
+            startDate: z.string().or(z.date()).transform(val => new Date(val)).optional(),
             contactEmail: z.string().email(),
             contactPhone: z.string().optional(),
         }))
@@ -23,23 +22,27 @@ export const jobRouter = router({
             const db = await getDb();
             if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
-            // Check ownership
+            // 1. Find the user's business
             const business = await db.query.businesses.findFirst({
-                where: eq(businesses.id, input.businessId),
+                where: eq(businesses.ownerId, ctx.user.id),
                 with: { subscriptions: true }
             });
 
-            if (!business || business.ownerId !== ctx.user.id) {
-                throw new TRPCError({ code: "FORBIDDEN" });
+            if (!business) {
+                // User must have a business profile
+                throw new TRPCError({
+                    code: "PRECONDITION_FAILED",
+                    message: "You must register a business profile first."
+                });
             }
 
-            // Check Subscription & Limits
+            // 2. Check Subscription & Limits
             const activeSub = business.subscriptions.find(s => s.status === 'active');
             const plan = activeSub?.plan || 'free';
 
             const activeJobsCount = await db.query.jobListings.findMany({
                 where: and(
-                    eq(jobListings.businessId, input.businessId),
+                    eq(jobListings.businessId, business.id),
                     eq(jobListings.status, 'active')
                 )
             });
@@ -51,15 +54,31 @@ export const jobRouter = router({
                 });
             }
 
-            // Check Limit (5 per month)
-            // simplified check for now
-
+            // 3. Create the job
             await db.insert(jobListings).values({
                 ...input,
+                businessId: business.id, // Linked automatically
                 status: "active",
                 createdAt: new Date(),
             });
             return { success: true };
+        }),
+
+    listMine: protectedProcedure
+        .query(async ({ ctx }) => {
+            const db = await getDb();
+            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+            const business = await db.query.businesses.findFirst({
+                where: eq(businesses.ownerId, ctx.user.id),
+            });
+
+            if (!business) return [];
+
+            return await db.query.jobListings.findMany({
+                where: eq(jobListings.businessId, business.id),
+                orderBy: (listings, { desc }) => [desc(listings.createdAt)],
+            });
         }),
 
     list: publicProcedure
@@ -69,18 +88,8 @@ export const jobRouter = router({
             return await db.query.jobListings.findMany({
                 where: eq(jobListings.status, "active"),
                 orderBy: (listings, { desc }) => [desc(listings.createdAt)],
-                with: { business: true }
-            });
-        }),
-
-    listByBusiness: publicProcedure
-        .input(z.object({ businessId: z.number() }))
-        .query(async ({ input }) => {
-            const db = await getDb();
-            if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-            return await db.query.jobListings.findMany({
-                where: eq(jobListings.businessId, input.businessId),
-                orderBy: (listings, { desc }) => [desc(listings.createdAt)],
+                with: { business: true },
+                limit: 50
             });
         }),
 
@@ -91,6 +100,7 @@ export const jobRouter = router({
             if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
             return await db.query.jobListings.findFirst({
                 where: eq(jobListings.id, input.id),
+                with: { business: true }
             });
         }),
 

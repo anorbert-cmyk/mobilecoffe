@@ -46,7 +46,7 @@ export default function EditJob() {
 
     const updateJob = trpc.job.update.useMutation({
         onSuccess: () => {
-            utils.job.listByBusiness.invalidate();
+            utils.job.listMine.invalidate();
             Alert.alert('Success', 'Job listing updated');
             router.back();
         },

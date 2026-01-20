@@ -44,15 +44,16 @@ function buildUserResponse(
   user:
     | Awaited<ReturnType<typeof getUserByOpenId>>
     | {
-        openId: string;
-        name?: string | null;
-        email?: string | null;
-        loginMethod?: string | null;
-        lastSignedIn?: Date | null;
-      },
+      id?: number | null;
+      openId: string;
+      name?: string | null;
+      email?: string | null;
+      loginMethod?: string | null;
+      lastSignedIn?: Date | null;
+    },
 ) {
   return {
-    id: (user as any)?.id ?? null,
+    id: user && "id" in user ? user.id : null,
     openId: user?.openId ?? null,
     name: user?.name ?? null,
     email: user?.email ?? null,
