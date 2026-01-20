@@ -24,7 +24,7 @@ export const learningCategories: LearningCategory[] = [
         id: 'what-is-specialty-coffee',
         title: 'What is Specialty Coffee?',
         // 1. Specialty Coffee - The Foundation
-        content: \`# What is Specialty Coffee?
+        content: `# What is Specialty Coffee?
 
 **It's more than just a buzzword—it's a promise of quality.**
 
@@ -56,7 +56,7 @@ By choosing specialty, you're voting for a better industry:
 *   **Taste**: You'll discover flavors you never knew coffee could have—blueberry, jasmine, earl grey, dark chocolate.
 
 ## Your Challenge
-        content: \`# What is Specialty Coffee?
+        content: `# What is Specialty Coffee?
 
 **It's more than just a buzzword—it's a promise of quality.**
 
@@ -88,13 +88,13 @@ By choosing specialty, you're voting for a better industry:
 *   **Taste**: You'll discover flavors you never knew coffee could have—blueberry, jasmine, earl grey, dark chocolate.
 
 ## Your Challenge
-Next time you buy beans, look for the **Region** and **Altitude** on the bag. If it's there, you're on the right track.\`,
+Next time you buy beans, look for the **Region** and **Altitude** on the bag. If it's there, you're on the right track.`,
         readTime: 6
       },
       {
         id: 'water-quality',
         title: 'The Importance of Water Quality',
-        content: \`# Coffee is 98% Water. Don't Ruin It.
+        content: `# Coffee is 98% Water. Don't Ruin It.
 
 **You can buy the best beans in the world, but if your water sucks, your coffee will suck.**
 
@@ -125,13 +125,13 @@ You don't need a PhD, but you should know these two terms:
 3.  **Bottled Spring Water**: Look for "Volvic" or "Crystal Geyser" (check the label for ~150 TDS).
 4.  **Carbon Filter (Brita)**: Better than tap, but doesn't fix hardness issues.
 
-> **Pro Tip:** Never use hot tap water for brewing. It picks up heavy metals from pipes. Always heat fresh, cold water.\`,
+> **Pro Tip:** Never use hot tap water for brewing. It picks up heavy metals from pipes. Always heat fresh, cold water.`,
         readTime: 5
       },
       {
         id: 'grind-size-guide',
         title: 'Grind Size Guide',
-        content: \`# Grind Size: The Secret Variables
+        content: `# Grind Size: The Secret Variables
 
 **You can buy the best beans and have perfect water, but if your grind is wrong, your coffee is ruined.**
 
@@ -167,7 +167,7 @@ If your grinder produces "boulders" (big chunks) and "dust" (fine powder) at the
 **Blade Grinders**: Inconsistent, create dust and boulders
 **Burr Grinders**: Uniform particles, adjustable settings
 
-Invest in a burr grinder—it's the single biggest upgrade for home brewing.\`,
+Invest in a burr grinder—it's the single biggest upgrade for home brewing.`,
       readTime: 5
       }
 ]
@@ -181,7 +181,7 @@ Invest in a burr grinder—it's the single biggest upgrade for home brewing.\`,
             {
               id: 'roast-spectrum',
               title: 'The Roast Spectrum',
-              content: \`# The Roast Spectrum
+              content: `# The Roast Spectrum
 
 Roasting transforms green coffee beans into the aromatic brown beans we know.
 
@@ -229,7 +229,7 @@ Contrary to popular belief, light roasts have slightly MORE caffeine than dark r
   {
     id: 'first-second-crack',
     title: 'First and Second Crack',
-    content: \`# First and Second Crack
+    content: `# First and Second Crack
 
 During roasting, beans go through two audible "cracks" that indicate development stages.
 
