@@ -34,7 +34,6 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: true,
     bundleIdentifier: env.iosBundleId,
-    appleTeamId: "Z2CMMGDNAF",
   },
   android: {
     adaptiveIcon: {
@@ -74,13 +73,7 @@ const config: ExpoConfig = {
         microphonePermission: "Allow $(PRODUCT_NAME) to access your microphone.",
       },
     ],
-    [
-      "expo-video",
-      {
-        supportsBackgroundPlayback: true,
-        supportsPictureInPicture: true,
-      },
-    ],
+    "expo-video",
     [
       "expo-splash-screen",
       {
