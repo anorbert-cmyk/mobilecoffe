@@ -163,7 +163,7 @@ export const businessRouter = router({
             // Actually better to update the subscription table
 
             // Check if active subscription exists
-            const activeSub = business.subscriptions.find(s => s.status === 'active');
+            const activeSub = business.subscriptions.find((s: any) => s.status === 'active');
             if (activeSub) {
                 await db.update(businessSubscriptions)
                     .set({ plan: 'premium', updatedAt: new Date() })

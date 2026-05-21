@@ -37,7 +37,7 @@ export const jobRouter = router({
             }
 
             // 2. Check Subscription & Limits
-            const activeSub = business.subscriptions.find(s => s.status === 'active');
+            const activeSub = business.subscriptions.find((s: any) => s.status === 'active');
             const plan = activeSub?.plan || 'free';
 
             const activeJobsCount = await db.query.jobListings.findMany({
@@ -77,7 +77,7 @@ export const jobRouter = router({
 
             return await db.query.jobListings.findMany({
                 where: eq(jobListings.businessId, business.id),
-                orderBy: (listings, { desc }) => [desc(listings.createdAt)],
+                orderBy: (listings: any, { desc }: any) => [desc(listings.createdAt)],
             });
         }),
 
@@ -87,7 +87,7 @@ export const jobRouter = router({
             if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
             return await db.query.jobListings.findMany({
                 where: eq(jobListings.status, "active"),
-                orderBy: (listings, { desc }) => [desc(listings.createdAt)],
+                orderBy: (listings: any, { desc }: any) => [desc(listings.createdAt)],
                 with: { business: true },
                 limit: 50
             });

@@ -37,7 +37,7 @@ export const productRouter = router({
             }
 
             // Check Limits
-            const activeSub = business.subscriptions.find(s => s.status === 'active');
+            const activeSub = business.subscriptions.find((s: any) => s.status === 'active');
             const plan = activeSub?.plan || 'free';
 
             if (plan === 'free') {

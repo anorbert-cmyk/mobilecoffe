@@ -1,19 +1,54 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import * as schema from "../drizzle/schema";
 import { InsertUser, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
+import { FallbackDatabase } from "./fallbackDb";
 
-let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
+let _db: any = null;
+let isFallback = false;
+
+async function testConnection(url: string): Promise<boolean> {
+  let connection;
+  try {
+    connection = await mysql.createConnection(url);
+    await connection.ping();
+    await connection.end();
+    return true;
+  } catch (error) {
+    console.warn("[Database] MySQL connection check failed:", error);
+    if (connection) {
+      try {
+        await connection.end();
+      } catch (_) {}
+    }
+    return false;
+  }
+}
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
-export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
-    try {
-      _db = drizzle(process.env.DATABASE_URL, { schema, mode: "default" });
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
+export async function getDb(): Promise<any> {
+  if (!_db) {
+    const dbUrl = process.env.DATABASE_URL;
+    if (dbUrl) {
+      try {
+        console.log("[Database] Testing connection to MySQL...");
+        const isConnected = await testConnection(dbUrl);
+        if (isConnected) {
+          console.log("[Database] Connecting to MySQL using Drizzle...");
+          _db = drizzle(dbUrl, { schema, mode: "default" });
+          isFallback = false;
+        }
+      } catch (error) {
+        console.warn("[Database] Failed to initialize MySQL client:", error);
+        _db = null;
+      }
+    }
+    if (!_db) {
+      console.warn("[Database] MySQL not available. Using local JSON fallback database...");
+      _db = new FallbackDatabase();
+      isFallback = true;
     }
   }
   return _db;
@@ -23,6 +58,11 @@ export async function migrateDb() {
   const db = await getDb();
   if (!db) {
     console.error("[Database] Cannot migrate: database not available");
+    return;
+  }
+
+  if (isFallback) {
+    console.log("[Database] Fallback database active. Bypassing schema migrations.");
     return;
   }
 

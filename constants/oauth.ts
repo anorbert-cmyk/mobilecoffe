@@ -1,5 +1,6 @@
 import * as Linking from "expo-linking";
 import * as ReactNative from "react-native";
+import Constants from "expo-constants";
 
 // Extract scheme from bundle ID (last segment timestamp, prefixed with "manus")
 // e.g., "space.manus.my.app.t20240115103045" -> "manus20240115103045"
@@ -30,22 +31,34 @@ export const API_BASE_URL = env.apiBaseUrl;
  * URL pattern: https://PORT-sandboxid.region.domain
  */
 export function getApiBaseUrl(): string {
+  // In development, resolve the host IP dynamically so that emulators and physical devices can connect
+  if (__DEV__) {
+    if (ReactNative.Platform.OS === "web" && typeof window !== "undefined" && window.location) {
+      const { protocol, hostname, port } = window.location;
+      // Metro on 8081, API on 3000
+      if (port === "8081" || hostname.startsWith("8081-")) {
+        const apiHostname = hostname.replace(/^8081-/, "3000-");
+        const apiPort = port === "8081" ? "3000" : port;
+        return `${protocol}//${apiHostname}${apiPort ? `:${apiPort}` : ""}`;
+      }
+      return `${protocol}//${hostname}${port ? `:${port}` : ""}`;
+    }
+
+    // Resolve the packager host IP
+    const hostUri = Constants.expoConfig?.hostUri;
+    if (hostUri) {
+      const host = hostUri.split(":")[0];
+      return `http://${host}:3000`;
+    }
+
+    return "http://localhost:3000";
+  }
+
   // If API_BASE_URL is set, use it
   if (API_BASE_URL) {
     return API_BASE_URL.replace(/\/$/, "");
   }
 
-  // On web, derive from current hostname by replacing port 8081 with 3000
-  if (ReactNative.Platform.OS === "web" && typeof window !== "undefined" && window.location) {
-    const { protocol, hostname } = window.location;
-    // Pattern: 8081-sandboxid.region.domain -> 3000-sandboxid.region.domain
-    const apiHostname = hostname.replace(/^8081-/, "3000-");
-    if (apiHostname !== hostname) {
-      return `${protocol}//${apiHostname}`;
-    }
-  }
-
-  // Fallback to empty (will use relative URL)
   return "";
 }
 

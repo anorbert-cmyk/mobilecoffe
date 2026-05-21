@@ -220,11 +220,11 @@ export default function ProductsManager() {
     // Filter products
     const filteredProducts = activeFilter === 'all'
         ? products
-        : products.filter(p => p.type === activeFilter);
+        : products.filter((p: any) => p.type === activeFilter);
 
     // Stats
-    const coffeeCount = products.filter(p => p.type === 'coffee').length;
-    const equipmentCount = products.filter(p => p.type === 'equipment' || p.type === 'accessory').length;
+    const coffeeCount = products.filter((p: any) => p.type === 'coffee').length;
+    const equipmentCount = products.filter((p: any) => p.type === 'equipment' || p.type === 'accessory').length;
 
     const CATEGORIES = [
         { type: 'all' as ProductType, label: 'All', icon: 'square.grid.2x2.fill' as IconSymbolName, color: colors.primary },
