@@ -102,10 +102,14 @@ async function startServer() {
   });
 }
 
-const { migrateDb } = await import("../db");
-await migrateDb();
+async function init() {
+  const { migrateDb } = await import("../db");
+  await migrateDb();
 
-// Auto-seed for demo environment
-const { seedDemoData } = await import("../services/demoSeeder");
-await seedDemoData().catch(err => console.error("Failed to seed demo data:", err));
-startServer().catch(console.error);
+  // Auto-seed for demo environment
+  const { seedDemoData } = await import("../services/demoSeeder");
+  await seedDemoData().catch(err => console.error("Failed to seed demo data:", err));
+  await startServer();
+}
+
+init().catch(console.error);

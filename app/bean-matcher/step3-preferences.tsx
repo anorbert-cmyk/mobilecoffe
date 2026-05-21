@@ -338,7 +338,7 @@ export default function BeanMatcherStep3() {
             What flavors do you enjoy?
           </Text>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            We'll filter the perfect beans for your palate.
+            {"We'll filter the perfect beans for your palate."}
           </Text>
         </Animated.View>
 

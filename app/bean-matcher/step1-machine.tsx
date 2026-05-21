@@ -142,7 +142,7 @@ export default function BeanMatcherStep1() {
             How do you brew?
           </Text>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            We'll transform your coffee experience based on your equipment.
+            {"We'll transform your coffee experience based on your equipment."}
           </Text>
         </Animated.View>
 

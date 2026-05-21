@@ -158,7 +158,7 @@ export default function BeanMatcherStep2() {
               Select your grinder
             </Text>
             <Text style={[styles.sectionDescription, { color: colors.muted }]}>
-              We'll tailor the coarseness for you
+              {"We'll tailor the coarseness for you"}
             </Text>
 
             <ScrollView
@@ -245,7 +245,7 @@ export default function BeanMatcherStep2() {
                 Pro Tip
               </Text>
               <Text style={[styles.tipText, { color: colors.foreground }]}>
-                We'll recommend beans that come in vacuum-sealed packs for freshness.
+                {"We'll recommend beans that come in vacuum-sealed packs for freshness."}
               </Text>
             </View>
           </Animated.View>

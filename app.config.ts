@@ -34,6 +34,7 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: true,
     bundleIdentifier: env.iosBundleId,
+    appleTeamId: "4L3PVR94QU",
   },
   android: {
     adaptiveIcon: {

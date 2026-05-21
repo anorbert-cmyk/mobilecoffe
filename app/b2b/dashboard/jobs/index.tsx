@@ -11,6 +11,73 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+interface JobCardItemProps {
+    item: any;
+    index: number;
+    colors: any;
+    router: any;
+}
+
+function JobCardItem({ item, index, colors, router }: JobCardItemProps) {
+    const scale = useSharedValue(1);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
+
+    const handlePress = () => {
+        if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        router.push(`/b2b/edit-job?id=${item.id}` as any);
+    };
+
+    return (
+        <Animated.View entering={FadeInDown.delay(index * 100).springify().damping(15)}>
+            <AnimatedPressable
+                onPress={handlePress}
+                onPressIn={() => { scale.value = withSpring(0.97); }}
+                onPressOut={() => { scale.value = withSpring(1); }}
+                style={[styles.jobCard, animatedStyle, { backgroundColor: colors.surface }]}
+            >
+                <View style={styles.cardHeader}>
+                    <View style={{ flex: 1 }}>
+                        <Text style={[styles.jobTitle, { color: colors.foreground }]}>{item.title}</Text>
+                        <View style={styles.metaRow}>
+                            <View style={[styles.typeBadge, { backgroundColor: colors.primary + '20' }]}>
+                                <Text style={[styles.typeText, { color: colors.primary }]}>
+                                    {item.contractType?.replace('-', ' ').toUpperCase()}
+                                </Text>
+                            </View>
+                            {item.status === 'active' && (
+                                <View style={[styles.statusBadge, { backgroundColor: '#10B98120' }]}>
+                                    <Text style={{ color: '#10B981', fontSize: 10, fontWeight: '700' }}>ACTIVE</Text>
+                                </View>
+                            )}
+                        </View>
+                    </View>
+                    <View style={[styles.iconContainer, { backgroundColor: colors.background }]}>
+                        <IconSymbol name="chevron.right" size={16} color={colors.muted} />
+                    </View>
+                </View>
+
+                <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+                <View style={styles.cardFooter}>
+                    <View style={styles.statItem}>
+                        <IconSymbol name="eye.fill" size={14} color={colors.muted} />
+                        <Text style={[styles.statText, { color: colors.muted }]}>{item.views || 0} views</Text>
+                    </View>
+                    <View style={styles.statItem}>
+                        <IconSymbol name="clock.fill" size={14} color={colors.muted} />
+                        <Text style={[styles.statText, { color: colors.muted }]}>
+                            {new Date(item.createdAt).toLocaleDateString()}
+                        </Text>
+                    </View>
+                </View>
+            </AnimatedPressable>
+        </Animated.View>
+    );
+}
+
 export default function JobList() {
     const router = useRouter();
     const colors = useColors();
@@ -18,65 +85,10 @@ export default function JobList() {
 
     const CONTENT_PADDING_BOTTOM = 120;
 
-    const renderItem = ({ item, index }: { item: any, index: number }) => {
-        const scale = useSharedValue(1);
+    const renderItem = ({ item, index }: { item: any, index: number }) => (
+        <JobCardItem item={item} index={index} colors={colors} router={router} />
+    );
 
-        const animatedStyle = useAnimatedStyle(() => ({
-            transform: [{ scale: scale.value }],
-        }));
-
-        const handlePress = () => {
-            if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push(`/b2b/edit-job?id=${item.id}` as any);
-        };
-
-        return (
-            <Animated.View entering={FadeInDown.delay(index * 100).springify().damping(15)}>
-                <AnimatedPressable
-                    onPress={handlePress}
-                    onPressIn={() => { scale.value = withSpring(0.97); }}
-                    onPressOut={() => { scale.value = withSpring(1); }}
-                    style={[styles.jobCard, animatedStyle, { backgroundColor: colors.surface }]}
-                >
-                    <View style={styles.cardHeader}>
-                        <View style={{ flex: 1 }}>
-                            <Text style={[styles.jobTitle, { color: colors.foreground }]}>{item.title}</Text>
-                            <View style={styles.metaRow}>
-                                <View style={[styles.typeBadge, { backgroundColor: colors.primary + '20' }]}>
-                                    <Text style={[styles.typeText, { color: colors.primary }]}>
-                                        {item.contractType?.replace('-', ' ').toUpperCase()}
-                                    </Text>
-                                </View>
-                                {item.status === 'active' && (
-                                    <View style={[styles.statusBadge, { backgroundColor: '#10B98120' }]}>
-                                        <Text style={{ color: '#10B981', fontSize: 10, fontWeight: '700' }}>ACTIVE</Text>
-                                    </View>
-                                )}
-                            </View>
-                        </View>
-                        <View style={[styles.iconContainer, { backgroundColor: colors.background }]}>
-                            <IconSymbol name="chevron.right" size={16} color={colors.muted} />
-                        </View>
-                    </View>
-
-                    <View style={[styles.divider, { backgroundColor: colors.border }]} />
-
-                    <View style={styles.cardFooter}>
-                        <View style={styles.statItem}>
-                            <IconSymbol name="eye.fill" size={14} color={colors.muted} />
-                            <Text style={[styles.statText, { color: colors.muted }]}>{item.views || 0} views</Text>
-                        </View>
-                        <View style={styles.statItem}>
-                            <IconSymbol name="clock.fill" size={14} color={colors.muted} />
-                            <Text style={[styles.statText, { color: colors.muted }]}>
-                                {new Date(item.createdAt).toLocaleDateString()}
-                            </Text>
-                        </View>
-                    </View>
-                </AnimatedPressable>
-            </Animated.View>
-        );
-    };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
