@@ -140,7 +140,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     
     espressoMl: 60,
     waterMl: 40,
-    ratio: '1:3 to 1:4',
+    ratio: '1:3',
     temperature: '93°C (200°F)',
     description: 'A "long" espresso shot with more water passed through the coffee, resulting in a larger, milder drink.',
     flavorProfile: ['Milder', 'More volume', 'Slightly bitter', 'Less intense'],
@@ -172,7 +172,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     milkFoamDepth: '1-2mm microfoam',
     
     espressoMl: 60,
-    ratio: '1:3 (espresso to milk)',
+    ratio: '1:3',
     temperature: '60-65°C (140-150°F)',
     description: 'A velvety smooth coffee with a double shot of espresso and silky steamed milk with minimal foam. Originated in Australia/New Zealand.',
     flavorProfile: ['Velvety', 'Strong coffee flavor', 'Creamy', 'Balanced'],
@@ -206,7 +206,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     espressoMl: 30,
     milkMl: 60,
     foamMl: 60,
-    ratio: '1:1:1 (espresso:milk:foam)',
+    ratio: '1:1:1',
     temperature: '60-65°C (140-150°F)',
     description: 'The classic Italian coffee drink with equal parts espresso, steamed milk, and thick milk foam. Often dusted with cocoa.',
     flavorProfile: ['Balanced', 'Creamy', 'Airy foam', 'Traditional'],
@@ -240,7 +240,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     
     espressoMl: 60,
     foamMl: 20,
-    ratio: '1:4 (espresso to milk)',
+    ratio: '1:4',
     temperature: '60-65°C (140-150°F)',
     description: 'A mild, milky coffee drink with espresso and lots of steamed milk. Perfect for those who prefer a gentler coffee flavor.',
     flavorProfile: ['Mild', 'Milky', 'Smooth', 'Gentle coffee'],
@@ -273,7 +273,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     
     espressoMl: 30,
     foamMl: 30,
-    ratio: '1:6 (espresso to milk)',
+    ratio: '1:6',
     temperature: '60-65°C (140-150°F)',
     description: 'Steamed milk "stained" with espresso, poured to create distinct layers. The reverse of a caffè latte.',
     flavorProfile: ['Layered', 'Milky', 'Visual appeal', 'Mild'],
@@ -307,7 +307,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     
     espressoMl: 30,
     foamMl: 15,
-    ratio: '4:1 (espresso to foam)',
+    ratio: '4:1',
     temperature: '60-65°C (140-150°F)',
     description: 'An espresso "marked" or "stained" with just a dollop of milk foam. Strong coffee with a hint of creaminess.',
     flavorProfile: ['Strong', 'Espresso-forward', 'Touch of cream', 'Bold'],
@@ -338,7 +338,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     waterMl: 150,
     
     espressoMl: 60,
-    ratio: '1:4 (espresso to water)',
+    ratio: '1:4',
     temperature: '90-95°C (194-203°F)',
     description: 'Espresso diluted with hot water, creating a coffee similar in strength to drip coffee but with espresso\'s flavor profile.',
     flavorProfile: ['Smooth', 'Less intense', 'Clean', 'Drip-like strength'],
@@ -371,7 +371,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     milkFoamDepth: 'Minimal foam',
     
     espressoMl: 30,
-    ratio: '1:1 (espresso to milk)',
+    ratio: '1:1',
     temperature: '60-65°C (140-150°F)',
     description: 'A Spanish drink meaning "cut" - espresso cut with an equal amount of warm milk to reduce acidity. Small but perfectly balanced.',
     flavorProfile: ['Balanced', 'Smooth', 'Strong', 'Reduced acidity'],
@@ -400,7 +400,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     outputMl: 130,
     
     espressoMl: 120,
-    ratio: '1:7 (coffee to water)',
+    ratio: '1:7',
     temperature: '100°C (212°F) starting water',
     description: 'Strong, rich coffee brewed on the stovetop using a Moka pot. Not true espresso, but a beloved Italian tradition.',
     flavorProfile: ['Strong', 'Rich', 'Slightly bitter', 'Full-bodied'],
@@ -430,7 +430,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     prepTime: '5 min',
     inputGrams: 30,
     waterMl: 500,
-    ratio: '1:16.7',
+    espressoMl: 500,
+    ratio: '1:16',
     temperature: '94°C (201°F)',
     description: 'A classic immersion brewing method that produces a full-bodied, rich, and textured cup of coffee by steeping grounds directly in water.',
     flavorProfile: ['Full-bodied', 'Robust', 'Rich', 'Textured'],
@@ -459,8 +460,9 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     prepTime: '2 min',
     inputGrams: 18,
     espressoMl: 36,
-    ratio: '1 scoop gelato : 1 shot espresso',
-    temperature: '93°C (200°F) espresso',
+    milkMl: 50,
+    ratio: '1:2',
+    temperature: '93°C (200°F)',
     description: 'A simple, elegant Italian dessert-beverage featuring a scoop of cold vanilla gelato drowned in a hot, freshly pulled shot of espresso.',
     flavorProfile: ['Sweet', 'Creamy', 'Contrast', 'Indulgent'],
     steps: [
@@ -486,6 +488,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     prepTime: '4 min',
     inputGrams: 7,
     waterMl: 70,
+    espressoMl: 70,
     ratio: '1:10',
     temperature: 'Simmered on heat',
     description: 'An ancient brewing method where extra-fine coffee grounds are simmered with water in a copper pot (cezve), serving unfiltered with foam.',
@@ -515,8 +518,10 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     difficulty: 'intermediate',
     prepTime: '5 min',
     inputGrams: 15,
-    waterMl: 120,
-    ratio: '120ml coffee : 40ml whiskey : 30ml cream',
+    waterMl: 40,
+    espressoMl: 120,
+    foamMl: 30,
+    ratio: '3:1:1',
     temperature: 'Hot coffee, cold cream',
     description: 'A warming cocktail of hot specialty filter coffee, Irish whiskey, and brown sugar, topped with a thick layer of cold, lightly whipped cream.',
     flavorProfile: ['Warm', 'Sweet', 'Spirited', 'Creamy contrast'],
@@ -545,7 +550,8 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     prepTime: '3 min',
     inputGrams: 15,
     waterMl: 250,
-    ratio: '1:16.6',
+    espressoMl: 250,
+    ratio: '1:17',
     temperature: '93°C (200°F)',
     description: 'A clean, bright drip brewing method that highlights the subtle floral and fruity acidity of specialty coffee using a conical V60 dripper.',
     flavorProfile: ['Clean', 'Bright acidity', 'Clarity', 'Nuanced'],
@@ -574,6 +580,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     prepTime: '12-24 hrs',
     inputGrams: 80,
     waterMl: 800,
+    espressoMl: 250,
     ratio: '1:10',
     temperature: 'Room temp or cold',
     description: 'A smooth, low-acid coffee brewed by steeping coarse grounds in cold water for a long period, resulting in a naturally sweet concentrate.',
@@ -603,7 +610,7 @@ export const coffeeRecipes: CoffeeRecipe[] = [
     inputGrams: 18,
     espressoMl: 36,
     milkMl: 150,
-    ratio: '1:4 (espresso to milk)',
+    ratio: '1:4',
     temperature: 'Cold / Iced',
     description: 'A refreshing, creamy drink made with rich espresso shots poured over cold milk and ice cubes in a tall glass.',
     flavorProfile: ['Refreshing', 'Creamy', 'Smooth', 'Mild'],
@@ -618,6 +625,140 @@ export const coffeeRecipes: CoffeeRecipe[] = [
       'Use whole milk or oat milk for a creamier texture',
       'Add simple syrup or vanilla syrup before pouring espresso if sweetness is desired',
       'Pouring the espresso slowly onto an ice cube helps preserve the layered look'
+    ]
+  },
+  {
+    id: 'mocha',
+    name: 'Caffè Mocha',
+    subtitle: 'Espresso, chocolate & milk',
+    image: require('@/assets/images/coffees/mocha.png'),
+    category: 'milk',
+    difficulty: 'beginner',
+    prepTime: '3 min',
+    inputGrams: 18,
+    espressoMl: 60,
+    milkMl: 120,
+    foamMl: 20,
+    ratio: '1:2',
+    temperature: '60-65°C (140-150°F)',
+    description: 'A chocolate-flavored variant of a caffè latte, made with a double shot of espresso, chocolate syrup or powder, steamed milk, and a thin layer of foam.',
+    flavorProfile: ['Chocolatey', 'Sweet', 'Rich', 'Creamy'],
+    steps: [
+      'Add 1-2 tablespoons of chocolate syrup to your cup',
+      'Pull a double espresso shot (18g in, 36g out) directly over the chocolate and stir to combine',
+      'Steam 120ml of milk to create a smooth, velvety microfoam',
+      'Pour the steamed milk into the espresso-chocolate mixture',
+      'Top with a light dusting of cocoa powder or chocolate flakes'
+    ],
+    tips: [
+      'Use high-quality dark chocolate syrup or cocoa powder for a rich, less cloying sweetness',
+      'Swirling the cup during pouring helps integrate the chocolate layer'
+    ]
+  },
+  {
+    id: 'piccolo',
+    name: 'Piccolo Latte',
+    subtitle: 'Small ristretto latte',
+    image: require('@/assets/images/coffees/piccolo.png'),
+    category: 'milk',
+    difficulty: 'intermediate',
+    prepTime: '2 min',
+    inputGrams: 18,
+    espressoMl: 20,
+    milkMl: 60,
+    foamMl: 10,
+    ratio: '1:3',
+    temperature: '60-65°C (140-150°F)',
+    description: 'A "small" latte served in a 90ml glass, featuring a single ristretto shot topped with warm, silky steamed milk and a thin layer of foam.',
+    flavorProfile: ['Intense', 'Creamy', 'Balanced', 'Bold milk'],
+    steps: [
+      'Grind 18g of coffee and pull a short ristretto shot (approx. 20ml output)',
+      'Steam 60ml of whole milk with minimal aeration to create thin microfoam',
+      'Pour the steamed milk slowly into the ristretto in a 90ml glass',
+      'Finish with a small heart or dot latte art'
+    ],
+    tips: [
+      'Perfect for coffee lovers who want a strong espresso taste but with the smooth texture of milk',
+      'Served traditionally in a small Gibraltar or glass cup'
+    ]
+  },
+  {
+    id: 'dirty-chai',
+    name: 'Dirty Chai',
+    subtitle: 'Chai latte with espresso',
+    image: require('@/assets/images/coffees/dirty_chai.png'),
+    category: 'alternative',
+    difficulty: 'beginner',
+    prepTime: '3 min',
+    inputGrams: 18,
+    espressoMl: 30,
+    milkMl: 150,
+    foamMl: 20,
+    ratio: '1:5',
+    temperature: '60-65°C (140-150°F)',
+    description: 'A popular fusion beverage combining a sweet, spiced chai latte (black tea infused with spices like cardamom, cinnamon, and ginger) with a single shot of espresso.',
+    flavorProfile: ['Spiced', 'Sweet', 'Complex', 'Warming'],
+    steps: [
+      'Brew a strong spiced chai tea concentrate or dissolve chai powder in 150ml of hot milk',
+      'Pull a single espresso shot (18g in, 30g out)',
+      'Pour the hot spiced milk into a mug',
+      'Pour the espresso shot directly over the spiced milk to create the "dirty" look',
+      'Dust with a pinch of cinnamon'
+    ],
+    tips: [
+      "Use a bold, dark-roasted coffee bean so its flavor isn't completely masked by the strong chai spices",
+      'For a "Double Dirty Chai", use a double shot of espresso'
+    ]
+  },
+  {
+    id: 'con-panna',
+    name: 'Espresso Con Panna',
+    subtitle: 'Espresso with whipped cream',
+    image: require('@/assets/images/coffees/con_panna.png'),
+    category: 'espresso',
+    difficulty: 'beginner',
+    prepTime: '2 min',
+    inputGrams: 18,
+    espressoMl: 60,
+    foamMl: 30,
+    ratio: '2:1',
+    temperature: '93°C (200°F)',
+    description: 'An old-school Italian classic consisting of a double shot of espresso topped with a generous dollop of cold, rich whipped cream.',
+    flavorProfile: ['Bold contrast', 'Sweet cream', 'Rich', 'Velvety'],
+    steps: [
+      'Pull a double espresso shot (18g in, 36g out) into a small demitasse cup',
+      'Whip fresh heavy cream until it holds soft peaks (avoid sweetened canned cream if possible)',
+      'Spoon or pipe a generous dollop of the cold whipped cream directly on top of the hot espresso crema',
+      'Serve immediately'
+    ],
+    tips: [
+      'Drink the hot espresso through the cold whipped cream layer without stirring',
+      'The temperature and texture contrast is the highlight of this traditional drink'
+    ]
+  },
+  {
+    id: 'red-eye',
+    name: 'Red Eye',
+    subtitle: 'Drip coffee with espresso',
+    image: require('@/assets/images/coffees/red_eye.png'),
+    category: 'espresso',
+    difficulty: 'beginner',
+    prepTime: '2 min',
+    inputGrams: 30,
+    espressoMl: 210,
+    ratio: '1:6',
+    temperature: '85-90°C (185-194°F)',
+    description: 'A high-caffeine drink combining a cup of brewed drip coffee with a single shot of espresso poured on top. Perfect for long travel or late nights.',
+    flavorProfile: ['Strong', 'Robust', 'Full-bodied', 'High-caffeine'],
+    steps: [
+      'Brew a standard 180ml cup of filter or drip coffee',
+      'Pull a single espresso shot (approx. 30ml)',
+      'Pour the fresh shot of espresso directly into the brewed cup of drip coffee',
+      'Serve black or with sugar/milk as desired'
+    ],
+    tips: [
+      'Also known as a "Black Eye" if made with a double espresso shot',
+      'Use a clean filter coffee base (like a pour-over) so the cup doesn\'t become overly bitter'
     ]
   }
 ];

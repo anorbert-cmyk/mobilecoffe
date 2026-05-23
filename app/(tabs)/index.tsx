@@ -69,6 +69,10 @@ function triggerHaptic() {
   }
 }
 
+const formatShortRatio = (ratio: string) => {
+  return ratio.replace(/\s*\(.*\)/g, '');
+};
+
 // Hero Featured Card Component
 function HeroCard({ coffee }: { coffee: CoffeeRecipe }) {
   const colors = useColors();
@@ -113,16 +117,16 @@ function HeroCard({ coffee }: { coffee: CoffeeRecipe }) {
             </View>
           </View>
           <View style={styles.heroTextContent}>
-            <Text style={styles.heroTitle}>{coffee.name}</Text>
-            <Text style={styles.heroSubtitle}>{coffee.description}</Text>
+            <Text style={styles.heroTitle} numberOfLines={1} ellipsizeMode="tail">{coffee.name}</Text>
+            <Text style={styles.heroSubtitle} numberOfLines={2} ellipsizeMode="tail">{coffee.description}</Text>
             <View style={styles.heroMeta}>
               <View style={styles.heroMetaItem}>
                 <IconSymbol name="clock.fill" size={14} color="#FFFFFF" />
-                <Text style={styles.heroMetaText}>{coffee.prepTime}</Text>
+                <Text style={styles.heroMetaText} numberOfLines={1} ellipsizeMode="tail">{coffee.prepTime}</Text>
               </View>
               <View style={styles.heroMetaItem}>
                 <IconSymbol name="chart.bar.fill" size={14} color="#FFFFFF" />
-                <Text style={styles.heroMetaText}>{coffee.difficulty}</Text>
+                <Text style={styles.heroMetaText} numberOfLines={1} ellipsizeMode="tail">{coffee.difficulty}</Text>
               </View>
             </View>
           </View>
@@ -166,19 +170,21 @@ function HorizontalCard({ coffee, index }: { coffee: CoffeeRecipe; index: number
           <View style={{ position: 'absolute', top: 8, right: 8, zIndex: 10 }}>
             <FavoriteButton id={coffee.id} type="coffee" size={22} />
           </View>
-          <View style={[
-            styles.difficultyDot,
-            { backgroundColor: getDifficultyColor(coffee.difficulty, colors) }
-          ]} />
-          <Text style={[styles.horizontalCardTitle, { color: colors.foreground }]} numberOfLines={1}>
-            {coffee.name}
-          </Text>
-          <Text style={[styles.horizontalCardSubtitle, { color: colors.muted }]} numberOfLines={1}>
-            {coffee.subtitle}
-          </Text>
+          <View style={styles.horizontalCardTextGroup}>
+            <View style={[
+              styles.difficultyDot,
+              { backgroundColor: getDifficultyColor(coffee.difficulty, colors) }
+            ]} />
+            <Text style={[styles.horizontalCardTitle, { color: colors.foreground }]} numberOfLines={1} ellipsizeMode="tail">
+              {coffee.name}
+            </Text>
+            <Text style={[styles.horizontalCardSubtitle, { color: colors.muted }]} numberOfLines={1} ellipsizeMode="tail">
+              {coffee.subtitle}
+            </Text>
+          </View>
           <View style={styles.horizontalCardMeta}>
-            <Text style={[styles.horizontalCardMetaText, { color: colors.muted }]}>
-              {coffee.prepTime} · {coffee.ratio}
+            <Text style={[styles.horizontalCardMetaText, { color: colors.muted }]} numberOfLines={1} ellipsizeMode="tail">
+              {coffee.prepTime} · {formatShortRatio(coffee.ratio)}
             </Text>
           </View>
         </View>
@@ -234,10 +240,10 @@ function SmallCard({ coffee, index }: { coffee: CoffeeRecipe; index: number }) {
           </View>
         </View>
         <View style={styles.smallCardContent}>
-          <Text style={[styles.smallCardTitle, { color: colors.foreground }]} numberOfLines={1}>
+          <Text style={[styles.smallCardTitle, { color: colors.foreground }]} numberOfLines={1} ellipsizeMode="tail">
             {coffee.name}
           </Text>
-          <Text style={[styles.smallCardSubtitle, { color: colors.muted }]} numberOfLines={1}>
+          <Text style={[styles.smallCardSubtitle, { color: colors.muted }]} numberOfLines={1} ellipsizeMode="tail">
             {coffee.prepTime}
           </Text>
         </View>
@@ -290,7 +296,7 @@ function CategoryPill({
       <Text style={[
         styles.categoryPillText,
         { color: isActive ? '#FFFFFF' : colors.foreground }
-      ]}>
+      ]} numberOfLines={1} ellipsizeMode="tail">
         {category.label}
       </Text>
     </AnimatedPressable>
@@ -651,24 +657,28 @@ const styles = StyleSheet.create({
   },
   horizontalCard: {
     width: HORIZONTAL_CARD_WIDTH,
-    height: 240,
+    height: 255,
     borderRadius: 16,
     overflow: 'hidden',
   },
   horizontalCardImage: {
     width: '100%',
-    height: 140,
+    height: 135,
   },
   horizontalCardContent: {
     padding: 14,
     flex: 1,
     justifyContent: 'space-between',
   },
+  horizontalCardTextGroup: {
+    flex: 1,
+    justifyContent: 'flex-start',
+  },
   difficultyDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   horizontalCardTitle: {
     fontSize: 17,
@@ -678,7 +688,7 @@ const styles = StyleSheet.create({
   },
   horizontalCardSubtitle: {
     fontSize: 14,
-    marginBottom: 8,
+    marginBottom: 6,
     lineHeight: 18,
   },
   horizontalCardMeta: {
@@ -728,8 +738,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   smallCardContent: {
-    padding: 12,
-    minHeight: 56,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    height: 64,
+    justifyContent: 'center',
   },
   smallCardTitle: {
     fontSize: 15,

@@ -390,9 +390,9 @@ export const demoCafes: Cafe[] = [
       {
         name: 'Brew Bar',
         items: [
-          { name: 'V60', price: 990, description: 'Choose from 3 single origins', imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80' },
-          { name: 'AeroPress', price: 890, imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=80' },
-          { name: 'Chemex (2 cups)', price: 1490, isPopular: true, imageUrl: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=400&q=80' },
+          { name: 'V60', price: 990, description: 'Choose from 3 single origins', imageUrl: require('@/assets/images/menu/v60_pour_over.png') },
+          { name: 'AeroPress', price: 890, imageUrl: require('@/assets/images/menu/aeropress.png') },
+          { name: 'Chemex (2 cups)', price: 1490, isPopular: true, imageUrl: require('@/assets/images/menu/chemex.png') },
           { name: 'Cold Drip', price: 1190, description: '8-hour slow drip', imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80' },
         ]
       },

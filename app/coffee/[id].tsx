@@ -16,6 +16,14 @@ import { useColors } from "@/hooks/use-colors";
 
 type TabType = 'recipe' | 'about' | 'tips';
 
+const formatShortRatio = (ratio: string) => {
+  return ratio.replace(/\s*\(.*\)/g, '');
+};
+
+const formatShortExtractionTime = (time: string) => {
+  return time.replace(/\s*seconds?/i, 's');
+};
+
 export default function CoffeeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
@@ -202,20 +210,20 @@ export default function CoffeeDetailScreen() {
                 <Text style={[
                   styles.difficultyText, 
                   { color: getDifficultyColor(coffee.difficulty) }
-                ]}>
+                ]} numberOfLines={1} ellipsizeMode="tail">
                   {coffee.difficulty}
                 </Text>
               </View>
               <View style={[styles.infoPill, { backgroundColor: colors.surfaceElevated }]}>
                 <IconSymbol name="clock.fill" size={14} color={colors.muted} />
-                <Text style={[styles.infoPillText, { color: colors.foreground }]}>
+                <Text style={[styles.infoPillText, { color: colors.foreground }]} numberOfLines={1} ellipsizeMode="tail">
                   {coffee.prepTime}
                 </Text>
               </View>
               <View style={[styles.infoPill, { backgroundColor: colors.surfaceElevated }]}>
                 <IconSymbol name="gauge" size={14} color={colors.muted} />
-                <Text style={[styles.infoPillText, { color: colors.foreground }]}>
-                  {coffee.ratio}
+                <Text style={[styles.infoPillText, { color: colors.foreground }]} numberOfLines={1} ellipsizeMode="tail">
+                  {formatShortRatio(coffee.ratio)}
                 </Text>
               </View>
             </View>
