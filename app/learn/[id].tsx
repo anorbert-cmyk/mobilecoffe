@@ -31,11 +31,11 @@ function triggerHaptic() {
 
 // Hero image mapping for articles - using generated premium header images
 const articleHeroImages: Record<string, any> = {
-  'brewing-basics': require('@/assets/images/learning/brewing-basics.png'),
-  'roast-levels': require('@/assets/images/learning/roast-levels.png'),
-  'coffee-origins': require('@/assets/images/learning/coffee-origins.png'),
-  'equipment-guide': require('@/assets/images/learning/equipment-guide.png'),
-  'home-setup': require('@/assets/images/learning/home-setup.png'),
+  'brewing-basics': require('@/assets/images/learning/brewing_basics.png'),
+  'roast-levels': require('@/assets/images/learning/roast_levels.png'),
+  'bean-origins': require('@/assets/images/learning/bean_origins.png'),
+  'equipment': require('@/assets/images/learning/equipment.png'),
+  'home-setup': require('@/assets/images/learning/home_setup.png'),
 };
 
 export default function LearnCategoryScreen() {
@@ -110,7 +110,7 @@ export default function LearnCategoryScreen() {
     // Try to load article specific image, fallback to category image
     // Note: In a real app we'd map these dynamically or check existence. 
     // For now we use the category image as the base, but structure allows specific ones.
-    const heroImage = articleHeroImages[selectedArticle.id] || articleHeroImages[category.id] || require('@/assets/images/espresso.png');
+    const heroImage = articleHeroImages[selectedArticle.id] || articleHeroImages[category.id] || require('@/assets/images/coffees/espresso.png');
 
     return (
       <>

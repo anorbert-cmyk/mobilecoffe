@@ -20,11 +20,11 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 // Mapping categories to the generated assets
 const categoryImages: Record<string, any> = {
-  'brewing-basics': require('@/assets/images/learn_brewing.png'),
-  'roast-levels': require('@/assets/images/learn_roasting.png'),
-  'bean-origins': require('@/assets/images/learn_origins.png'), // Mapped from 'coffee-origins' equivalent in earlier mental model, checking data
-  'equipment': require('@/assets/images/learn_equipment.png'),
-  'home-setup': require('@/assets/images/learn_home.png'),
+  'brewing-basics': require('@/assets/images/learning/brewing_basics.png'),
+  'roast-levels': require('@/assets/images/learning/roast_levels.png'),
+  'bean-origins': require('@/assets/images/learning/bean_origins.png'),
+  'equipment': require('@/assets/images/learning/equipment.png'),
+  'home-setup': require('@/assets/images/learning/home_setup.png'),
 };
 
 function LearningCard({ item, index }: { item: LearningCategory; index: number }) {
@@ -137,7 +137,7 @@ export default function LearnCoffeeScreen() {
           <View style={styles.headerContainer}>
             <View style={styles.heroContainer}>
               <Animated.Image
-                source={require('@/assets/images/learn_hero.png')}
+                source={require('@/assets/images/learning/learn_hero.png')}
                 style={[styles.heroImage, heroImageStyle]}
               />
               <LinearGradient
